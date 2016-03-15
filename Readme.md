@@ -5,10 +5,15 @@ Collection of PowerShell CmdLet that interface with ConnectWise's REST API servi
 
 ##CmdLets  
 - ConnectWise Service Tickets  
-  - `Get-CWServiceTicket`  
-  - `Add-CWServiceTicket`  
-  - `Remove-CWServiceTicket`  
+  - `Get-CWServiceTicket` (_Partially Implemented_) 
+    - Gets ticket(s) via the ticket number or array ticket numbers.
+    - Gets ticket(s) based on a query condition (*not implemented yet*).
+  - `Add-CWServiceTicket` 
+    - **_Not Implemented Yet_**
+  - `Remove-CWServiceTicket` 
+    - **_Not Implemented Yet_** 
   - `Update-CWServiceTicket` 
+    - **_Not Implemented Yet_** 
 
 ##Classes  
 - `WebRestApiClient`  
@@ -157,24 +162,26 @@ Creates a client service for the ConnectWise "Service Tickets" APIs. Inherts fro
 - Private (Helpers)
   - n/a
 - Public
-  - `Read(int ticketId)`
-    - purpose: get ticket(s)
+  - `ReadTicket(int ticketId)`
+    - purpose: get ticket
     - returns: `pscustomobject[] cwTickets`
-    - overloads: :
-      - `Read(hashtable filterHashtable)`
-      - `Read(int ticketId, string[] fields)`
-      - `Read(string ticketQuery)`
-      - `Read(string ticketQuery, string[] fields)`
-      - `Read(string ticketQuery, string[] fields, int page, int pageSize)`
-      - `Read(string ticketQuery, string[] fields, string orderBy)`
-      - `Read(string ticketQuery, string[] fields, string orderBy, int page, int pageSize)`
-  - `Create(hashtable ticketHashtable)`
+  - `ReadTickets(hashtable filterHashtable)`
+    - purpose: get tickets
+    - returns: `pscustomobject[] cwTickets`
+    - overloads:
+      - `ReadTickets(int ticketId, string[] fields)`
+      - `ReadTickets(string ticketQuery)`
+      - `ReadTickets(string ticketQuery, string[] fields)`
+      - `ReadTickets(string ticketQuery, string[] fields, int page, int pageSize)`
+      - `ReadTickets(string ticketQuery, string[] fields, string orderBy)`
+      - `ReadTickets(string ticketQuery, string[] fields, string orderBy, int page, int pageSize)`
+  - `CreateTicket(hashtable ticketHashtable)`
     - purpose: create single ticket
     - returns: `pscustomobject cwTicket`
-  - `Update(hashtable ticketHashtable)`
+  - `UpdateTicket(hashtable ticketHashtable)`
     - params: update single ticket
     - returns: `pscustomobject cwTicket`
-  - `Delete(int ticketId)`
+  - `DeleteTicket(int ticketId)`
     - params: delete single ticket
     - returns: `bool isDeleted`
     
