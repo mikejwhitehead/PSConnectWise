@@ -4,10 +4,11 @@ Collection of PowerShell CmdLet that interface with ConnectWise's REST API servi
 
 ##CmdLets Overview 
 - ConnectWise Service Tickets  
-  - `Get-CWServiceTicket` (_Partially Implemented_) 
-    - Gets ticket(s) via the ticket number or array ticket numbers.
-      - Can request for specific CW ticket fields (ie id, summary, etc). 
-    - Gets ticket(s) based on a query condition (*not implemented yet*).
+  - `Get-CWServiceTicket`
+    - **Use Case**: Gets ticket(s) via the ticket number, array of ticket numbers, or query.
+    - **Features**
+      - Request for specific CW ticket fields (ie id, summary, etc).
+      - Accepted ticket ids via the pipe.
   - `Add-CWServiceTicket` 
     - **_Not Implemented Yet_**
   - `Remove-CWServiceTicket` 
@@ -43,7 +44,7 @@ Collection of PowerShell CmdLet that interface with ConnectWise's REST API servi
 ### OneLiner Example
 0. Open PS and Import Module (*see above*)
 0. Execute in PowerShell:
-   - `Get-CWServiceDeskTicket -TicketID 1234567 -BaseApiEndpointUrl "https://TechInUrPocket.example.com/v4_6_Release/apis/3.0" -CompanyName "TechInYourPocket" -PublicKey 'Pub1icK3yH3r3' -PrivateKey 'Pri@t3K3yH3r3';`
+   - `Get-CWServiceTicket -TicketID 1234567 -BaseApiUrl "https://TechInUrPocket.example.com/v4_6_Release/apis/3.0" -CompanyName "TechInUrPocket" -PublicKey 'Pub1icK3yH3r3' -PrivateKey 'Pri@t3K3yH3r3';`
 
 #Creating CW Memeber API Keys
 
