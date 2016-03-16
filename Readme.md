@@ -6,6 +6,7 @@ Collection of PowerShell CmdLet that interface with ConnectWise's REST API servi
 - ConnectWise Service Tickets  
   - `Get-CWServiceTicket` (_Partially Implemented_) 
     - Gets ticket(s) via the ticket number or array ticket numbers.
+      - Can request for specific CW ticket fields (ie id, summary, etc). 
     - Gets ticket(s) based on a query condition (*not implemented yet*).
   - `Add-CWServiceTicket` 
     - **_Not Implemented Yet_**
