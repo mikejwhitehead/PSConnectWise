@@ -56,14 +56,15 @@ class WebRestApiRequest
     {
         [string] $queryString = "";
         
-        foreach ($p in $queryParams)
+        foreach ($p in $queryParams.GetEnumerator())
         {
             if ($p.Value -eq $null)
             {
                 continue;    
             }
             
-            $queryString = _concateQueryString($p.Key, $p.Value);
+            $subQuery = [String]::Format("{0}={1}", $p.Key, $p.Value);
+            $queryString = [WebRestApiRequest]::_concateQueryString($queryString, $subQuery);
         }
         
         return $queryString;
@@ -154,13 +155,13 @@ class CWApiRestClient
         return $response;
     }
     
-    [string] BuildCWQueryString([hashtable] $queryParams)
+    static hidden [string] buildCWQueryString([hashtable] $queryParams)
     {
         [string[]] $validParams = @("fields", "page", "pagesize", "orderby", "conditions");
         [string] $queryString = "";
         [hashtable] $vettedQueryParams = @{}
         
-        foreach ($p in $queryParams)
+        foreach ($p in $queryParams.GetEnumerator())
         {
             if ($p.Key -notin $validParams)
             {
@@ -173,10 +174,10 @@ class CWApiRestClient
        
         if ($vettedQueryParams.Count -gt 0)
         {
-           $queryString = WebRestApiRequest.BuildQueryString($vettedQueryParams);
+           $queryString = [WebRestApiRequest]::BuildQueryString($vettedQueryParams);
         }
         
-        return = $queryString;
+        return $queryString;
     }    
         
     [string] BuildUrl([string] $relativePathUri, [string] $queryString)
@@ -267,10 +268,15 @@ class CwApiServiceTicketSvc
     
     [pscustomobject] ReadTicket([int] $ticketId, [string[]] $fields)
     {
+        [hashtable] $queryParam = @{ 
+            fields = ([string] [String]::Join(",", $fields)).TrimEnd(",");
+        }
+        [string] $queryString = [CWApiRestClient]::buildCWQueryString($queryParam);
+        
         [CWApiRequestInfo] $request = [CWApiRequestInfo]::new();
         $request.RelativePathUri = "/$ticketID";
         $request.Verb            = "GET";
-        $request.QueryString     = [string]::Join(",", $fields);
+        $request.QueryString     = $queryString
         
         return $this.read($request);
     }
@@ -337,8 +343,9 @@ function Get-CWServiceDeskTicket
             [string[]] $selectedFields = $null;
             if ($Fields -ne $null)
             {
-                if ($Fields.Count() -eq 1 -and !($Fields[0].Trim() -ne "*"))
+                if (!($Fields.Length -eq 1 -and $Fields[0].Trim() -ne "*"))
                 {
+                    # TODO add parser for valid fields only
                     $selectedFields = $Fields;
                 }
             }
@@ -346,7 +353,7 @@ function Get-CWServiceDeskTicket
             foreach ($ticket in $TicketID)
             {
                 Write-Verbose "Requesting ConnectWise Ticket Number: $ticket";
-                if ($selectedFields -eq $null -or $selectedFields.Count() -eq 0)
+                if ($selectedFields -eq $null -or $selectedFields.Length -eq 0)
                 {
                     $TicketSvc.ReadTicket($ticket);
                 }
