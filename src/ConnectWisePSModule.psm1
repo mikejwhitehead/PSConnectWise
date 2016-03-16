@@ -1,4 +1,4 @@
-class WebRestApiRequest 
+class WebRestApiRequest
 {
     # public properties
     [string] $Url;
@@ -86,6 +86,22 @@ class WebRestApiRequest
     
 }
 
+class CWApiRequestInfo
+{
+    # this acts more like stuct than a class
+    # it holds the request information used by the CWApiRestClient class
+    
+    [string] $RelativePathUri;
+    [string] $QueryString;
+    [string] $Verb;
+    [string] $Body;
+    
+    CWApiRestClientRequest()
+    {
+        # empty constr    
+    }    
+}
+
 class CWApiRestClient 
 {
     # public properties
@@ -118,15 +134,15 @@ class CWApiRestClient
         transformHttpHeader($header);
     }
     
-    [pscustomobject] Request([hashtable] $requestHashtable)
+    [pscustomobject] Request([CWApiRequestInfo] $request)
     {
         $header = $this.HttpHeader;
-        $url    = $this.BuildUrl($requestHashtable['RelativePathUri'], $requestHashtable['QueryString']);
-        $verb   = $requestHashtable['Verb'];
+        $url    = $this.BuildUrl($request.RelativePathUri, $request.QueryString);
+        $verb   = $request.Verb;
         
-        if ($requestHashtable['Body'] -ne $null)
+        if ($request.QueryString -ne $null)
         {
-            $body   = $requestHashtable['Body'] | ConvertTo-Json -Depth 100 | Out-String; 
+            $body = $request.Body | ConvertTo-Json -Depth 100 | Out-String; 
         }
         else
         {
@@ -242,16 +258,29 @@ class CwApiServiceTicketSvc
     
     [pscustomobject] ReadTicket([int] $ticketId)
     {
-        [hashtable] $request = @{
-            RelativePathUri = "/$ticketID";
-            QueryString = "";
-            Verb = "GET";
-            Body = $null;
-        }
-        
-        $ticket = $this.CWApiClient.Request($request);
-        return $ticket;   
+        $request = [CWApiRequestInfo]::new();
+        $request.RelativePathUri = "/$ticketID";
+        $request.Verb            = "GET";
+
+        return $this.read($request);
     }
+    
+    [pscustomobject] ReadTicket([int] $ticketId, [string[]] $fields)
+    {
+        [CWApiRequestInfo] $request = [CWApiRequestInfo]::new();
+        $request.RelativePathUri = "/$ticketID";
+        $request.Verb            = "GET";
+        $request.QueryString     = [string]::Join(",", $fields);
+        
+        return $this.read($request);
+    }
+    
+    hidden [pscustomobject] read([hashtable] $requestHashtable) 
+    {
+        $ticket = $this.CWApiClient.Request($requestHashtable);
+        return $ticket; 
+    }
+  
 }
 
 function Get-CWServiceDeskTicket 
@@ -260,32 +289,35 @@ function Get-CWServiceDeskTicket
     param
     (
         [Parameter(ParameterSetName='SingleTicket', Position=0, Mandatory=$true)]
+        [Parameter(ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [int[]]$TicketID,
-        # [Parameter(ParameterSetName='MultiTickets', Position=0, Mandatory=$true)]
-        # [ValidateNotNullOrEmpty()]
-        # [string]$Query,
-        # [Parameter(ParameterSetName='MultiTickets', Mandatory=$false)]
-        # [string]$Fields,
-        # [Parameter(ParameterSetName='MultiTickets', Mandatory=$false)]
-        # [string]$OrderBy,
-        # [Parameter(ParameterSetName='MultiTickets', Mandatory=$false)]
-        # [int]$Page,
-        # [Parameter(ParameterSetName='MultiTickets', Mandatory=$false)]
-        # [int]$PageSize,
-        # [Parameter(ParameterSetName='SingleTicket', Position=1, Mandatory=$true)]
-        # [Parameter(ParameterSetName='MultiTickets', Position=1, Mandatory=$true)]
-        # [ValidateNotNullOrEmpty()]
-        [string]$BaseApiEndpointUrl,
+        #[Parameter(ParameterSetName='MultiTickets', Position=0, Mandatory=$true)]
+        #[ValidateNotNullOrEmpty()]
+        #[string]$Query,
+        [Parameter(ParameterSetName='SingleTicket', Position=1, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        #[Parameter(ParameterSetName='MultiTickets', Mandatory=$false)]
+        [string[]]$Fields,
+        #[Parameter(ParameterSetName='MultiTickets', Mandatory=$false)]
+        #[string]$OrderBy,
+        #[Parameter(ParameterSetName='MultiTickets', Mandatory=$false)]
+        #[int]$Page,
+        #[Parameter(ParameterSetName='MultiTickets', Mandatory=$false)]
+        #[int]$PageSize,
         [Parameter(ParameterSetName='SingleTicket', Position=2, Mandatory=$true)]
+        #[Parameter(ParameterSetName='MultiTickets', Position=1, Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$BaseApiEndpointUrl,
+        [Parameter(ParameterSetName='SingleTicket', Position=3, Mandatory=$true)]
         #[Parameter(ParameterSetName='MultiTickets', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$CompanyName,
-        [Parameter(ParameterSetName='SingleTicket', Position=3, Mandatory=$true)]
+        [Parameter(ParameterSetName='SingleTicket', Position=4, Mandatory=$true)]
         #[Parameter(ParameterSetName='MultiTickets', Position=3, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$PublicKey,
-        [Parameter(ParameterSetName='SingleTicket', Position=4, Mandatory=$true)]
+        [Parameter(ParameterSetName='SingleTicket', Position=5, Mandatory=$true)]
         #[Parameter(ParameterSetName='MultiTickets', Position=4, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$PrivateKey
@@ -297,23 +329,38 @@ function Get-CWServiceDeskTicket
     }
     Process
     {
+        Write-Debug "Retrieving ConnectWise Tickets by Ticket ID"
+        
         if ($TicketID -ne $null)
         {
-            foreach ($ticket in $TicketID)
+            # determines if to select all fields or specific fields
+            [string[]] $selectedFields = $null;
+            if ($Fields -ne $null -or $Fields.Count() -eq 0 -or ($Fields.Count() -eq 1 -and ($Fields[0].Trim() -ne "*")))
             {
-                Write-Verbose "Getting Ticket Number: $ticket";
-                $TicketSvc.ReadTicket($ticket);
+                $selectedFields = $Fields;
             }
             
+            foreach ($ticket in $TicketID)
+            {
+                Write-Verbose "Requesting ConnectWise Ticket Number: $ticket";
+                if ($selectedFields -eq $null -or $selectedFields.Count() -eq 0)
+                {
+                    $TicketSvc.ReadTicket($ticket);
+                }
+                else 
+                {
+                    $TicketSvc.ReadTicket($ticket, $selectedFields);
+                }
+            }
         }
         else
         {
-            Write-Debug "Using the filtering method in the Get-CWServiceDeskTicket function."
+            Write-Debug "Filtering for ConnectWise Tickets"
         }
     }
     End
     {
-        
+        # do nothing here
     }
 }
 
