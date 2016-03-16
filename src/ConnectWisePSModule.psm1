@@ -275,7 +275,7 @@ class CwApiServiceTicketSvc
         return $this.read($request);
     }
     
-    hidden [pscustomobject] read([hashtable] $requestHashtable) 
+    hidden [pscustomobject] read([CWApiRequestInfo] $requestHashtable) 
     {
         $ticket = $this.CWApiClient.Request($requestHashtable);
         return $ticket; 
@@ -335,9 +335,12 @@ function Get-CWServiceDeskTicket
         {
             # determines if to select all fields or specific fields
             [string[]] $selectedFields = $null;
-            if ($Fields -ne $null -or $Fields.Count() -eq 0 -or ($Fields.Count() -eq 1 -and ($Fields[0].Trim() -ne "*")))
+            if ($Fields -ne $null)
             {
-                $selectedFields = $Fields;
+                if ($Fields.Count() -eq 1 -and !($Fields[0].Trim() -ne "*"))
+                {
+                    $selectedFields = $Fields;
+                }
             }
             
             foreach ($ticket in $TicketID)
