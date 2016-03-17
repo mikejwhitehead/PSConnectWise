@@ -17,6 +17,8 @@ Collection of PowerShell CmdLet that interface with ConnectWise's REST API servi
     - **_Not Implemented Yet_** 
 
 #Other
+- The *pester* Directory Stores the Unit Test Scripts
+  - See [Readme](https://github.com/sgtoj/ConnectWisePSModule/tree/master/pester)
 - [Documented Architecture](https://github.com/sgtoj/ConnectWisePSModule/blob/master/doc/ClassArchitectures.md) of the Dependent PS Classes
   - It is not required to read or understand it to use PowerShell CmdLets.
   - Its target is future contributors to this project. 
@@ -33,7 +35,8 @@ Collection of PowerShell CmdLet that interface with ConnectWise's REST API servi
 ##Importing Module to PowerShell
 
 ###Importing Module for the current PS Session
-0. Download this Repository
+0. Download or Clone this Repository
+   -  Or [Download](https://github.com/sgtoj/ConnectWisePSModule/tree/master/src) Only the  `ConnectWisePSModule.psm1` Module File
 0. Open PowerShell
 0. Import the Module (.psm1) within the `scr` Directory
    - `Import-Module "C:\Path\To\ConnectWisePSModule\scr\ConnectWisePSModule.psm1" -Force;`
@@ -52,15 +55,15 @@ Collection of PowerShell CmdLet that interface with ConnectWise's REST API servi
 
 ##Create Keys for Normal Memeber
 
-0. Go to Respective Memeber's 'My Account' Page
-   ![My Account Link](https://raw.githubusercontent.com/sgtoj/ConnectWisePSModule/master/doc/imgs/createapikey-1.png)
-0. Click on the API Key Tab
-   ![My Account Link](https://raw.githubusercontent.com/sgtoj/ConnectWisePSModule/master/doc/imgs/createapikey-2.png)
-0. Click on the Plus Button to Add a New Key
-   ![My Account Link](https://raw.githubusercontent.com/sgtoj/ConnectWisePSModule/master/doc/imgs/createapikey-3.png)
-0. Add a Description and Click on the Save Button
-   ![My Account Link](https://raw.githubusercontent.com/sgtoj/ConnectWisePSModule/master/doc/imgs/createapikey-4.png)
-0. Write Down Public and Private Keys
+0. Go to Respective Memeber's 'My Account' Page  
+   ![My Account Link](https://raw.githubusercontent.com/sgtoj/ConnectWisePSModule/master/doc/imgs/createapikey-1.png)  
+0. Click on the API Key Tab  
+   ![My Account Link](https://raw.githubusercontent.com/sgtoj/ConnectWisePSModule/master/doc/imgs/createapikey-2.png)  
+0. Click on the Plus Button to Add a New Key  
+   ![My Account Link](https://raw.githubusercontent.com/sgtoj/ConnectWisePSModule/master/doc/imgs/createapikey-3.png)  
+0. Add a Description and Click on the Save Button  
+   ![My Account Link](https://raw.githubusercontent.com/sgtoj/ConnectWisePSModule/master/doc/imgs/createapikey-4.png)  
+0. Write Down Public and Private Keys  
 
 *__Note__: Same account restrictions that apply for the member in the ConnectWise Client will apply through the API too. In the above example, it shows how to create a API key for a normal ConnectWise member. However, an 'API Member Only' memeber can be created.*
 
