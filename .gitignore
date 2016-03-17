@@ -46,6 +46,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Development Folders
-.vscode
-.test
+# Development and Testing items
+.hidden/
+.test.variables.ps1
