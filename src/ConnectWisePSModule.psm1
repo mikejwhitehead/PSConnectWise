@@ -313,21 +313,18 @@ function Get-CWServiceTicket
     [CmdLetBinding()]
     param
     (
-        [Parameter(ParameterSetName='SingleTicket', Position=0, Mandatory=$true)]
-        [Parameter(ValueFromPipeline=$true)]
+        [Parameter(ParameterSetName='SingleTicket', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [int[]]$TicketID,
         [Parameter(ParameterSetName='TicketQuery', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$Query,
+        [string]$Filter,
         [Parameter(ParameterSetName='SingleTicket', Position=1, Mandatory=$false)]
         [Parameter(ParameterSetName='TicketQuery', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [string[]]$Fields,
+        [string[]]$Property,
         #[Parameter(ParameterSetName='TicketQuery', Mandatory=$false)]
         #[string]$OrderBy,
-        #[Parameter(ParameterSetName='TicketQuery', Mandatory=$false)]
-        #[int]$Page,
         #[Parameter(ParameterSetName='TicketQuery', Mandatory=$false)]
         #[int]$PageSize,
         [Parameter(ParameterSetName='SingleTicket', Position=2, Mandatory=$true)]
@@ -354,21 +351,21 @@ function Get-CWServiceTicket
     }
     Process
     {
-        if (![String]::IsNullOrWhiteSpace($Query))
+        if (![String]::IsNullOrWhiteSpace($Filter))
         {
-            Write-Debug "Requesting Ticket IDs that Meets this Query: $Query";
-            $queriedTickets = $TicketSvc.ReadTickets($Query, [string[]] @("id"));
+            Write-Debug "Requesting Ticket IDs that Meets this Filter: $Filter";
+            $queriedTickets = $TicketSvc.ReadTickets($Filter, [string[]] @("id"));
             [int[]] $TicketID = $queriedTickets.id
         }
         
         # determines if to select all fields or specific fields
         [string[]] $selectedFields = $null;
-        if ($Fields -ne $null)
+        if ($Property -ne $null)
         {
-            if (!($Fields.Length -eq 1 -and $Fields[0].Trim() -ne "*"))
+            if (!($Property.Length -eq 1 -and $Property[0].Trim() -ne "*"))
             {
                 # TODO add parser for valid fields only
-                $selectedFields = $Fields;
+                $selectedFields = $Property;
             }
         }
         
