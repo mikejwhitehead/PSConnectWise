@@ -45,11 +45,19 @@ Describe 'Get-CWServiceTicket' {
 		$ticket.id | Should Be $pstrTicketID;		
 	}
 	
+	It 'gets ticket based on the -Filter param and uses the SizeLimit param' {
+		$filter = "id = $pstrTicketID";
+		$pageSize = 2;
+		$ticket = Get-CWServiceTicket -Filter $filter -SizeLimit 2 -BaseApiUrl $pstrSvrUrl -CompanyName $pstrCompany -PublicKey $pstrSvrPublicKey -PrivateKey $pstrSvrPrivateKey;
+		$ticket.id | Should Be $pstrTicketID;		
+	}
+	
 	It 'gets tickets and sorts ticket id by descending piping cmdlet through Sort-Object cmdlet' {
 		$ticketIDs = $pstrTicketIDs;
 		$tickets = Get-CWServiceTicket -TicketID $ticketIDs -BaseApiUrl $pstrSvrUrl -CompanyName $pstrCompany -PublicKey $pstrSvrPublicKey -PrivateKey $pstrSvrPrivateKey | Sort -Descending id;
 		$maxTicketId = $ticketIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
 		$tickets[0].id | Should Be $maxTicketId;		
 	}
+	
 
 } 
