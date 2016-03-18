@@ -97,15 +97,6 @@ class CWApiRequestInfo
     [string] $Verb;
     [string] $Body;
     
-    CWApiRequestInfo()
-    {
-        # empty constr    
-    }
-    
-    CWApiRequestInfo([string] $HttpVerb)
-    {
-        $this.Verb = $HttpVerb;
-    }
 }
 
 class CWApiRestClient 
@@ -140,11 +131,11 @@ class CWApiRestClient
         transformHttpHeader($header);
     }
     
-    [pscustomobject] Request([CWApiRequestInfo] $request)
+    [pscustomobject] Get ([CWApiRequestInfo] $request)
     {
         $header = $this.HttpHeader;
         $url    = $this.BuildUrl($request.RelativePathUri, $request.QueryString);
-        $verb   = $request.Verb;
+        $verb   = "GET"
         
         if ($request.QueryString -ne $null)
         {
@@ -155,10 +146,9 @@ class CWApiRestClient
             $body = $null;     
         }
         
-        $client = [WebRestApiRequest]::new($header, $url, $verb, $body);
-        $response = $client.Invoke();
-        return $response;
+        return $this._request($header, $url, $verb, $body);
     }
+    
     
     static hidden [string] buildCWQueryString([hashtable] $queryParams)
     {
@@ -228,6 +218,13 @@ class CWApiRestClient
         
         return $header;
     }
+    
+    [pscustomobject] _request ($header, $url, $verb, $body)
+    {
+        $client = [WebRestApiRequest]::new($header, $url, $verb, $body);
+        $response = $client.Invoke();
+        return $response;
+    }
 
     hidden [string] _createCWAuthenticationString()
     {   
@@ -274,122 +271,71 @@ class CwApiServiceTicketSvc
         }
         [string] $queryString = [CWApiRestClient]::buildCWQueryString($queryParams);
         
-        $request = [CWApiRequestInfo]::new("GET");
+        $request = [CWApiRequestInfo]::new();
         $request.RelativePathUri = "/$ticketID";
-        $request.QueryString     = $queryString
+        $request.QueryString     = $queryString;
         
         return $this.read($request);
     }
     
-    [pscustomobject[]] ReadTickets([string] $ticketQuery)
+    [pscustomobject[]] ReadTickets([string] $ticketConditions)
     {
-        return $this.ReadTickets($ticketQuery, "*");
+        return $this.ReadTickets($ticketConditions, "*");
     }
     
-    [pscustomobject[]] ReadTickets([string] $ticketQuery, [string[]] $fields)
+    [pscustomobject[]] ReadTickets([string] $ticketConditions, [string[]] $fields)
+    {        
+        return $this.ReadTickets($ticketConditions, $fields, 1);
+    }
+    
+    [pscustomobject[]] ReadTickets([string] $ticketConditions, [string[]] $fields, [uint32] $pageNum)
+    {        
+        return $this.ReadTickets($ticketConditions, $fields, 1, 0);
+    }
+    
+    [pscustomobject[]] ReadTickets([string] $ticketConditions, [string[]] $fields, [uint32] $pageNum, [uint32] $pageSize)
     {
+        $MAX_PAGE_REQUEST_SIZE = 50;
+        
+        if ($pageSize -eq 0)
+        {
+            $pageSize = $MAX_PAGE_REQUEST_SIZE;
+        }
+        
         [hashtable] $queryParams = @{
-            conditions = $ticketQuery
+            conditions = $ticketConditions
             fields     = ([string] [String]::Join(",", $fields)).TrimEnd(",");
+            page       = $pageNum;
+            pageSize   = $pageSize;
         }
         [string] $queryString = [CWApiRestClient]::buildCWQueryString($queryParams);
         
-        $request = [CWApiRequestInfo]::new("GET");
+        $request = [CWApiRequestInfo]::new();
         $request.QueryString = $queryString;
         
         return $this.read($request);
     }
     
+    [uint32] GetTicketCount([string] $ticketConditions)
+    {
+        [hashtable] $queryParams = @{
+            conditions = $ticketConditions;
+        }
+        [string] $queryString = [CWApiRestClient]::buildCWQueryString($queryParams)
+        
+        $request = [CWApiRequestInfo]::new();
+        $request.RelativePathUri = "/count";
+        $request.QueryString = $queryString;
+        
+        return [uint32] ($this.read($request).count);
+    }
+    
     hidden [pscustomobject] read([CWApiRequestInfo] $requestHashtable) 
     {
-        $ticket = $this.CWApiClient.Request($requestHashtable);
-        return $ticket; 
+        $items = $this.CWApiClient.Get($requestHashtable);
+        return $items; 
     }
+    
+    
   
 }
-
-function Get-CWServiceTicket 
-{
-    [CmdLetBinding()]
-    param
-    (
-        [Parameter(ParameterSetName='SingleTicket', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
-        [ValidateNotNullOrEmpty()]
-        [int[]]$TicketID,
-        [Parameter(ParameterSetName='TicketQuery', Position=0, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$Filter,
-        [Parameter(ParameterSetName='SingleTicket', Position=1, Mandatory=$false)]
-        [Parameter(ParameterSetName='TicketQuery', Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [string[]]$Property,
-        #[Parameter(ParameterSetName='TicketQuery', Mandatory=$false)]
-        #[string]$OrderBy,
-        #[Parameter(ParameterSetName='TicketQuery', Mandatory=$false)]
-        #[int]$PageSize,
-        [Parameter(ParameterSetName='SingleTicket', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='TicketQuery', Position=1, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$BaseApiUrl,
-        [Parameter(ParameterSetName='SingleTicket', Position=3, Mandatory=$true)]
-        [Parameter(ParameterSetName='TicketQuery', Position=2, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$CompanyName,
-        [Parameter(ParameterSetName='SingleTicket', Position=4, Mandatory=$true)]
-        [Parameter(ParameterSetName='TicketQuery', Position=3, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PublicKey,
-        [Parameter(ParameterSetName='SingleTicket', Position=5, Mandatory=$true)]
-        [Parameter(ParameterSetName='TicketQuery', Position=4, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PrivateKey
-    )
-    
-    Begin
-    {
-        $TicketSvc = [CwApiServiceTicketSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
-    }
-    Process
-    {
-        if (![String]::IsNullOrWhiteSpace($Filter))
-        {
-            Write-Debug "Requesting Ticket IDs that Meets this Filter: $Filter";
-            $queriedTickets = $TicketSvc.ReadTickets($Filter, [string[]] @("id"));
-            [int[]] $TicketID = $queriedTickets.id
-        }
-        
-        # determines if to select all fields or specific fields
-        [string[]] $selectedFields = $null;
-        if ($Property -ne $null)
-        {
-            if (!($Property.Length -eq 1 -and $Property[0].Trim() -ne "*"))
-            {
-                # TODO add parser for valid fields only
-                $selectedFields = $Property;
-            }
-        }
-        
-        if ($TicketID -ne $null)
-        {
-            Write-Debug "Retrieving ConnectWise Tickets by Ticket ID"
-            foreach ($ticket in $TicketID)
-            {
-                Write-Verbose "Requesting ConnectWise Ticket Number: $ticket";
-                if ($selectedFields -eq $null -or $selectedFields.Length -eq 0)
-                {
-                    $TicketSvc.ReadTicket($ticket);
-                }
-                else 
-                {
-                    $TicketSvc.ReadTicket($ticket, $selectedFields);
-                }
-            }
-        }
-    }
-    End
-    {
-        # do nothing here
-    }
-}
-
-Export-ModuleMember -Function 'Get-CWServiceTicket';
