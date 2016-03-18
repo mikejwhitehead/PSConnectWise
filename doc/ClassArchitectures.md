@@ -189,9 +189,12 @@ Creates a client service for the ConnectWise "Service Tickets" APIs. Inherts fro
     - overloads:
       - `ReadTickets(string ticketQuery)`
       - `ReadTickets(string ticketQuery, string[] fields)`
-      - `ReadTickets(string ticketQuery, string[] fields, int page, int pageSize)`
+      - `ReadTickets(string ticketQuery, string[] fields, int32 page, int32 pageSize)`
       - `ReadTickets(string ticketQuery, string[] fields, string orderBy)`
       - `ReadTickets(string ticketQuery, string[] fields, string orderBy, int page, int pageSize)`
+  - `GetTicketCount(string ticketConditions)`
+    - purpose: gets the count of tickets that meets the conditions
+    - returns: `uint32`
   - `CreateTicket(hashtable ticketHashtable)`
     - purpose: create single ticket
     - returns: `pscustomobject cwTicket`
