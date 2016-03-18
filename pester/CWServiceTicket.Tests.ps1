@@ -1,7 +1,7 @@
 # remove module if it exist and re-imports it
 $WorkspaceRoot = $(Get-Item $PSScriptRoot).Parent.FullName
 Remove-Module "ConnectWisePSModule" -ErrorAction Ignore
-Import-Module "$WorkspaceRoot\src\ConnectWisePSModule.psm1" -Force 
+Import-Module "$WorkspaceRoot\src\CWServiceTicketCmdLets.psm1" -Force 
 
 # dot-sources the definition file to get static variables (prefixed with 'pstr') to be used for testing
 . "$WorkspaceRoot\pester\.pester.variables.ps1" 
@@ -43,6 +43,13 @@ Describe 'Get-CWServiceTicket' {
 		$filter = "id = $pstrTicketID";
 		$ticket = Get-CWServiceTicket -Filter $filter -BaseApiUrl $pstrSvrUrl -CompanyName $pstrCompany -PublicKey $pstrSvrPublicKey -PrivateKey $pstrSvrPrivateKey;
 		$ticket.id | Should Be $pstrTicketID;		
+	}
+	
+	It 'gets tickets and sorts ticket id by descending piping cmdlet through Sort-Object cmdlet' {
+		$ticketIDs = $pstrTicketIDs;
+		$tickets = Get-CWServiceTicket -TicketID $ticketIDs -BaseApiUrl $pstrSvrUrl -CompanyName $pstrCompany -PublicKey $pstrSvrPublicKey -PrivateKey $pstrSvrPrivateKey | Sort -Descending id;
+		$maxTicketId = $ticketIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
+		$tickets[0].id | Should Be $maxTicketId;		
 	}
 
 } 
