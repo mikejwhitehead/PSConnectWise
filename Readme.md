@@ -1,12 +1,15 @@
-#Description  
+#Readme  
+
+##Description
 
 Collection of PowerShell CmdLet that interface with ConnectWise's REST API service. This project is meant to target the latest general releases of PowerShell and ConnectWise.
 
-##CmdLets Milestones
+##Version 1.0.0 Milestones
+Milestone Requirement: Create the minimum  required CmdLets that is needed to get, create, update, and delete a ConnectWise ticket. 
 
 0. `Get-CWServiceTicket` -- **Completed**
 0. `Remove-CWServiceTicket`
-0. `Get-CWServiceBoard`
+0. `Get-CWServiceBoard` -- **Completed**
 0. `Get-CWServiceBoardStatus`
 0. `Get-CWServicePriority`
 0. `Add-CWServiceTicket`
@@ -25,8 +28,16 @@ Collection of PowerShell CmdLet that interface with ConnectWise's REST API servi
     - **_Not Implemented Yet_** 
   - `Update-CWServiceTicket` 
     - **_Not Implemented Yet_** 
+    
+- ConnectWise Service Boards  
+  - `Get-CWServiceBoard`
+    - **Use Case**: Gets board(s) via the board number, array of board numbers, or query.
+    - **Features**
+      - Request for specific CW board fields (ie id, summary, etc).
+      - Accepted board ids via the pipe.
 
 #Other
+- There is no module manifest until initial v1.0.0 milestones are meet. 
 - The *pester* Directory Stores the Unit Test Scripts
   - See [Readme](https://github.com/sgtoj/ConnectWisePSModule/tree/master/pester)
 - [Documented Architecture](https://github.com/sgtoj/ConnectWisePSModule/blob/master/doc/ClassArchitectures.md) of the Dependent PS Classes
@@ -40,7 +51,7 @@ Collection of PowerShell CmdLet that interface with ConnectWise's REST API servi
 - CW Member's Public and Private API Key
 - ConnectWise Service's Base URL for API Request
 
-#How To Use
+#Example Instructions
 
 ##Importing Module to PowerShell
 

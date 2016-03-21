@@ -187,20 +187,55 @@ Creates a client service for the ConnectWise "Service Tickets" APIs. Inherts fro
     - purpose: get tickets
     - returns: `pscustomobject[] cwTickets`
     - overloads:
-      - `ReadTickets(string ticketQuery)`
-      - `ReadTickets(string ticketQuery, string[] fields)`
-      - `ReadTickets(string ticketQuery, string[] fields, int32 page, int32 pageSize)`
-      - `ReadTickets(string ticketQuery, string[] fields, string orderBy)`
-      - `ReadTickets(string ticketQuery, string[] fields, string orderBy, int page, int pageSize)`
-  - `GetTicketCount(string ticketConditions)`
+      - `ReadTickets(string ticketFilter)`
+      - `ReadTickets(string ticketFilter, string[] fields)`
+      - `ReadTickets(string ticketFilter, string[] fields, int32 page, int32 pageSize)`
+      - `ReadTickets(string ticketFilter, string[] fields, string orderBy)`
+      - `ReadTickets(string ticketFilter, string[] fields, string orderBy, int page, int pageSize)`
+  - `GetTicketCount(string ticketConditions)` 
     - purpose: gets the count of tickets that meets the conditions
     - returns: `uint32`
-  - `CreateTicket(hashtable ticketHashtable)`
+  - `CreateTicket(hashtable ticketHashtable)` - *Not Implemented*
     - purpose: create single ticket
     - returns: `pscustomobject cwTicket`
-  - `UpdateTicket(hashtable ticketHashtable)`
+  - `UpdateTicket(hashtable ticketHashtable)` - *Not Implemented*
     - params: update single ticket
-    - returns: `pscustomobject cwTicket`
-  - `DeleteTicket(int ticketId)`
+    - returns: `pscustomobject cwTicket` 
+  - `DeleteTicket(int ticketId)` - *Not Implemented*
     - params: delete single ticket
     - returns: `bool isDeleted`
+
+##CwApiServiceBoardSvc
+
+###Purpose
+Creates a client service for the ConnectWise "Service Boards" APIs. Inherts from the `CWApiRestClient` class. 
+
+###Contructors
+- `CwApiServiceBoardSvc(string baseUrl, string companyName, string publicKey, string privateKey)`
+
+###Properties
+- Private (Hidden)
+  - n/a
+- Public 
+  - `CWApiClient`
+    - purpose: reference to the CW API client
+    - type: `CWApiRestClient`
+    
+###Methods
+- Private (Helpers)
+  - n/a
+- Public
+  - `ReadBoard(int boardID)`
+    - purpose: get board
+    - returns: `pscustomobject[] cwBoards`
+  - `ReadBoards(hashtable filterHashtable)`
+    - purpose: get board
+    - returns: `pscustomobject[] cwBoards`
+    - overloads:
+      - `ReadBoards(string boardFilter)`
+      - `ReadBoards(string boardFilter, int32 page, int32 pageSize)`
+      - `ReadBoards(string boardFilter, string orderBy)`
+      - `ReadBoards(string boardFilter, string orderBy, int page, int pageSize)`
+  - `GetBoardCount(string boardFilter)` 
+    - purpose: gets the count of board that meets the conditions
+    - returns: `uint32`
