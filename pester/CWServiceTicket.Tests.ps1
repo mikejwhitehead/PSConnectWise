@@ -1,6 +1,6 @@
 # remove module if it exist and re-imports it
 $WorkspaceRoot = $(Get-Item $PSScriptRoot).Parent.FullName
-Remove-Module "ConnectWisePSModule" -ErrorAction Ignore
+Remove-Module "CWServiceTicketCmdLets" -ErrorAction Ignore
 Import-Module "$WorkspaceRoot\src\CWServiceTicketCmdLets.psm1" -Force 
 
 # dot-sources the definition file to get static variables (prefixed with 'pstr') to be used for testing
@@ -46,10 +46,10 @@ Describe 'Get-CWServiceTicket' {
 	}
 	
 	It 'gets ticket based on the -Filter param and uses the SizeLimit param' {
-		$filter = "id = $pstrTicketID";
-		$pageSize = 2;
-		$ticket = Get-CWServiceTicket -Filter $filter -SizeLimit 2 -BaseApiUrl $pstrSvrUrl -CompanyName $pstrCompany -PublicKey $pstrSvrPublicKey -PrivateKey $pstrSvrPrivateKey;
-		$ticket.id | Should Be $pstrTicketID;		
+		$filter = "id IN ($([String]::Join(",", $pstrTicketIDs)))";
+		$sizeLimit =  2;
+		$tickets = Get-CWServiceTicket -Filter $filter -SizeLimit $sizeLimit -BaseApiUrl $pstrSvrUrl -CompanyName $pstrCompany -PublicKey $pstrSvrPublicKey -PrivateKey $pstrSvrPrivateKey;
+		$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit;
 	}
 	
 	It 'gets tickets and sorts ticket id by descending piping cmdlet through Sort-Object cmdlet' {
