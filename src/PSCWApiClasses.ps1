@@ -327,8 +327,10 @@ class CwApiServiceTicketSvc
         $request.RelativePathUri = "/count";
         $request.QueryString = $queryString;
         
-        return [uint32] ($this.read($request).count);
+        $response = $this.read($request)[0];
+        return [uint32] $response.count;
     }
+    
     
     hidden [pscustomobject] read([CWApiRequestInfo] $requestHashtable) 
     {
@@ -338,4 +340,78 @@ class CwApiServiceTicketSvc
     
     
   
+}
+
+class CwApiServiceBoardSvc
+{
+    hidden [CWApiRestClient] $CWApiClient; 
+    
+    CwApiServiceBoardSvc([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey)
+    {
+        [string] $basePathUri = "/service/boards";
+        $this.CWApiClient = [CWApiRestClient]::new($baseUrl, $basePathUri, $companyName, $publicKey, $privateKey);
+    }
+    
+    [pscustomobject] ReadBoard([int] $boardId)
+    {
+        $request = [CWApiRequestInfo]::new();
+        $request.RelativePathUri = "/$boardId";
+        
+        return $this.read($request);
+    }
+    
+    
+    [pscustomobject[]] ReadBoards([string] $boardConditions)
+    {        
+        return $this.ReadBoards($boardConditions, 1);
+    }
+    
+    [pscustomobject[]] ReadBoards([string] $boardConditions, [uint32] $pageNum)
+    {         
+        return ($boardConditions, 1, 0);
+    }
+    
+    [pscustomobject[]] ReadBoards([string] $boardConditions, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        $MAX_PAGE_REQUEST_SIZE = 50;
+        
+        if ($pageSize -eq 0)
+        {
+            $pageSize = $MAX_PAGE_REQUEST_SIZE;
+        }
+        
+        [hashtable] $queryParams = @{
+            conditions = $boardConditions
+            page       = $pageNum;
+            pageSize   = $pageSize;
+        }
+        [string] $queryString = [CWApiRestClient]::buildCWQueryString($queryParams);
+        
+        $request = [CWApiRequestInfo]::new();
+        $request.QueryString = $queryString;
+        
+        return $this.read($request);
+    }
+    
+    [uint32] GetBoardCount([string] $boardConditions)
+    {
+        [hashtable] $queryParams = @{
+            conditions = $boardConditions;
+        }
+        [string] $queryString = [CWApiRestClient]::buildCWQueryString($queryParams)
+        
+        $request = [CWApiRequestInfo]::new();
+        $request.RelativePathUri = "/count";
+        $request.QueryString = $queryString;
+        
+        $response = $this.read($request)[0];
+        return [uint32] $response.count;
+    }
+    
+    hidden [pscustomobject] read([CWApiRequestInfo] $requestHashtable) 
+    {
+        $items = $this.CWApiClient.Get($requestHashtable);
+        return $items; 
+    }
+    
 }
