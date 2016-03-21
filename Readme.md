@@ -2,6 +2,16 @@
 
 Collection of PowerShell CmdLet that interface with ConnectWise's REST API service. This project is meant to target the latest general releases of PowerShell and ConnectWise.
 
+##CmdLets Milestones
+
+0. `Get-CWServiceTicket` -- **Completed**
+0. `Remove-CWServiceTicket`
+0. `Get-CWServiceBoard`
+0. `Get-CWServiceBoardStatus`
+0. `Get-CWServicePriority`
+0. `Add-CWServiceTicket`
+0. `Update-CWServiceTicket`
+
 ##CmdLets Overview 
 - ConnectWise Service Tickets  
   - `Get-CWServiceTicket`
