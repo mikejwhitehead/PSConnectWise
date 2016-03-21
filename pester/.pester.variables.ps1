@@ -11,3 +11,6 @@ $pstrSvrPrivateKey = "yfYD9sg13eDtB236";
 $pstrTicketID  = 7617515
 $pstrTicketIDs =  @(7617515, 7787839, 7738721);
 
+# example board numbers to use for testing 
+$pstrBoardID = 297
+$pstrBoardIDs = @(1,2,3,250,297)
