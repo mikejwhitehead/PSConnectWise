@@ -17,7 +17,7 @@ function Get-CWServiceTicket
         [ValidateNotNullOrEmpty()]
         [string[]]$Property,
         [Parameter(ParameterSetName='TicketQuery', Mandatory=$false)]
-        [int]$SizeLimit = 5,
+        [int]$SizeLimit,
         [Parameter(ParameterSetName='SingleTicket', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='TicketQuery', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -38,27 +38,28 @@ function Get-CWServiceTicket
     
     Begin
     {
-        $TICKETS_PER_PAGE = 50 
+        $MAX_TICKETS_PER_PAGE = 50 
         
         # get the ticket service
         $TicketSvc = [CwApiServiceTicketSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
         
         [uint32] $ticketCount = 1  
         [uint32] $pageCount   = 1  
+        
+        # get the number of pages of ticket to request and total ticket count
         if (![String]::IsNullOrWhiteSpace($Filter))
         {
             $ticketCount = $TicketSvc.GetTicketCount($Filter);
             Write-Debug "Total Count Ticket the Filter ($Filter): $ticketCount";
             
-            if ($totalTicketCount -gt $SizeLimit)
+            if ($SizeLimit -ne $null -and $SizeLimit -gt 0)
             {
                 Write-Verbose "Total Ticket Count Excess SizeLimit; Setting Ticket Count to the SizeLimit: $SizeLimit"
                 $ticketCount = [Math]::Min($ticketCount, $SizeLimit);
             }
+            $pageCount = [Math]::Ceiling([double]($ticketCount / $MAX_TICKETS_PER_PAGE));
             
-            $pageCount = [Math]::Ceiling([double]($ticketCount / $TICKETS_PER_PAGE));
-            
-            Write-Debug "Total Number of Pages ($TICKETS_PER_PAGE Tickets Per Pages): $pageCount";
+            Write-Debug "Total Number of Pages ($MAX_TICKETS_PER_PAGE Tickets Per Pages): $pageCount";
         }
         
         # determines if to select all fields or specific fields
@@ -71,6 +72,7 @@ function Get-CWServiceTicket
                 $Properties = $Property;
             }
         }
+        
     }
     Process
     {
@@ -79,10 +81,12 @@ function Get-CWServiceTicket
         {
             if (![String]::IsNullOrWhiteSpace($Filter))
             {
+                # find how many tickets to retrieve
+                $ticketsPerPage = $ticketCount - (($pageNum - 1) * $MAX_TICKETS_PER_PAGE);
+                
                 Write-Debug "Requesting Ticket IDs that Meets this Filter: $Filter";
-                $queriedTickets = $TicketSvc.ReadTickets($Filter, [string[]] @("id"), $pageNum, $pageCount);
-                [int[]] $TicketID = $queriedTickets.id
-            }  
+                $queriedTickets = $TicketSvc.ReadTickets($Filter, [string[]] @("id"), $pageNum, $ticketsPerPage);
+                [int[]] $TicketID = $queriedTickets.id   }  
         
             if ($TicketID -ne $null)
             {
@@ -103,7 +107,7 @@ function Get-CWServiceTicket
             
         }
     }
-    End
+    End 
     {
         # do nothing here
     }
