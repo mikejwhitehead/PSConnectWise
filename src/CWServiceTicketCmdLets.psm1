@@ -38,7 +38,7 @@ function Get-CWServiceTicket
     
     Begin
     {
-        $MAX_TICKETS_PER_PAGE = 50 
+        $MAX_ITEMS_PER_PAGE = 50 
         
         # get the ticket service
         $TicketSvc = [CwApiServiceTicketSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
@@ -57,9 +57,9 @@ function Get-CWServiceTicket
                 Write-Verbose "Total Ticket Count Excess SizeLimit; Setting Ticket Count to the SizeLimit: $SizeLimit"
                 $ticketCount = [Math]::Min($ticketCount, $SizeLimit);
             }
-            $pageCount = [Math]::Ceiling([double]($ticketCount / $MAX_TICKETS_PER_PAGE));
+            $pageCount = [Math]::Ceiling([double]($ticketCount / $MAX_ITEMS_PER_PAGE));
             
-            Write-Debug "Total Number of Pages ($MAX_TICKETS_PER_PAGE Tickets Per Pages): $pageCount";
+            Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Tickets Per Pages): $pageCount";
         }
         
         # determines if to select all fields or specific fields
@@ -82,7 +82,7 @@ function Get-CWServiceTicket
             if (![String]::IsNullOrWhiteSpace($Filter))
             {
                 # find how many tickets to retrieve
-                $ticketsPerPage = $ticketCount - (($pageNum - 1) * $MAX_TICKETS_PER_PAGE);
+                $ticketsPerPage = $ticketCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
                 
                 Write-Debug "Requesting Ticket IDs that Meets this Filter: $Filter";
                 $queriedTickets = $TicketSvc.ReadTickets($Filter, [string[]] @("id"), $pageNum, $ticketsPerPage);
