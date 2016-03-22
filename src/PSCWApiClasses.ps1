@@ -191,8 +191,11 @@ class CWApiRestClient
                 continue;
             }
             
-            $vettedQueryParams.Add($p.Key, $p.Value);   
-        } 
+            if (![String]::IsNullOrEmpty($p.Value))
+            {
+                $vettedQueryParams.Add($p.Key, $p.Value);   
+            }    
+    } 
        
         if ($vettedQueryParams.Count -gt 0)
         {
@@ -280,17 +283,22 @@ class CWApiRestClientSvc
 {
     hidden [CWApiRestClient] $CWApiClient; 
     
-    CWApiRestClientSvc([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey)
+    CWApiRestClientSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey)
     {
         $this.CWApiClient = [CWApiRestClient]::new($baseUrl, $companyName, $publicKey, $privateKey);
     }
     
-    hidden [pscustomobject[]] QuickRead([string] $url)
+    hidden [pscustomobject[]] QuickRead ([string] $url)
     {
         return $this.CWApiClient.Get($url);
     }
     
-    hidden [pscustomobject[]] read([string] $relativePathUri, [hashtable] $queryHashtable)
+    hidden [pscustomobject[]] read ([string] $relativePathUri)
+    {
+        return $this.read($relativePathUri, $null);
+    }
+    
+    hidden [pscustomobject[]] read ([string] $relativePathUri, [hashtable] $queryHashtable)
     {
         $MAX_PAGE_REQUEST_SIZE = 50;
         
@@ -313,12 +321,12 @@ class CWApiRestClientSvc
         return $items
     }
     
-    hidden [uint32] getCount([string] $conditions)
+    hidden [uint32] getCount ([string] $conditions)
     {        
         return $this.getCount($conditions, "/count")
     }
     
-    hidden [uint32] getCount([string] $conditions, [string] $relativePathUri)
+    hidden [uint32] getCount ([string] $conditions, [string] $relativePathUri)
     {
         [hashtable] $queryParams = @{
             conditions = $conditions;
@@ -430,38 +438,36 @@ class CwApiServiceBoardSvc : CWApiRestClientSvc
 
 class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
 {
-    CwApiServiceBoardStatusSvc([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiServiceBoardStatusSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base ($baseUrl, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.HttpBasePathUri = "/service/boards";;
     }
     
     [pscustomobject] ReadStatus([int] $boardId, $statusId)
     {
-        $request = [CWApiRequestInfo]::new();
-        $request.RelativePathUri = "/$boardId/statuses/$statusId";
-        
-        return $this.read($request);
+        $relativePathUri = "/$boardId/statuses/$statusId";
+        return $this.read($relativePathUri);
     }
     
-    [pscustomobject[]] ReadStatuses([uint32] $boardId)
+    [pscustomobject[]] ReadStatuses ([uint32] $boardId)
     {
-        return $this.ReadStatuses([uint32] $boardId, $null);
+        return $this.ReadStatuses([uint32] $boardId, "*");
     }
     
-    [pscustomobject[]] ReadStatuses([uint32] $boardId, [string] $statusConditions)
+    [pscustomobject[]] ReadStatuses ([uint32] $boardId, [string] $fields)
     {        
-        return $this.ReadStatuses($boardId, $statusConditions, 1);
+        return $this.ReadStatuses($boardId, $fields, 1);
     }
     
-    [pscustomobject[]] ReadStatuses([uint32] $boardId, [string] $statusConditions, [uint32] $pageNum)
+    [pscustomobject[]] ReadStatuses ([uint32] $boardId, [string] $fields, [uint32] $pageNum)
     {         
-        return $this.ReadStatuses($boardId, $statusConditions, 1, 0);
+        return $this.ReadStatuses($boardId, $fields, 1, 0);
     }
     
-    [pscustomobject[]] ReadStatuses([uint32] $boardId, [string] $statusConditions, [uint32] $pageNum, [uint32] $pageSize)
+    [pscustomobject[]] ReadStatuses ([uint32] $boardId, [string] $fields, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
-            conditions = $statusConditions
+            fields     = $fields
             page       = $pageNum;
             pageSize   = $pageSize;
         }
@@ -470,12 +476,12 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
         return $this.read($relativePathUri, $queryHashtable);
     }
     
-    [uint32] GetStatusCount([uint32] $boardId)
+    [uint32] GetStatusCount ([uint32] $boardId)
     {
         return $this.GetStatusCount($boardId, $null);
     }
     
-    [uint32] GetStatusCount([uint32] $boardId, [string] $statusConditions)
+    [uint32] GetStatusCount ([uint32] $boardId, [string] $statusConditions)
     {
         $relativePathUri = "/$boardId/statuses/count";
         return $this.getCount($statusConditions, $relativePathUri);
