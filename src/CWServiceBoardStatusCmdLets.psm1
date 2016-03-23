@@ -59,21 +59,26 @@ function Get-CWServiceBoardStatus
             if ($BoardID -gt 0)
             {
                 # find how many Status to retrieve
-                $statusesPerPage = $ticketCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                $statusesPerPage = $statusCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
                 
                 Write-Debug "Requesting Ticket IDs that Meets this Filter: $Filter";
-                $queriedStatuses = $BoardStatusSvc.ReadStatuses($boardId, [string[]] @("id"), $pageNum, $statusesPerPage);
-                [uint32[]] $StatusID = $queriedStatuses.id;
-             }  
-        
-            if ($StatusID -ne $null)
-            {
+                $queriedStatuses = $BoardStatusSvc.ReadStatuses($boardId, [string[]] @("*"), $pageNum, $statusesPerPage);
+                [pscustomobject[]] $Statuses = $queriedStatuses;
+                
+                foreach ($Status in $Statuses)
+                {
+                    $Status
+                }
+                
+            }  elseif ($StatusID -ne $null) {
+                
                 Write-Debug "Retrieving ConnectWise Status by Ticket ID"
                 foreach ($status in $StatusID)
                 {
                     Write-Verbose "Requesting ConnectWise Ticket Number: $status";
                     $BoardStatusSvc.ReadStatus($boardId, $status);
                 }
+                
             }
         }
     }
