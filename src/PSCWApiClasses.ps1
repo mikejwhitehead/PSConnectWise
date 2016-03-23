@@ -1,3 +1,24 @@
+
+
+class ModelImporter
+{
+    static [pscustomobject] Import ([string] $pathToJson)
+    {
+        [pscustomobject] $item = $null;
+        
+        if (Test-Path $pathToJson)
+        {
+            $item = Get-Content $pathToJson | Out-String | ConvertFrom-Json;
+        } 
+        else 
+        {
+            throw [System.IO.FileNotFoundException];      
+        }
+        
+        return $item;
+    }
+}
+
 class WebRestApiRequest
 {
     # public properties
@@ -10,6 +31,10 @@ class WebRestApiRequest
     # private properties
     hidden [string] $contentType = "application/json";
     
+    #
+    # Constructors
+    #
+    
     WebRestApiRequest([hashtable] $header, [string] $url, [string] $verb, [string] $body)
     {
         $this.Url    = $url;
@@ -20,21 +45,29 @@ class WebRestApiRequest
         $this._validateWebRequestParams();
     }
     
+    #
+    # Methods
+    #
+    
     [pscustomobject] Invoke() 
     {
         if ([String]::IsNullOrWhiteSpace($this.Body))
         {
-            Write-Debug "REST Request Details:  $($this | Select Url, Header, Verb | ConvertTo-Json -Depth 10 | Out-String)"
-            $this.Response = Invoke-RestMethod -Uri $this.Url -Method $this.Verb -Headers $this.Header -ContentType $this.contentType;   
+            Write-Debug "REST Request Details:  $($this | Select Url, Header, Verb | ConvertTo-Json -Depth 10 | Out-String)";
+            $this.Response = Invoke-WebRequest -Uri $this.Url -Method $this.Verb -Headers $this.Header -ContentType $this.contentType;   
         }
         else
         {
-            Write-Debug "REST Request Details:  $($this | Select Url, Header, Verb, Body | ConvertTo-Json -Depth 10 | Out-String)"
-            $this.Response = Invoke-RestMethod -Uri $this.Url -Method $this.Verb -Headers $this.Header -Body $this.Body -ContentType $this.contentType;       
+            Write-Debug "REST Request Details:  $($this | Select Url, Header, Verb, Body | ConvertTo-Json -Depth 10 | Out-String)";
+            $this.Response = Invoke-WebRequest -Uri $this.Url -Method $this.Verb -Headers $this.Header -Body $this.Body -ContentType $this.contentType;       
         }
-        
+    
         return $this.Response;
     }
+    
+    #
+    #  Helper Functions
+    #
     
     hidden [void] _validateWebRequestParams()
     {
@@ -51,6 +84,10 @@ class WebRestApiRequest
         }
         
     }
+    
+    #
+    # Static Functions
+    #
     
     static [string] BuildQueryString([hashtable] $queryParams)
     {
@@ -69,6 +106,10 @@ class WebRestApiRequest
         
         return $queryString;
     }
+    
+    #
+    # Static Functions - Used Internally Only
+    #
     
     static hidden [string] _concateQueryString([string] $queryString, [string] $subJoinQuery)
     {
@@ -99,7 +140,6 @@ class CWApiRequestInfo
     
 }
 
-
 class CWApiRestClient 
 {
     # public properties
@@ -113,12 +153,16 @@ class CWApiRestClient
     # private properties
     hidden [string] $_headerAthenticationString;
     
+    #
+    # Constructors
+    #
+    
     CWApiRestClient ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey)
     {
-        $this.HttpBaseUrl = $baseUrl;
+        $this.HttpBaseUrl     = $baseUrl;
         $this.HttpBasePathUri = "";
-        $this.CWCompanyName = $companyName;
-        $this.CWApiPublicKey = $publicKey;
+        $this.CWCompanyName   = $companyName;
+        $this.CWApiPublicKey  = $publicKey;
         $this.CWApiPrivateKey = $privateKey;
         
         $this._validateCWApiRequestParams();
@@ -127,10 +171,10 @@ class CWApiRestClient
     
     CWApiRestClient ([string] $baseUrl, [string] $pathUri, [string] $companyName, [string] $publicKey, [string] $privateKey)
     {
-        $this.HttpBaseUrl = $baseUrl;
+        $this.HttpBaseUrl     = $baseUrl;
         $this.HttpBasePathUri = $pathUri;
-        $this.CWCompanyName = $companyName;
-        $this.CWApiPublicKey = $publicKey;
+        $this.CWCompanyName   = $companyName;
+        $this.CWApiPublicKey  = $publicKey;
         $this.CWApiPrivateKey = $privateKey;
         
         $this._validateCWApiRequestParams();
@@ -139,49 +183,115 @@ class CWApiRestClient
     
     CWApiRestClient ([string] $baseUrl, [string] $pathUri, [hashtable] $header, [string] $companyName, [string] $publicKey, [string] $privateKey)
     {
-        $this.HttpBaseUrl = $baseUrl;
+        $this.HttpBaseUrl     = $baseUrl;
         $this.HttpBasePathUri = $pathUri;
-        $this.CWCompanyName = $companyName;
-        $this.CWApiPublicKey = $publicKey;
+        $this.CWCompanyName   = $companyName;
+        $this.CWApiPublicKey  = $publicKey;
         $this.CWApiPrivateKey = $privateKey;
         
         $this._validateCWApiRequestParams();
         $this.HttpHeader = $this._buildHttpHeader();
         
-        transformHttpHeader($header);
+        $this.transformHttpHeader($header);
     }
     
-    [pscustomobject] Get ([string] $url)
+    #
+    # Methods
+    #
+    
+    [pscustomobject[]] Get ([string] $fullUrl)
     {
+        [pscustomobject[]] $response = $null;
+        
         $header = $this.HttpHeader;
         $verb   = "GET";
         
-        return $this._request($header, $url, $verb, $null);
+        [PSObject] $rawResponse = $this._request($header, $fullUrl, $verb);
+        
+        if ($rawResponse.StatusCode -eq 200)
+        {
+            $response = $rawResponse.Content | ConvertFrom-Json 
+        }
+        
+        return $response;
     }
     
-    [pscustomobject] Get ([CWApiRequestInfo] $request)
+    [pscustomobject[]] Get ([CWApiRequestInfo] $request)
     {
+        [pscustomobject[]] $response = $null;
+        
         $header = $this.HttpHeader;
-        $url    = $this.BuildUrl($request.RelativePathUri, $request.QueryString);
-        $verb   = "GET"
+        $url    = $this.buildUrl($request.RelativePathUri, $request.QueryString);
+        $verb   = $request.Verb;
         
-        if ($request.QueryString -ne $null)
+        [PSObject] $rawResponse = $this._request($header, $url, $verb);
+        
+        if ($rawResponse.StatusCode -eq 200)
         {
-            $body = $request.Body | ConvertTo-Json -Depth 100 | Out-String; 
-        }
-        else
-        {
-            $body = $null;     
+            $response = $rawResponse.Content | ConvertFrom-Json 
         }
         
-        return $this._request($header, $url, $verb, $body);
+        return $response;
     }
+    
+    [bool] Delete ([string] $fullUrl)
+    {
+        $wasDeleted = $false;
+        
+        $header = $this.HttpHeader;
+        $verb   = "DELETE";
+        
+        $rawResponse = $this._request($header, $fullUrl, $verb)
+        
+        if ($rawResponse.StatusCode -eq 204)
+        {
+            $wasDeleted = $true;
+        }
+        
+        return $wasDeleted;
+    }
+    
+    [bool] Delete ([CWApiRequestInfo] $request)
+    {
+        $wasDeleted = $false;
+        
+        $header = $this.HttpHeader;
+        $url    = $this.buildUrl($request.RelativePathUri);
+        $verb   = $request.Verb;
+        
+        $rawResponse = $this._request($header, $url, $verb);
+        
+        if ($rawResponse.StatusCode -eq 204)
+        {
+            $wasDeleted = $true;
+        }
+        
+        return $wasDeleted; 
+    }
+    
+    [pscustomobject] Post ([CWApiRequestInfo] $request)
+    {
+       [pscustomobject] $response = $null;
+       
+       $header = $this.HttpHeader;
+       $url    = $this.buildUrl($request.RelativePathUri);
+       $verb   = $request.Verb;
+       $body   = $request | ConvertTo-Json -Depth 100 | Out-String
+       
+       $response = $this._request($header, $url, $verb, $body);
+        
+       return $response;
+    }
+    
+    #
+    # Helper Functions
+    #
     
     static hidden [string] buildCWQueryString ([hashtable] $queryParams)
     {
         [string[]] $validParams = @("fields", "page", "pagesize", "orderby", "conditions");
         [string] $queryString = "";
-        [hashtable] $vettedQueryParams = @{}
+        [hashtable] $vettedQueryParams = @{};
         
         foreach ($p in $queryParams.GetEnumerator())
         {
@@ -205,7 +315,7 @@ class CWApiRestClient
         return $queryString;
     }    
         
-    [string] BuildUrl ([string] $relativePathUri, [string] $queryString)
+    [string] buildUrl ([string] $relativePathUri, [string] $queryString)
     {
         if ([string]::IsNullOrEmpty($relativePathUri))
         {
@@ -219,7 +329,7 @@ class CWApiRestClient
         
         $url = [String]::Format("{0}{1}{2}{3}", $this.HttpBaseUrl, $this.HttpBasePathUri, $relativePathUri, $queryString);
         
-        return $url
+        return $url;
     }
     
     hidden [void] transformHttpHeader ([hashtable] $transformHeaderHashtable)
@@ -237,6 +347,10 @@ class CWApiRestClient
         }
     }
     
+    #
+    # Helper Functions - Used Internally Only
+    #
+    
     hidden [hashtable] _buildHttpHeader () 
     {
         $header = [hashtable] @{
@@ -249,10 +363,33 @@ class CWApiRestClient
         return $header;
     }
     
+    [pscustomobject] _request ($header, $url, $verb)
+    {
+        return $this._request($header, $url, $verb, $null);
+    }
+    
     [pscustomobject] _request ($header, $url, $verb, $body)
     {
+        [pscustomobject] $response = $null;
         $client = [WebRestApiRequest]::new($header, $url, $verb, $body);
-        $response = $client.Invoke();
+        
+        try
+        {
+            $response = $client.Invoke();
+        }
+        catch
+        {
+            if ($_.Exception.Response.StatusCode.value__ -in @(401,404))
+            {
+                Write-Warning $_.ErrorDetails.Message;
+                
+            } else {
+                
+                throw $_;
+                
+            }
+        }
+        
         return $response;
     }
 
@@ -302,8 +439,8 @@ class CWApiRestClientSvc
     {
         $MAX_PAGE_REQUEST_SIZE = 50;
         
-        $request = [CWApiRequestInfo]::new();
-        $request.RelativePathUri = $RelativePathUri
+        $request = [CWApiRequestInfo]::New();
+        $request.RelativePathUri = $RelativePathUri;
         $request.Verb = "GET"; 
         
         if ($queryHashtable -ne $null)
@@ -318,12 +455,46 @@ class CWApiRestClientSvc
         }
         
         $items = $this.CWApiClient.Get($request);
-        return $items
+        return $items;
+    }
+    
+    hidden [bool] delete ([string] $relativePathUri)
+    {
+        $request = [CWApiRequestInfo]::New();
+        $request.RelativePathUri = $relativePathUri;
+        $request.Verb = "DELETE";
+        
+        $response = $this.CWApiClient.Delete($request);
+        return $response;
+    }
+    
+    
+    
+    hidden [pscustomobject] create ([hashtable] $newItemHashtable)
+    {
+        [pscustomobject] $newItem = @{};
+        
+        foreach ($p in $newItemHashtable.GetEnumerator())
+        {
+            Add-Member -InputObject $newItem -MemberType NoteProperty -Name $p.Key -Value $p.Value;
+        } 
+        
+        return $this.create($newItem);
+    }
+    
+    hidden [pscustomobject] create ([pscustomobject] $newItem)
+    {
+        $request = [CWApiRequestInfo]::New();
+        $request.Verb = "POST";
+        $request.Body = $newItem;
+        
+        $response = $this.CWApiClient.Post($request);
+        return $response;
     }
     
     hidden [uint32] getCount ([string] $conditions)
     {        
-        return $this.getCount($conditions, "/count")
+        return $this.getCount($conditions, "/count");
     }
     
     hidden [uint32] getCount ([string] $conditions, [string] $relativePathUri)
@@ -345,12 +516,12 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         $this.CWApiClient.HttpBasePathUri = "/service/tickets";
     }
     
-    [pscustomobject] ReadTicket([int] $ticketId)
+    [pscustomobject] ReadTicket ([int] $ticketId)
     {
         return $this.ReadTicket($ticketId, "*");
     }
     
-    [pscustomobject] ReadTicket([int] $ticketId, [string[]] $fields)
+    [pscustomobject] ReadTicket ([int] $ticketId, [string[]] $fields)
     {
         [hashtable] $queryHashtable = @{ 
             fields = ([string] [String]::Join(",", $fields)).TrimEnd(",");
@@ -361,25 +532,25 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         return $this.read($relativePathUri, $queryHashtable);
     }
     
-    [pscustomobject[]] ReadTickets([string] $ticketConditions)
+    [pscustomobject[]] ReadTickets ([string] $ticketConditions)
     {
         return $this.ReadTickets($ticketConditions, "*");
     }
     
-    [pscustomobject[]] ReadTickets([string] $ticketConditions, [string[]] $fields)
+    [pscustomobject[]] ReadTickets ([string] $ticketConditions, [string[]] $fields)
     {        
         return $this.ReadTickets($ticketConditions, $fields, 1);
     }
     
-    [pscustomobject[]] ReadTickets([string] $ticketConditions, [string[]] $fields, [uint32] $pageNum)
+    [pscustomobject[]] ReadTickets ([string] $ticketConditions, [string[]] $fields, [uint32] $pageNum)
     {        
         return $this.ReadTickets($ticketConditions, $fields, 1, 0);
     }
     
-    [pscustomobject[]] ReadTickets([string] $ticketConditions, [string[]] $fields, [uint32] $pageNum, [uint32] $pageSize)
+    [pscustomobject[]] ReadTickets ([string] $ticketConditions, [string[]] $fields, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryParams = @{
-            conditions = $ticketConditions
+            conditions = $ticketConditions;
             fields     = ([string] [String]::Join(",", $fields)).TrimEnd(",");
             page       = $pageNum;
             pageSize   = $pageSize;
@@ -388,10 +559,38 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         return $this.read($null, $queryParams);
     }
     
-    [uint32] GetTicketCount([string] $ticketConditions)
+    [pscustomobject] CreateTicket ([uint32] $companyId, [uint32] $contactId, [string] $subject, [string] $body, [string] $analysis, [uint32] $boardId, [uint32] $statusId, [uint32] $priorityID)
+    {
+        $newTicketInfo = [PSCustomObject] @{
+            Board                   = [PSCustomObject] @{ ID = [uint32]$boardId;    }
+            Company                 = [PSCustomObject] @{ ID = [uint32]$companyId;  }
+            Contact                 = [PSCustomObject] @{ ID = [uint32]$contactId;  }
+            Summary                 = [string]$subject
+            InitialDescription      = [string]$body
+            InitialInternalAnalysis = [string]$analysis
+            Priority                = [PSCustomObject] @{ ID = [uint32]$priorityId; }
+            Status                  = [PSCustomObject] @{ ID = [uint32]$statusId;   }
+        }
+        
+        $newTicket = $this.create($newTicketInfo); 
+        return $newTicket;
+    }
+    
+    [bool] DeleteTicket ([uint32] $ticketID)
+    {
+        $relativePathUri = "/$ticketID";
+        return $this.delete($relativePathUri);
+    }
+    
+    [uint32] GetTicketCount ([string] $ticketConditions)
     {
         return $this.getCount($ticketConditions);
     }
+    
+    # static [pscustomobject] GetTicketTemplate ()
+    # {
+    #     ModelImporter.Import()
+    # }    
     
 }
 
@@ -421,7 +620,7 @@ class CwApiServiceBoardSvc : CWApiRestClientSvc
     [pscustomobject[]] ReadBoards([string] $boardConditions, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
-            conditions = $boardConditions
+            conditions = $boardConditions;
             page       = $pageNum;
             pageSize   = $pageSize;
         }
@@ -440,7 +639,7 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
 {
     CwApiServiceBoardStatusSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base ($baseUrl, $companyName, $publicKey, $privateKey)
     {
-        $this.CWApiClient.HttpBasePathUri = "/service/boards";;
+        $this.CWApiClient.HttpBasePathUri = "/service/boards";
     }
     
     [pscustomobject] ReadStatus([int] $boardId, $statusId)
@@ -467,7 +666,7 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
     [pscustomobject[]] ReadStatuses ([uint32] $boardId, [string] $fields, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
-            fields     = $fields
+            fields     = $fields;
             page       = $pageNum;
             pageSize   = $pageSize;
         }
@@ -486,4 +685,97 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
         $relativePathUri = "/$boardId/statuses/count";
         return $this.getCount($statusConditions, $relativePathUri);
     }
+}
+
+class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
+{
+    CwApiServiceBoardTypeSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base ($baseUrl, $companyName, $publicKey, $privateKey)
+    {
+        $this.CWApiClient.HttpBasePathUri = "/service/boards";
+    }
+    
+    [pscustomobject] ReadType([int] $boardId, $typeId)
+    {
+        $relativePathUri = "/$boardId/types/$typeId";
+        return $this.read($relativePathUri);
+    }
+    
+    [pscustomobject[]] ReadTypes ([uint32] $boardId)
+    {
+        return $this.ReadTypes([uint32] $boardId, "*");
+    }
+    
+    [pscustomobject[]] ReadTypes ([uint32] $boardId, [string] $fields)
+    {        
+        return $this.ReadTypes($boardId, $fields, 1);
+    }
+    
+    [pscustomobject[]] ReadTypes ([uint32] $boardId, [string] $fields, [uint32] $pageNum)
+    {         
+        return $this.ReadTypes($boardId, $fields, 1, 0);
+    }
+    
+    [pscustomobject[]] ReadTypes ([uint32] $boardId, [string] $fields, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        [hashtable] $queryHashtable = @{
+            fields     = $fields;
+            page       = $pageNum;
+            pageSize   = $pageSize;
+        }
+
+        $relativePathUri = "/$boardId/types";
+        return $this.read($relativePathUri, $queryHashtable);
+    }
+    
+    [uint32] GetTypeCount ([uint32] $boardId)
+    {
+        return $this.GetTypeCount($boardId, $null);
+    }
+    
+    [uint32] GetTypeCount ([uint32] $boardId, [string] $typeConditions)
+    {
+        $relativePathUri = "/$boardId/types/count";
+        return $this.getCount($typeConditions, $relativePathUri);
+    }
+}
+
+class CwApiServicePrioritySvc : CWApiRestClientSvc
+{
+    CwApiServicePrioritySvc([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    {
+        $this.CWApiClient.HttpBasePathUri = "/service/priorities";
+    }
+    
+    [pscustomobject] ReadPriority([int] $priorityId)
+    {
+        $relativePathUri = "/$priorityId";
+        return $this.read($relativePathUri, $null);
+    }
+    
+    [pscustomobject[]] ReadPriorities([string] $priorityConditions)
+    {        
+        return $this.ReadPriorities($priorityConditions, 1);
+    }
+    
+    [pscustomobject[]] ReadPriorities([string] $priorityConditions, [uint32] $pageNum)
+    {         
+        return $this.ReadPriorities($priorityConditions, 1, 0);
+    }
+    
+    [pscustomobject[]] ReadPriorities([string] $priorityConditions, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        [hashtable] $queryHashtable = @{
+            conditions = $priorityConditions;
+            page       = $pageNum;
+            pageSize   = $pageSize;
+        }
+        
+        return $this.read($null, $queryHashtable);
+    }
+    
+    [uint32] GetPriorityCount([string] $priorityConditions)
+    {
+        return $this.getCount($priorityConditions);
+    }
+    
 }
