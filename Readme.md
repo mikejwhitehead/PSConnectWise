@@ -8,9 +8,9 @@ Milestone Requirement: Create the minimum  required CmdLets that is needed to ge
 0. `Get-CWServiceTicket` -- **Completed**
 0. `Remove-CWServiceTicket`
 0. `Get-CWServiceBoard` -- **Completed**
-0. `Get-CWServiceBoardStatus`
-0. `Get-CWServicePriority`
-0. `Add-CWServiceTicket`
+0. `Get-CWServiceBoardStatus` -- **Completed**
+0. `Get-CWServicePriority` -- **Completed (*Not Tested*)**
+0. `New-CWServiceTicket`
 0. `Update-CWServiceTicket`
 
 ##CmdLets Overview 
