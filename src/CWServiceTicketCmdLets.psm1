@@ -113,5 +113,64 @@ function Get-CWServiceTicket
     }
 }
 
+function New-CWServiceTicket 
+{
+    [CmdLetBinding()]
+    param
+    (
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$BoardID,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$CompanyID,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$ContactID,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Subject,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Description,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Internal,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$PriorityID,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$StatusID,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$BaseApiUrl,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$CompanyName,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$PublicKey,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$PrivateKey
+    )
+    
+    Begin
+    {
+        # get the ticket service
+        $TicketSvc = [CwApiServiceTicketSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+    }
+    Process
+    {
+        $newTicket = $TicketSvc.CreateTicket($BoardID, $CompanyID, $ContactID, $Subject, $Description, $Internal, $StatusID, $PriorityID);
+        return $newTicket;
+    }
+    End
+    {
+        # do nothing here
+    }
+} 
 
 Export-ModuleMember -Function 'Get-CWServiceTicket';
+Export-ModuleMember -Function 'New-CWServiceTicket';

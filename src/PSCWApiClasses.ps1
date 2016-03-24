@@ -1,5 +1,3 @@
-
-
 class ModelImporter
 {
     static [pscustomobject] Import ([string] $pathToJson)
@@ -32,7 +30,7 @@ class WebRestApiRequest
     hidden [string] $contentType = "application/json";
     
     #
-    # Constructors
+    # -- Constructors
     #
     
     WebRestApiRequest([hashtable] $header, [string] $url, [string] $verb, [string] $body)
@@ -136,7 +134,7 @@ class CWApiRequestInfo
     [string] $RelativePathUri;
     [string] $QueryString;
     [string] $Verb;
-    [string] $Body;
+    [PSObject] $Body;
     
 }
 
@@ -276,7 +274,7 @@ class CWApiRestClient
        $header = $this.HttpHeader;
        $url    = $this.buildUrl($request.RelativePathUri);
        $verb   = $request.Verb;
-       $body   = $request | ConvertTo-Json -Depth 100 | Out-String
+       $body   = $request.Body | ConvertTo-Json -Depth 100 -Compress | Out-String
        
        $response = $this._request($header, $url, $verb, $body);
         
@@ -313,7 +311,12 @@ class CWApiRestClient
         }
         
         return $queryString;
-    }    
+    } 
+    
+    [string] buildUrl ([string] $relativePathUri)
+    {
+        return $this.buildUrl($relativePathUri, $null);
+    }   
         
     [string] buildUrl ([string] $relativePathUri, [string] $queryString)
     {
@@ -379,7 +382,7 @@ class CWApiRestClient
         }
         catch
         {
-            if ($_.Exception.Response.StatusCode.value__ -in @(401,404))
+            if ($_.Exception.Response.StatusCode.value__ -in @(400, 401, 404))
             {
                 Write-Warning $_.ErrorDetails.Message;
                 
@@ -559,7 +562,7 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         return $this.read($null, $queryParams);
     }
     
-    [pscustomobject] CreateTicket ([uint32] $companyId, [uint32] $contactId, [string] $subject, [string] $body, [string] $analysis, [uint32] $boardId, [uint32] $statusId, [uint32] $priorityID)
+    [pscustomobject] CreateTicket ([uint32] $boardId, [uint32] $companyId, [uint32] $contactId, [string] $subject, [string] $body, [string] $analysis, [uint32] $statusId, [uint32] $priorityID)
     {
         $newTicketInfo = [PSCustomObject] @{
             Board                   = [PSCustomObject] @{ ID = [uint32]$boardId;    }
