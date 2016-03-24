@@ -58,6 +58,25 @@ Describe 'Get-CWServiceTicket' {
 		$maxTicketId = $ticketIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
 		$tickets[0].id | Should Be $maxTicketId;		
 	}
-	
 
 } 
+
+Describe "New-CWServiceTicket"  {
+	# re assigne the variable to shorter names
+	$title      = $pstrNewTicketTitle;
+	$body       = $pstrNewTicketBody;
+	$companyID  = $pstrNewTicketCompany;
+	$boardID    = $pstrNewTicketBoard;
+	$contactID  = $pstrNewTicketContact;
+	$statusID   = $pstrNewTicketStatus;
+	$priorityID = $pstrNewTicketPriority;
+	
+	It "create a new service ticket and check for the ticket number" {
+		$ticket = New-CWServiceTicket -BoardID $boardID -CompanyID $companyID -ContactID $contactID -Status $statusID -PriorityID $priorityID `
+             -Subject $title -Description $body `
+             -BaseApiUrl $pstrSvrUrl -CompanyName $pstrCompany -PublicKey $pstrSvrPublicKey -PrivateKey $pstrSvrPrivateKey;
+		$ticket.id -gt 0 | Should Be $true; 
+	}
+	
+	
+}

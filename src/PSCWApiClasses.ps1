@@ -277,8 +277,8 @@ class CWApiRestClient
        $body   = $request.Body | ConvertTo-Json -Depth 100 -Compress | Out-String
        
        $response = $this._request($header, $url, $verb, $body);
-        
-       return $response;
+       $newItem = $response | ConvertFrom-Json 
+       return $newItem;
     }
     
     #
