@@ -3,15 +3,17 @@
 Collection of PowerShell CmdLet that interface with ConnectWise's REST API service. This project is meant to target the latest general releases of PowerShell and ConnectWise.
 
 ##Version 1.0.0 Milestones
-Milestone Requirement: Create the minimum  required CmdLets that is needed to get, create, update, and delete a ConnectWise ticket. 
+Milestone Requirement: Create the minimum required CmdLets that is needed to properly create, read, update, and delete a ConnectWise ticket. 
 
 0. `Get-CWServiceTicket` -- **Completed**
-0. `Remove-CWServiceTicket`
 0. `Get-CWServiceBoard` -- **Completed**
 0. `Get-CWServiceBoardStatus` -- **Completed**
-0. `Get-CWServicePriority` -- **Completed (*Not Tested*)**
+0. `Get-CWServicePriority` -- **Completed (*Not Tested Yet*)**
 0. `New-CWServiceTicket`
+0. `Add-CWServiceTicketTimeEntry`
+0. `Remove-CWServiceTicket`
 0. `Update-CWServiceTicket`
+0. `Get-CWCompanyContact`
 
 ##CmdLets Overview 
 - ConnectWise Service Tickets  
@@ -20,20 +22,19 @@ Milestone Requirement: Create the minimum  required CmdLets that is needed to ge
     - **Features**
       - Request for specific CW ticket fields (ie id, summary, etc).
       - Accepted ticket ids via the pipe.
-  - `Add-CWServiceTicket` 
-    - **_Not Implemented Yet_**
+  - `New-CWServiceTicket` 
+    - *_Not Implemented Yet_*
   - `Remove-CWServiceTicket` 
-    - **_Not Implemented Yet_** 
+    - *_Not Implemented Yet_*
   - `Update-CWServiceTicket` 
-    - **_Not Implemented Yet_**  
-
+    - *_Not Implemented Yet_*  
+ 
 - ConnectWise Service Boards  
   - `Get-CWServiceBoard`
     - **Use Case**: Gets board(s) via the board number, array of board numbers, or query.
     - **Features**
       - Request for specific CW board fields (ie id, summary, etc).
       - Accepted board ids via the pipe.
-
         
 #Requirements
 
@@ -63,5 +64,4 @@ Milestone Requirement: Create the minimum  required CmdLets that is needed to ge
   - See [Readme](https://github.com/sgtoj/ConnectWisePSModule/tree/master/pester)
 - [Documented Architecture](https://github.com/sgtoj/ConnectWisePSModule/blob/master/doc/ClassArchitectures.md) of the Dependent PS Classes
   - It is not required to read or understand it to use PowerShell CmdLets.
-  - Its target is future contributors to this project. 
-
+  - Its target is future contributors to this project.
