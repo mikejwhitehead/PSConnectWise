@@ -1,0 +1,172 @@
+[
+    {
+        "id": 0,
+        "summary": "string",
+        "recordType": "ServiceTicket",
+        "board": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "status": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "project": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "phase": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "wbsCode": "string",
+        "company": {
+            "id": 0,
+            "identifier": "string",
+            "name": "string",
+            "_info": {}
+        },
+        "site": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "siteName": "string",
+        "addressLine1": "string",
+        "addressLine2": "string",
+        "city": "string",
+        "stateIdentifier": "string",
+        "zip": "string",
+        "country": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "contact": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "contactPhoneNumber": "string",
+        "contactPhoneExtension": "string",
+        "contactEmailAddress": "string",
+        "type": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "subType": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "item": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "team": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "owner": {
+            "id": 0,
+            "identifier": "string",
+            "name": "string",
+            "_info": {}
+        },
+        "priority": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "serviceLocation": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "source": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "requiredDate": "2016-03-16T14:23:34Z",
+        "budgetHours": 0,
+        "opportunity": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "agreement": {
+            "id": 0,
+            "name": "string",
+            "_info": {}
+        },
+        "severity": "Low",
+        "impact": "Low",
+        "externalXRef": "string",
+        "poNumber": "string",
+        "knowledgeBaseCategoryId": 0,
+        "knowledgeBaseSubCategoryId": 0,
+        "allowAllClientsPortalView": true,
+        "customerUpdatedFlag": true,
+        "automaticEmailContactFlag": true,
+        "automaticEmailResourceFlag": true,
+        "automaticEmailCcFlag": true,
+        "automaticEmailCc": "string",
+        "initialDescription": "string",
+        "initialInternalAnalysis": "string",
+        "initialResolution": "string",
+        "contactEmailLookup": "string",
+        "processNotifications": true,
+        "skipCallback": true,
+        "closedDate": "string",
+        "closedBy": "string",
+        "closedFlag": true,
+        "dateEntered": "string",
+        "enteredBy": "string",
+        "actualHours": 0,
+        "approved": true,
+        "subBillingMethod": "ActualRates",
+        "subBillingAmount": 0,
+        "subDateAccepted": "string",
+        "dateResolved": "string",
+        "dateResplan": "string",
+        "dateResponded": "string",
+        "resolveMinutes": 0,
+        "resPlanMinutes": 0,
+        "respondMinutes": 0,
+        "isInSla": true,
+        "knowledgeBaseLinkId": 0,
+        "resources": "string",
+        "parentTicketId": 0,
+        "hasChildTicket": true,
+        "knowledgeBaseLinkType": "ServiceTicket",
+        "billTime": "Billable",
+        "billExpenses": "Billable",
+        "billProducts": "Billable",
+        "predecessorType": "Ticket",
+        "predecessorId": 0,
+        "predecessorClosedFlag": true,
+        "lagDays": 0,
+        "lagNonworkingDaysFlag": true,
+        "estimatedStartDate": "2016-03-16T14:23:34Z",
+        "duration": 0,
+        "_info": {},
+        "customFields": [
+            {
+                "id": 0,
+                "caption": "string",
+                "type": "Text",
+                "entryMethod": "EntryField",
+                "numberOfDecimals": 0,
+                "value": "string"
+            }
+        ]
+    }
+]

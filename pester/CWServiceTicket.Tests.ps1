@@ -4,7 +4,7 @@ Remove-Module "CWServiceTicketCmdLets" -ErrorAction Ignore
 Import-Module "$WorkspaceRoot\src\CWServiceTicketCmdLets.psm1" -Force 
 
 # dot-sources the definition file to get static variables (prefixed with 'pstr') to be used for testing
-. "$WorkspaceRoot\pester\.pester.variables.ps1" 
+. "$WorkspaceRoot\pester\.test.variables.ps1" 
 
 Describe 'Get-CWServiceTicket' {
 	

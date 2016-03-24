@@ -49,3 +49,5 @@ Temporary Items
 # Development and Testing items
 .hidden/
 .test.variables.ps1
+.sandbox.ps1
+.vscode/

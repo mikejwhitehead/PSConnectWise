@@ -1,0 +1,12 @@
+{
+    "code": "string",
+    "message": "string",
+    "errors": [
+        {
+            "code": "string",
+            "message": "string",
+            "resource": "string",
+            "field": "string"
+        }
+    ]
+}
