@@ -1,3 +1,11 @@
+enum ServiceTicketNoteTypes 
+{
+    Description
+    Internal
+    Resolution
+}
+
+# this class is not in use yet
 class ModelImporter
 {
     static [pscustomobject] Import ([string] $pathToJson)
@@ -471,8 +479,6 @@ class CWApiRestClientSvc
         return $response;
     }
     
-    
-    
     hidden [pscustomobject] create ([hashtable] $newItemHashtable)
     {
         [pscustomobject] $newItem = @{};
@@ -487,7 +493,13 @@ class CWApiRestClientSvc
     
     hidden [pscustomobject] create ([pscustomobject] $newItem)
     {
+        return $this.create($null, $newItem);
+    }
+    
+    hidden [pscustomobject] create ([string] $relativePathUri, [pscustomobject] $newItem)
+    {
         $request = [CWApiRequestInfo]::New();
+        $request.RelativePathUri = $relativePathUri;
         $request.Verb = "POST";
         $request.Body = $newItem;
         
@@ -514,7 +526,7 @@ class CWApiRestClientSvc
 
 class CwApiServiceTicketSvc : CWApiRestClientSvc
 {
-    CwApiServiceTicketSvc([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiServiceTicketSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.HttpBasePathUri = "/service/tickets";
     }
@@ -599,28 +611,28 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
 
 class CwApiServiceBoardSvc : CWApiRestClientSvc
 {
-    CwApiServiceBoardSvc([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiServiceBoardSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.HttpBasePathUri = "/service/boards";;
     }
     
-    [pscustomobject] ReadBoard([int] $boardId)
+    [pscustomobject] ReadBoard ([int] $boardId)
     {
         $relativePathUri = "/$boardId";
         return $this.read($relativePathUri, $null);
     }
     
-    [pscustomobject[]] ReadBoards([string] $boardConditions)
+    [pscustomobject[]] ReadBoards ([string] $boardConditions)
     {        
         return $this.ReadBoards($boardConditions, 1);
     }
     
-    [pscustomobject[]] ReadBoards([string] $boardConditions, [uint32] $pageNum)
+    [pscustomobject[]] ReadBoards ([string] $boardConditions, [uint32] $pageNum)
     {         
         return $this.ReadBoards($boardConditions, 1, 0);
     }
     
-    [pscustomobject[]] ReadBoards([string] $boardConditions, [uint32] $pageNum, [uint32] $pageSize)
+    [pscustomobject[]] ReadBoards ([string] $boardConditions, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
             conditions = $boardConditions;
@@ -745,28 +757,28 @@ class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
 class CwApiServicePrioritySvc : CWApiRestClientSvc
 {
 
-    CwApiServicePrioritySvc([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiServicePrioritySvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.HttpBasePathUri = "/service/priorities";
     }
     
-    [pscustomobject] ReadPriority([int] $priorityId)
+    [pscustomobject] ReadPriority([uint32] $priorityId)
     {
         $relativePathUri = "/$priorityId";
         return $this.read($relativePathUri, $null);
     }
     
-    [pscustomobject[]] ReadPriorities([string] $priorityConditions)
+    [pscustomobject[]] ReadPriorities ([string] $priorityConditions)
     {        
         return $this.ReadPriorities($priorityConditions, 1);
     }
     
-    [pscustomobject[]] ReadPriorities([string] $priorityConditions, [uint32] $pageNum)
+    [pscustomobject[]] ReadPriorities ([string] $priorityConditions, [uint32] $pageNum)
     {         
         return $this.ReadPriorities($priorityConditions, 1, 0);
     }
     
-    [pscustomobject[]] ReadPriorities([string] $priorityConditions, [uint32] $pageNum, [uint32] $pageSize)
+    [pscustomobject[]] ReadPriorities ([string] $priorityConditions, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
             conditions = $priorityConditions;
@@ -784,36 +796,50 @@ class CwApiServicePrioritySvc : CWApiRestClientSvc
     
 }
 
-class CwApiServiceTicketTimeEntrySvc : CWApiRestClientSvc
+class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
 {
-    CwApiServiceTicketTimeEntrySvc([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiServiceTicketNoteSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.HttpBasePathUri = "/service/tickets";
     }
     
-    [pscustomobject] ReadTimeEntry([uint32] $ticketId, [int] $timeEntryId)
+    [pscustomobject] ReadNote ([uint32] $ticketId, [int] $timeEntryId)
     {
-        $relativePathUri = "/$ticketId/timeentries/$timeEntryId";
+        $relativePathUri = "/$ticketId/notes/$timeEntryId";
         return $this.read($relativePathUri, $null);
     }
     
-    [pscustomobject[]] ReadTimeEntries([uint32] $ticketId)
+    [pscustomobject[]] ReadNotes ([uint32] $ticketId)
     {
         return $this.ReadTimeEntries($ticketId, 1, 0)
     }
     
-    [pscustomobject[]] ReadTimeEntries([uint32] $ticketId, [uint32] $pageNum, [uint32] $pageSize)
+    [pscustomobject[]] ReadNotes ([uint32] $ticketId, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
             page       = $pageNum;
             pageSize   = $pageSize;
         }
         
-        $relativePathUri = "/$ticketId/timeentries";
+        $relativePathUri = "/$ticketId/notes";
         return $this.read($relativePathUri, $queryHashtable);
     }
     
-    [uint32] GetTimeEntryCount([uint32] $ticketId)
+    [uint32] CreateNote ([uint32] $ticketId, [string] $message, [ServiceTicketNoteTypes[]] $addTo)
+    {
+        $newTicketNote = [PSCustomObject] @{
+            Text                  = [string]$message
+            DetailDescriptionFlag = [ServiceTicketNoteTypes]::Description -in $addTo
+            InternalAnalysisFlag  = [ServiceTicketNoteTypes]::Internal -in $addTo
+            ResolutionFlag        = [ServiceTicketNoteTypes]::Resolution -in $addTo
+        }
+        
+        $relativePathUri = "/$ticketId/notes";
+        $newTicketNote = $this.create($relativePathUri, $newTicketNote); 
+        return $newTicketNote;
+    }
+    
+    [uint32] GetNoteCount ([uint32] $ticketId)
     {
         $relativePathUri = "/$ticketId/timeentries/count";
         return $this.GetCount($null, $relativePathUri);
