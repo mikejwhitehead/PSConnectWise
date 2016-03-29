@@ -121,7 +121,7 @@ function New-CWServiceTicket
         [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$BoardID,
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$CompanyID,
         [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
