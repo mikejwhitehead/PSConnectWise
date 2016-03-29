@@ -744,6 +744,7 @@ class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
 
 class CwApiServicePrioritySvc : CWApiRestClientSvc
 {
+
     CwApiServicePrioritySvc([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.HttpBasePathUri = "/service/priorities";
@@ -781,4 +782,40 @@ class CwApiServicePrioritySvc : CWApiRestClientSvc
         return $this.getCount($priorityConditions);
     }
     
+}
+
+class CwApiServiceTicketTimeEntrySvc : CWApiRestClientSvc
+{
+    CwApiServiceTicketTimeEntrySvc([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    {
+        $this.CWApiClient.HttpBasePathUri = "/service/tickets";
+    }
+    
+    [pscustomobject] ReadTimeEntry([uint32] $ticketId, [int] $timeEntryId)
+    {
+        $relativePathUri = "/$ticketId/timeentries/$timeEntryId";
+        return $this.read($relativePathUri, $null);
+    }
+    
+    [pscustomobject[]] ReadTimeEntries([uint32] $ticketId)
+    {
+        return $this.ReadTimeEntries($ticketId, 1, 0)
+    }
+    
+    [pscustomobject[]] ReadTimeEntries([uint32] $ticketId, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        [hashtable] $queryHashtable = @{
+            page       = $pageNum;
+            pageSize   = $pageSize;
+        }
+        
+        $relativePathUri = "/$ticketId/timeentries";
+        return $this.read($relativePathUri, $queryHashtable);
+    }
+    
+    [uint32] GetTimeEntryCount([uint32] $ticketId)
+    {
+        $relativePathUri = "/$ticketId/timeentries/count";
+        return $this.GetCount($null, $relativePathUri);
+    }
 }
