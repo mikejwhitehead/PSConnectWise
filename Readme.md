@@ -2,40 +2,46 @@
 
 Collection of PowerShell CmdLet that interface with ConnectWise's REST API service. This project is meant to target the latest general releases of PowerShell and ConnectWise.
 
-##Version 1.0.0 Milestones
+##TODO for v1.0.0 
 Milestone Requirement: Create the minimum required CmdLets that is needed to properly create, read, update, and delete a ConnectWise ticket. 
 
-0. `Get-CWServiceTicket` -- **Completed**
-0. `Get-CWServiceBoard` -- **Completed**
-0. `Get-CWServiceBoardStatus` -- **Completed**
-0. `Get-CWServicePriority` -- **Completed (*Not Tested Yet*)**
-0. `New-CWServiceTicket` -- **Completed**
-0. `Get-CWServiceTicketNote` -- **Completed**
+###CmdLets
+0. `Get-CWServiceTicket`
+  - CmdLet: Completed
+  - Documentation: **Not Completed**
+0. `Get-CWServiceBoard`
+  - CmdLet: Completed
+  - Documentation: **Not Completed**
+0. `Get-CWServiceBoardStatus`
+  - CmdLet: Completed
+  - Documentation: **Not Completed**
+0. `Get-CWServicePriority`
+  - CmdLet: Completed (*Not Tested Yet*)
+  - Documentation: **Not Completed**
+0. `New-CWServiceTicket`
+  - CmdLet: Completed
+  - Documentation: **Not Completed**
+0. `Get-CWServiceTicketNote`
+  - CmdLet: Completed
+  - Documentation: **Not Completed**
 0. `Add-CWServiceTicketNote`
+  - CmdLet: Completed
+  - Documentation: **Not Completed**
 0. `Remove-CWServiceTicket`
+  - CmdLet: **Not Completed**
+  - Documentation: **Not Completed**
 0. `Update-CWServiceTicket`
+  - CmdLet: **Not Completed**
+  - Documentation: **Not Completed**
 0. `Get-CWCompanyContact`
-
-##CmdLets Overview 
-- ConnectWise Service Tickets  
-  - `Get-CWServiceTicket`
-    - **Use Case**: Gets ticket(s) via the ticket number, array of ticket numbers, or query.
-    - **Features**
-      - Request for specific CW ticket fields (ie id, summary, etc).
-      - Accepted ticket ids via the pipe.
-  - `New-CWServiceTicket` 
-    - *_Not Implemented Yet_*
-  - `Remove-CWServiceTicket` 
-    - *_Not Implemented Yet_*
-  - `Update-CWServiceTicket` 
-    - *_Not Implemented Yet_*  
- 
-- ConnectWise Service Boards  
-  - `Get-CWServiceBoard`
-    - **Use Case**: Gets board(s) via the board number, array of board numbers, or query.
-    - **Features**
-      - Request for specific CW board fields (ie id, summary, etc).
-      - Accepted board ids via the pipe.
+  - CmdLet: **Not Completed**
+  - Documentation: **Not Completed**
+        
+###Other
+0. Document All CmdLets
+0. Rename **pester** to **test**
+0. Create a Module Manifest
+0. Expand on the Examples
         
 #Requirements
 
