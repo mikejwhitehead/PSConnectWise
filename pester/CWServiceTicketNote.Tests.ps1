@@ -13,5 +13,12 @@ Describe 'Get-CWServiceTicketNote' {
 		$timeEntries = Get-CWServiceTicketNote -TicketID $ticketID -BaseApiUrl $pstrSvrUrl -CompanyName $pstrCompany -PublicKey $pstrSvrPublicKey -PrivateKey $pstrSvrPrivateKey;
 		$timeEntries.GetType().BaseType.Name | Should Be "Array";		
 	}
+	
+	It 'gets a single note from a ticket and pipes it through the Select-Object cmdlet for the id property of the first object' {
+		$noteID = $pstrNoteID;
+		$ticketID = $pstrTicketID;
+		$note = Get-CWServiceTicketNote -TicketID $ticketID -NoteID $noteID -BaseApiUrl $pstrSvrUrl -CompanyName $pstrCompany -PublicKey $pstrSvrPublicKey -PrivateKey $pstrSvrPrivateKey | Select-Object -First 1;
+		$note | Select-Object -ExpandProperty id | Should Be $noteID;		
+	}
 
 } 
