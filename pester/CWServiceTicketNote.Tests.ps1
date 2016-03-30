@@ -18,7 +18,14 @@ Describe 'Get-CWServiceTicketNote' {
 		$noteID = $pstrNoteID;
 		$ticketID = $pstrTicketID;
 		$note = Get-CWServiceTicketNote -TicketID $ticketID -NoteID $noteID -BaseApiUrl $pstrSvrUrl -CompanyName $pstrCompany -PublicKey $pstrSvrPublicKey -PrivateKey $pstrSvrPrivateKey | Select-Object -First 1;
-		$note | Select-Object -ExpandProperty id | Should Be $noteID;		
+		$note | Select-Object -ExpandProperty ticketID | Should Be $ticketID;		
+	}
+	
+	It 'add a new ticket note to a ticket then checks the return object for the ticket id' {
+		$ticketID = $pstrTicketID;
+		$message = "Testing the ability to add note entries to a ticket."
+		$note = Add-CWServiceTicketNote -TicketID 7857582 -Message $message -BaseApiUrl $pstrSvrUrl -CompanyName $pstrCompany -PublicKey $pstrSvrPublicKey -PrivateKey $pstrSvrPrivateKey;
+		$note | Select-Object -ExpandProperty ticketId | Should Be $ticketID;	
 	}
 
 } 

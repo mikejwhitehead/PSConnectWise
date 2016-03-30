@@ -825,7 +825,7 @@ class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
         return $this.read($relativePathUri, $queryHashtable);
     }
     
-    [uint32] CreateNote ([uint32] $ticketId, [string] $message, [ServiceTicketNoteTypes[]] $addTo)
+    [pscustomobject] CreateNote ([uint32] $ticketId, [string] $message, [ServiceTicketNoteTypes[]] $addTo)
     {
         $newTicketNote = [PSCustomObject] @{
             Text                  = [string]$message
@@ -841,7 +841,7 @@ class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
     
     [uint32] GetNoteCount ([uint32] $ticketId)
     {
-        $relativePathUri = "/$ticketId/timeentries/count";
+        $relativePathUri = "/$ticketId/notes/count";
         return $this.GetCount($null, $relativePathUri);
     }
 }

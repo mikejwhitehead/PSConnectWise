@@ -80,6 +80,7 @@ function Get-CWServiceTicketNote
             
             foreach ($Note in $Notes)
             {
+
                 Write-Verbose "Requesting ConnectWise Ticket Note Number: $($Note.id)";
                 $Note;
             } 
@@ -92,4 +93,76 @@ function Get-CWServiceTicketNote
     }
 }
 
+function Add-CWServiceTicketNote 
+{
+    [CmdLetBinding()]
+    param
+    (
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$TicketID,
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Message,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [switch]$AddToDescription,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [switch]$AddToInternal,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [switch]$AddToResolution,
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$BaseApiUrl,
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$CompanyName,
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$PublicKey,
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$PrivateKey
+    )
+    
+    Begin
+    {
+        # get the ticket service
+        $NoteSvc = [CwApiServiceTicketNoteSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        
+        [ServiceTicketNoteTypes[]] $addTo = @();
+    }
+    Process
+    {
+        if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
+        {
+            # defaults to detail description if no AddTo switch were passed
+            $AddToDescription = $true
+        }
+        
+        if ($AddToDescription -eq $true)
+        {
+            $addTo += [ServiceTicketNoteTypes]::Description;
+        }
+        if ($AddToInternal -eq $true)
+        {
+            $addTo += [ServiceTicketNoteTypes]::Internal;
+        }
+        if ($AddToResolution -eq $true)
+        {
+            $addTo += [ServiceTicketNoteTypes]::Resolution;
+        }       
+        
+        $newNote = $NoteSvc.CreateNote($TicketID, $Message, $addTo);
+        return $newNote;
+    }
+    End
+    {
+        # do nothing here
+    }
+} 
+
 Export-ModuleMember -Function 'Get-CWServiceTicketNote';
+Export-ModuleMember -Function 'Add-CWServiceTicketNote';
