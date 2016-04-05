@@ -132,9 +132,7 @@ function Add-CWServiceTicketNote
         $NoteSvc = [CwApiServiceTicketNoteSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
         
         [ServiceTicketNoteTypes[]] $addTo = @();
-    }
-    Process
-    {
+        
         if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
         {
             # defaults to detail description if no AddTo switch were passed
@@ -152,8 +150,10 @@ function Add-CWServiceTicketNote
         if ($AddToResolution -eq $true)
         {
             $addTo += [ServiceTicketNoteTypes]::Resolution;
-        }       
-        
+        }   
+    }
+    Process
+    {
         $newNote = $NoteSvc.CreateNote($TicketID, $Message, $addTo);
         return $newNote;
     }
