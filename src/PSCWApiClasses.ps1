@@ -380,7 +380,7 @@ class CWApiRestClient
                 }
                 else 
                 {
-                    # do not create an operation if the property value is null
+                    # do not Create an operation if the property value is null
                     if ($objDetail.Value -eq $null)
                     {
                         continue;
@@ -513,17 +513,17 @@ class CWApiRestClientSvc
         $this.CWApiClient = [CWApiRestClient]::new($baseUrl, $companyName, $publicKey, $privateKey);
     }
     
-    hidden [pscustomobject[]] QuickRead ([string] $url)
+    [pscustomobject[]] QuickRead ([string] $url)
     {
         return $this.CWApiClient.Get($url);
     }
     
-    hidden [pscustomobject[]] read ([string] $relativePathUri)
+    [pscustomobject[]] ReadRequest ([string] $relativePathUri)
     {
-        return $this.read($relativePathUri, $null);
+        return $this.ReadRequest($relativePathUri, $null);
     }
     
-    hidden [pscustomobject[]] read ([string] $relativePathUri, [hashtable] $queryHashtable)
+    [pscustomobject[]] ReadRequest ([string] $relativePathUri, [hashtable] $queryHashtable)
     {
         $MAX_PAGE_REQUEST_SIZE = 50;
         
@@ -546,17 +546,17 @@ class CWApiRestClientSvc
         return $items;
     }
     
-    hidden [bool] delete ([string] $relativePathUri)
+    [bool] DeleteRequest ([string] $relativePathUri)
     {
         $request = [CWApiRequestInfo]::New();
         $request.RelativePathUri = $relativePathUri;
-        $request.Verb = "DELETE";
+        $request.Verb = "Delete";
         
-        $response = $this.CWApiClient.Delete($request);
+        $response = $this.CWApiClient.DeleteRequest($request);
         return $response;
     }
     
-    hidden [pscustomobject] create ([hashtable] $newItemHashtable)
+    [pscustomobject] CreateRequest ([hashtable] $newItemHashtable)
     {
         [pscustomobject] $newItem = @{};
         
@@ -565,15 +565,15 @@ class CWApiRestClientSvc
             Add-Member -parentObject $newItem -MemberType NoteProperty -Name $p.Key -Value $p.Value;
         } 
         
-        return $this.create($newItem);
+        return $this.CreateRequest($newItem);
     }
     
-    hidden [pscustomobject] create ([pscustomobject] $newItem)
+    [pscustomobject] CreateRequest ([pscustomobject] $newItem)
     {
-        return $this.create($null, $newItem);
+        return $this.CreateRequest($null, $newItem);
     }
     
-    hidden [pscustomobject] create ([string] $relativePathUri, [pscustomobject] $newItem)
+    [pscustomobject] CreateRequest ([string] $relativePathUri, [pscustomobject] $newItem)
     {
         $request = [CWApiRequestInfo]::New();
         $request.RelativePathUri = $relativePathUri;
@@ -584,7 +584,7 @@ class CWApiRestClientSvc
         return $response;
     }
     
-    hidden [pscustomobject] update ([string] $relativePathUri, [pscustomobject] $itemUpdates)
+    [pscustomobject] UpdateRequest ([string] $relativePathUri, [pscustomobject] $itemUpdates)
     {
         $request = [CWApiRequestInfo]::New();
         $request.RelativePathUri = $relativePathUri;
@@ -595,19 +595,19 @@ class CWApiRestClientSvc
         return $response;
     }
     
-    hidden [uint32] getCount ([string] $conditions)
+    [uint32] GetCount ([string] $conditions)
     {        
-        return $this.getCount($conditions, "/count");
+        return $this.GetCount($conditions, "/count");
     }
     
-    hidden [uint32] getCount ([string] $conditions, [string] $relativePathUri)
+    [uint32] GetCount ([string] $conditions, [string] $relativePathUri)
     {
         [hashtable] $queryParams = @{
             conditions = $conditions;
         }
         [string] $queryString = [CWApiRestClient]::BuildCWQueryString($queryParams)
         
-        $response = $this.read($relativePathUri, $queryParams)[0];
+        $response = $this.ReadRequest($relativePathUri, $queryParams)[0];
         return [uint32] $response.count;
     }
 }
@@ -632,7 +632,7 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         
         $relativePathUri = "/$ticketID";
         
-        return $this.read($relativePathUri, $queryHashtable);
+        return $this.ReadRequest($relativePathUri, $queryHashtable);
     }
     
     [pscustomobject[]] ReadTickets ([string] $ticketConditions)
@@ -659,12 +659,13 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
             pageSize   = $pageSize;
         }
         
-        return $this.read($null, $queryParams);
+        return $this.ReadRequest($null, $queryParams);
     }
     
-    [pscustomobject] UpdateItem ([uint32] $boardId, [uint32] $contactId, [uint32] $statusId, [uint32] $priorityID)
+    [pscustomobject] 
+    UpdateItem ([uint32] $ticketId, [uint32] $boardId, [uint32] $contactId, [uint32] $statusId, [uint32] $priorityID)
     {
-        [pscustomobject] $updatedTicket= $null;
+        [pscustomobject] $UpdatedTicket= $null;
         
         $newTicketInfo = [PSCustomObject] @{
             Board    = [PSCustomObject] @{ ID = [uint32]$boardId;    }
@@ -672,8 +673,11 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
             Priority = [PSCustomObject] @{ ID = [uint32]$priorityId; }
             Status   = [PSCustomObject] @{ ID = [uint32]$statusId;   }
         }
+
+        $relativePathUri = "/$ticketID";
+        $UpdatedTicket = $this.UpdateRequest($relativePathUri, $newTicketInfo)
         
-        return $updatedTicket;
+        return $UpdatedTicket;
     }
     
     [pscustomobject] CreateTicket ([uint32] $boardId, [uint32] $companyId, [uint32] $contactId, [string] $subject, [string] $body, [string] $analysis, [uint32] $statusId, [uint32] $priorityID)
@@ -689,26 +693,20 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
             Status                  = [PSCustomObject] @{ ID = [uint32]$statusId;   }
         }
         
-        $newTicket = $this.create($newTicketInfo); 
+        $newTicket = $this.CreateRequest($newTicketInfo); 
         return $newTicket;
     }
     
     [bool] DeleteTicket ([uint32] $ticketID)
     {
         $relativePathUri = "/$ticketID";
-        return $this.delete($relativePathUri);
+        return $this.DeleteRequest($relativePathUri);
     }
     
     [uint32] GetTicketCount ([string] $ticketConditions)
     {
-        return $this.getCount($ticketConditions);
+        return $this.GetCount($ticketConditions);
     }
-    
-    # static [pscustomobject] GetTicketTemplate ()
-    # {
-    #     ModelImporter.Import()
-    # }    
-    
 }
 
 class CwApiServiceBoardSvc : CWApiRestClientSvc
@@ -721,7 +719,7 @@ class CwApiServiceBoardSvc : CWApiRestClientSvc
     [pscustomobject] ReadBoard ([int] $boardId)
     {
         $relativePathUri = "/$boardId";
-        return $this.read($relativePathUri, $null);
+        return $this.ReadRequest($relativePathUri, $null);
     }
     
     [pscustomobject[]] ReadBoards ([string] $boardConditions)
@@ -742,12 +740,12 @@ class CwApiServiceBoardSvc : CWApiRestClientSvc
             pageSize   = $pageSize;
         }
         
-        return $this.read($null, $queryHashtable);
+        return $this.ReadRequest($null, $queryHashtable);
     }
     
     [uint32] GetBoardCount([string] $boardConditions)
     {
-        return $this.getCount($boardConditions);
+        return $this.GetCount($boardConditions);
     }
     
 }
@@ -762,7 +760,7 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
     [pscustomobject] ReadStatus([int] $boardId, $statusId)
     {
         $relativePathUri = "/$boardId/statuses/$statusId";
-        return $this.read($relativePathUri);
+        return $this.ReadRequest($relativePathUri);
     }
     
     [pscustomobject[]] ReadStatuses ([uint32] $boardId)
@@ -789,7 +787,7 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
         }
 
         $relativePathUri = "/$boardId/statuses";
-        return $this.read($relativePathUri, $queryHashtable);
+        return $this.ReadRequest($relativePathUri, $queryHashtable);
     }
     
     [uint32] GetStatusCount ([uint32] $boardId)
@@ -800,7 +798,7 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
     [uint32] GetStatusCount ([uint32] $boardId, [string] $statusConditions)
     {
         $relativePathUri = "/$boardId/statuses/count";
-        return $this.getCount($statusConditions, $relativePathUri);
+        return $this.GetCount($statusConditions, $relativePathUri);
     }
 }
 
@@ -814,7 +812,7 @@ class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
     [pscustomobject] ReadType([int] $boardId, $typeId)
     {
         $relativePathUri = "/$boardId/types/$typeId";
-        return $this.read($relativePathUri);
+        return $this.ReadRequest($relativePathUri);
     }
     
     [pscustomobject[]] ReadTypes ([uint32] $boardId)
@@ -841,7 +839,7 @@ class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
         }
 
         $relativePathUri = "/$boardId/types";
-        return $this.read($relativePathUri, $queryHashtable);
+        return $this.ReadRequest($relativePathUri, $queryHashtable);
     }
     
     [uint32] GetTypeCount ([uint32] $boardId)
@@ -852,7 +850,7 @@ class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
     [uint32] GetTypeCount ([uint32] $boardId, [string] $typeConditions)
     {
         $relativePathUri = "/$boardId/types/count";
-        return $this.getCount($typeConditions, $relativePathUri);
+        return $this.GetCount($typeConditions, $relativePathUri);
     }
 }
 
@@ -867,7 +865,7 @@ class CwApiServicePrioritySvc : CWApiRestClientSvc
     [pscustomobject] ReadPriority([uint32] $priorityId)
     {
         $relativePathUri = "/$priorityId";
-        return $this.read($relativePathUri, $null);
+        return $this.ReadRequest($relativePathUri, $null);
     }
     
     [pscustomobject[]] ReadPriorities ([string] $priorityConditions)
@@ -888,12 +886,12 @@ class CwApiServicePrioritySvc : CWApiRestClientSvc
             pageSize   = $pageSize;
         }
         
-        return $this.read($null, $queryHashtable);
+        return $this.ReadRequest($null, $queryHashtable);
     }
     
     [uint32] GetPriorityCount([string] $priorityConditions)
     {
-        return $this.getCount($priorityConditions);
+        return $this.GetCount($priorityConditions);
     }
     
 }
@@ -908,7 +906,7 @@ class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
     [pscustomobject] ReadNote ([uint32] $ticketId, [int] $timeEntryId)
     {
         $relativePathUri = "/$ticketId/notes/$timeEntryId";
-        return $this.read($relativePathUri, $null);
+        return $this.ReadRequest($relativePathUri, $null);
     }
     
     [pscustomobject[]] ReadNotes ([uint32] $ticketId)
@@ -924,7 +922,7 @@ class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
         }
         
         $relativePathUri = "/$ticketId/notes";
-        return $this.read($relativePathUri, $queryHashtable);
+        return $this.ReadRequest($relativePathUri, $queryHashtable);
     }
     
     [pscustomobject] CreateNote ([uint32] $ticketId, [string] $message, [ServiceTicketNoteTypes[]] $addTo)
@@ -937,7 +935,7 @@ class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
         }
         
         $relativePathUri = "/$ticketId/notes";
-        $newTicketNote = $this.create($relativePathUri, $newTicketNote); 
+        $newTicketNote = $this.CreateRequest($relativePathUri, $newTicketNote); 
         return $newTicketNote;
     }
     

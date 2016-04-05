@@ -172,5 +172,87 @@ function New-CWServiceTicket
     }
 } 
 
+function Update-CWServiceTicket  
+{
+    [CmdLetBinding()]
+    param
+    (
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$TicketID,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$BoardID,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$ContactID,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Subject,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Description,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Internal,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$PriorityID,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$StatusID,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$BaseApiUrl,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$CompanyName,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$PublicKey,
+        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$PrivateKey
+    )
+    
+    Begin
+    {
+        # get the ticket service
+        $TicketSvc = [CwApiServiceTicketSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        $NoteSvc   = [CwApiServiceTicketSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        
+        [ServiceTicketNoteTypes[]] $addToForNote = @();
+        if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
+        {
+            # defaults to detail description if no AddTo switch were passed
+            $AddToDescription = $true
+        }
+        
+        if ($AddToDescription -eq $true)
+        {
+            $addToForNote += [ServiceTicketNoteTypes]::Description;
+        }
+        if ($AddToInternal -eq $true)
+        {
+            $addToForNote += [ServiceTicketNoteTypes]::Internal;
+        }
+        if ($AddToResolution -eq $true)
+        {
+            $addToForNote += [ServiceTicketNoteTypes]::Resolution;
+        }  
+    }
+    Process
+    {
+        $updatedTicket = $TicketSvc.UpdateTicket($TicketID, $BoardID, $ContactID, $StatusID, $PriorityID);
+        $newTicketNote = $TicketSvc.CreateNote($TicketID, $Message, $addToForNote);
+    }
+    End
+    {
+        # do nothing here
+    }
+    
+}
+
 Export-ModuleMember -Function 'Get-CWServiceTicket';
 Export-ModuleMember -Function 'New-CWServiceTicket';
+Export-ModuleMember -Function 'Update-CWServiceTicket';
