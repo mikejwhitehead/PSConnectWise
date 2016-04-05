@@ -578,6 +578,17 @@ class CWApiRestClientSvc
         return $response;
     }
     
+    hidden [pscustomobject] update ([string] $relativePathUri, [pscustomobject] $itemUpdates)
+    {
+        $request = [CWApiRequestInfo]::New();
+        $request.RelativePathUri = $relativePathUri;
+        $request.Verb = "PATCH";
+        $request.Body = [CWApiRestClient]::BuildPatchOperations($itemUpdates);
+        
+        $response = $this.CWApiClient.Patch($request);
+        return $response;
+    }
+    
     hidden [uint32] getCount ([string] $conditions)
     {        
         return $this.getCount($conditions, "/count");
