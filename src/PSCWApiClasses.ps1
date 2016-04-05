@@ -275,25 +275,39 @@ class CWApiRestClient
         return $wasDeleted; 
     }
     
+    [pscustomobject] Patch ([CWApiRequestInfo] $request)
+    {
+        [pscustomobject] $response = $null;
+        
+        $header = $this.HttpHeader;
+        $url    = $this.buildUrl($request.RelativePathUri);
+        $verb   = $request.Verb;
+        $body   = $request.Body | ConvertTo-Json -Depth 100 -Compress | Out-String
+        
+        $response = $this._request($header, $url, $verb, $body);
+        $newItem = $response | ConvertFrom-Json 
+        return $newItem;
+    }
+    
     [pscustomobject] Post ([CWApiRequestInfo] $request)
     {
-       [pscustomobject] $response = $null;
-       
-       $header = $this.HttpHeader;
-       $url    = $this.buildUrl($request.RelativePathUri);
-       $verb   = $request.Verb;
-       $body   = $request.Body | ConvertTo-Json -Depth 100 -Compress | Out-String
-       
-       $response = $this._request($header, $url, $verb, $body);
-       $newItem = $response | ConvertFrom-Json 
-       return $newItem;
+        [pscustomobject] $response = $null;
+        
+        $header = $this.HttpHeader;
+        $url    = $this.buildUrl($request.RelativePathUri);
+        $verb   = $request.Verb;
+        $body   = $request.Body | ConvertTo-Json -Depth 100 -Compress | Out-String
+        
+        $response = $this._request($header, $url, $verb, $body);
+        $newItem = $response | ConvertFrom-Json 
+        return $newItem;
     }
     
     #
     # Helper Functions
     #
     
-    static hidden [string] buildCWQueryString ([hashtable] $queryParams)
+    static [string] BuildCWQueryString ([hashtable] $queryParams)
     {
         [string[]] $validParams = @("fields", "page", "pagesize", "orderby", "conditions");
         [string] $queryString = "";
@@ -321,34 +335,12 @@ class CWApiRestClient
         return $queryString;
     } 
     
-    [string] buildUrl ([string] $relativePathUri)
+    static [pscustomObject[]] BuildPatchOperations ([pscustomobject[]] $patchRequests)
     {
-        return $this.buildUrl($relativePathUri, $null);
-    }   
-        
-    [string] buildUrl ([string] $relativePathUri, [string] $queryString)
-    {
-        if ([string]::IsNullOrEmpty($relativePathUri))
-        {
-            $relativePathUri = "";
-        }
-        
-        if ([string]::IsNullOrEmpty($queryString))
-        {
-            $queryString = "";
-        }
-        
-        $url = [String]::Format("{0}{1}{2}{3}", $this.HttpBaseUrl, $this.HttpBasePathUri, $relativePathUri, $queryString);
-        
-        return $url;
-    }
-    
-    [pscustomObject[]] buildPatchOperations ([pscustomobject[]] $patchRequests)
-    {
-        return $this.buildPatchOperations($patchRequests, $null);
+        return [CWApiRestClient]::BuildPatchOperations($patchRequests, $null);
     } 
     
-    [pscustomobject[]] buildPatchOperations ([pscustomobject[]] $patchRequests, [pscustomobject] $parentObject)
+    static [pscustomobject[]] BuildPatchOperations ([pscustomobject[]] $patchRequests, [pscustomobject] $parentObject)
     {
         # TODO: accept other HTTP PATCH verbs (ie move, copy, etc); all patch 
         [pscustomobject[]] $postInfoCollection = @()
@@ -380,10 +372,10 @@ class CWApiRestClient
                     $patchOperation.path += "/";
                 }
                 
-                if ($objDetail.Value.GetType().Name.ToString() -in @("PSCustomObject","PSObject"))
+                if ($objDetail.Value.GetType().Name.ToString() -in @("PSCustomObject", "PSObject"))
                 {
                     $patchOperation.path += $objDetail.Name;
-                    $value = $this.buildPostObject($objDetail.Value, $patchOperation);
+                    $value = [CWApiRestClient]::BuildPatchOperations($objDetail.Value, $patchOperation);
                     $postInfoCollection += $value;    
                 }
                 else 
@@ -397,6 +389,30 @@ class CWApiRestClient
         }
         return $postInfoCollection
     }
+    
+    [string] buildUrl ([string] $relativePathUri)
+    {
+        return $this.buildUrl($relativePathUri, $null);
+    }   
+        
+    [string] buildUrl ([string] $relativePathUri, [string] $queryString)
+    {
+        if ([string]::IsNullOrEmpty($relativePathUri))
+        {
+            $relativePathUri = "";
+        }
+        
+        if ([string]::IsNullOrEmpty($queryString))
+        {
+            $queryString = "";
+        }
+        
+        $url = [String]::Format("{0}{1}{2}{3}", $this.HttpBaseUrl, $this.HttpBasePathUri, $relativePathUri, $queryString);
+        
+        return $url;
+    }
+    
+    
     
     hidden [void] transformHttpHeader ([hashtable] $transformHeaderHashtable)
     {
@@ -515,7 +531,7 @@ class CWApiRestClientSvc
             {
                 $queryHashtable['pageSize'] = $MAX_PAGE_REQUEST_SIZE;
             }
-            [string] $queryString = [CWApiRestClient]::buildCWQueryString($queryHashtable);
+            [string] $queryString = [CWApiRestClient]::BuildCWQueryString($queryHashtable);
             
             $request.QueryString = $queryString;
         }
@@ -572,7 +588,7 @@ class CWApiRestClientSvc
         [hashtable] $queryParams = @{
             conditions = $conditions;
         }
-        [string] $queryString = [CWApiRestClient]::buildCWQueryString($queryParams)
+        [string] $queryString = [CWApiRestClient]::BuildCWQueryString($queryParams)
         
         $response = $this.read($relativePathUri, $queryParams)[0];
         return [uint32] $response.count;
