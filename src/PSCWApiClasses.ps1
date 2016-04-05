@@ -380,6 +380,12 @@ class CWApiRestClient
                 }
                 else 
                 {
+                    # do not create an operation if the property value is null
+                    if ($objDetail.Value -eq $null)
+                    {
+                        continue;
+                    }
+                    
                     $patchOperation.path += $objDetail.Name;
                     $patchOperation.value = $objDetail.Value.ToString();
                     $postInfoCollection += $patchOperation;
@@ -658,13 +664,13 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
     
     [pscustomobject] UpdateItem ([uint32] $boardId, [uint32] $contactId, [uint32] $statusId, [uint32] $priorityID)
     {
-         [pscustomobject] $updatedTicket= $null;
+        [pscustomobject] $updatedTicket= $null;
         
         $newTicketInfo = [PSCustomObject] @{
-            Board                   = [PSCustomObject] @{ ID = [uint32]$boardId;    }
-            Contact                 = [PSCustomObject] @{ ID = [uint32]$contactId;  }
-            Priority                = [PSCustomObject] @{ ID = [uint32]$priorityId; }
-            Status                  = [PSCustomObject] @{ ID = [uint32]$statusId;   }
+            Board    = [PSCustomObject] @{ ID = [uint32]$boardId;    }
+            Contact  = [PSCustomObject] @{ ID = [uint32]$contactId;  }
+            Priority = [PSCustomObject] @{ ID = [uint32]$priorityId; }
+            Status   = [PSCustomObject] @{ ID = [uint32]$statusId;   }
         }
         
         return $updatedTicket;
