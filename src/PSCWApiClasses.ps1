@@ -343,6 +343,61 @@ class CWApiRestClient
         return $url;
     }
     
+    [pscustomObject[]] buildPatchOperations ([pscustomobject[]] $patchRequests)
+    {
+        return $this.buildPatchOperations($patchRequests, $null);
+    } 
+    
+    [pscustomobject[]] buildPatchOperations ([pscustomobject[]] $patchRequests, [pscustomobject] $parentObject)
+    {
+        # TODO: accept other HTTP PATCH verbs (ie move, copy, etc); all patch 
+        [pscustomobject[]] $postInfoCollection = @()
+        
+        if ($patchRequests.GetType().Name.ToString() -eq "PSObject[]" -and $patchRequests.Count -eq 1)
+        {
+            if ($patchRequests[0].GetType().Name.ToString() -in @("PSCustomObject","PSObject"))
+            {
+                $patchRequests = $patchRequests[0].PSObject.Properties;
+            }
+        }
+        
+        foreach ($objDetail in $patchRequests)
+        {
+        
+            if ($objDetail.GetType().Name.ToString() -eq "PSNoteProperty")
+            {
+                if ($parentObject -eq $null)
+                    {
+                    $patchOperation = [PSCustomObject] @{
+                        op    = [string]"replace";
+                        path  = [string]$null;
+                        value = [string]$null;
+                    }
+                }
+                else 
+                {
+                    $patchOperation = $parentObject.PSObject.Copy();
+                    $patchOperation.path += "/";
+                }
+                
+                if ($objDetail.Value.GetType().Name.ToString() -in @("PSCustomObject","PSObject"))
+                {
+                    $patchOperation.path += $objDetail.Name;
+                    $value = $this.buildPostObject($objDetail.Value, $patchOperation);
+                    $postInfoCollection += $value;    
+                }
+                else 
+                {
+                    $patchOperation.path += $objDetail.Name;
+                    $patchOperation.value = $objDetail.Value.ToString();
+                    $postInfoCollection += $patchOperation;
+                }
+            }
+
+        }
+        return $postInfoCollection
+    }
+    
     hidden [void] transformHttpHeader ([hashtable] $transformHeaderHashtable)
     {
         foreach ($p in $transformHeaderHashtable)
@@ -485,7 +540,7 @@ class CWApiRestClientSvc
         
         foreach ($p in $newItemHashtable.GetEnumerator())
         {
-            Add-Member -InputObject $newItem -MemberType NoteProperty -Name $p.Key -Value $p.Value;
+            Add-Member -parentObject $newItem -MemberType NoteProperty -Name $p.Key -Value $p.Value;
         } 
         
         return $this.create($newItem);
@@ -572,6 +627,20 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         }
         
         return $this.read($null, $queryParams);
+    }
+    
+    [pscustomobject] UpdateItem ([uint32] $boardId, [uint32] $contactId, [uint32] $statusId, [uint32] $priorityID)
+    {
+         [pscustomobject] $updatedTicket= $null;
+        
+        $newTicketInfo = [PSCustomObject] @{
+            Board                   = [PSCustomObject] @{ ID = [uint32]$boardId;    }
+            Contact                 = [PSCustomObject] @{ ID = [uint32]$contactId;  }
+            Priority                = [PSCustomObject] @{ ID = [uint32]$priorityId; }
+            Status                  = [PSCustomObject] @{ ID = [uint32]$statusId;   }
+        }
+        
+        return $updatedTicket;
     }
     
     [pscustomobject] CreateTicket ([uint32] $boardId, [uint32] $companyId, [uint32] $contactId, [string] $subject, [string] $body, [string] $analysis, [uint32] $statusId, [uint32] $priorityID)
