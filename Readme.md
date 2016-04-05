@@ -7,35 +7,35 @@ Milestone Requirement: Create the minimum required CmdLets that is needed to pro
 
 ###CmdLets
 0. `Get-CWServiceTicket`
-  - CmdLet: Completed
-  - Documentation: **Not Completed**
+  - CmdLet: **Completed**
+  - Documentation: *Not Completed*
 0. `Get-CWServiceBoard`
-  - CmdLet: Completed
-  - Documentation: **Not Completed**
+  - CmdLet: **Completed**
+  - Documentation: *Not Completed*
 0. `Get-CWServiceBoardStatus`
-  - CmdLet: Completed
-  - Documentation: **Not Completed**
+  - CmdLet: **Completed**
+  - Documentation: *Not Completed*
 0. `Get-CWServicePriority`
-  - CmdLet: Completed (*Not Tested Yet*)
-  - Documentation: **Not Completed**
+  - CmdLet: **Completed** (*Not Tested Yet*)
+  - Documentation: *Not Completed*
 0. `New-CWServiceTicket`
-  - CmdLet: Completed
-  - Documentation: **Not Completed**
+  - CmdLet: **Completed**
+  - Documentation: *Not Completed*
 0. `Get-CWServiceTicketNote`
-  - CmdLet: Completed
-  - Documentation: **Not Completed**
+  - CmdLet: **Completed**
+  - Documentation: *Not Completed*
 0. `Add-CWServiceTicketNote`
-  - CmdLet: Completed
-  - Documentation: **Not Completed**
+  - CmdLet: **Completed**
+  - Documentation: *Not Completed*
 0. `Remove-CWServiceTicket`
-  - CmdLet: **Not Completed**
-  - Documentation: **Not Completed**
+  - CmdLet: *Not Completed*
+  - Documentation: *Not Completed*
 0. `Update-CWServiceTicket`
-  - CmdLet: **Not Completed**
-  - Documentation: **Not Completed**
+  - CmdLet: *Not Completed*
+  - Documentation: *Not Completed*
 0. `Get-CWCompanyContact`
-  - CmdLet: **Not Completed**
-  - Documentation: **Not Completed**
+  - CmdLet: *Not Completed*
+  - Documentation: *Not Completed*
         
 ###Other
 0. Document All CmdLets
