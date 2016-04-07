@@ -282,7 +282,7 @@ class CWApiRestClient
         $header = $this.HttpHeader;
         $url    = $this.buildUrl($request.RelativePathUri);
         $verb   = $request.Verb;
-        $body   = $request.Body | ConvertTo-Json -Depth 100 -Compress | Out-String
+        $body   = ConvertTo-Json -InputObject @($request.Body) -Depth 100 -Compress | Out-String
         
         $response = $this._request($header, $url, $verb, $body);
         $newItem = $response | ConvertFrom-Json 
@@ -335,12 +335,12 @@ class CWApiRestClient
         return $queryString;
     } 
     
-    static [pscustomObject[]] BuildPatchOperations ([pscustomobject[]] $patchRequests)
+    static [pscustomobject[]] BuildPatchOperations ([pscustomobject] $patchRequests)
     {
         return [CWApiRestClient]::BuildPatchOperations($patchRequests, $null);
     } 
     
-    static [pscustomobject[]] BuildPatchOperations ([pscustomobject[]] $patchRequests, [pscustomobject] $parentObject)
+    static [pscustomobject[]] BuildPatchOperations ([pscustomobject] $patchRequests, [pscustomobject] $parentObject)
     {
         # TODO: accept other HTTP PATCH verbs (ie move, copy, etc); all patch 
         [pscustomobject[]] $postInfoCollection = @()
@@ -362,7 +362,7 @@ class CWApiRestClient
                     {
                     $patchOperation = [PSCustomObject] @{
                         op    = [string]"replace";
-                        path  = [string]$null;
+                        path  = [string]"/";
                         value = [string]$null;
                     }
                 }
@@ -374,26 +374,26 @@ class CWApiRestClient
                 
                 if ($objDetail.Value.GetType().Name.ToString() -in @("PSCustomObject", "PSObject"))
                 {
-                    $patchOperation.path += $objDetail.Name;
-                    $value = [CWApiRestClient]::BuildPatchOperations($objDetail.Value, $patchOperation);
+                    $patchOperation.path += $objDetail.Name.ToLower();
+                    $value = [CWApiRestClient]::BuildPatchOperations([psobject[]] $objDetail.Value, $patchOperation);
                     $postInfoCollection += $value;    
                 }
                 else 
                 {
-                    # do not Create an operation if the property value is null
-                    if ($objDetail.Value -eq $null)
+                    # do not create an operation obj if the property value is null or numeric value is 0
+                    if ($objDetail.Value -eq $null -or ($objDetail.Value.GetType().IsValueType -and $objDetail.Value -eq 0))
                     {
                         continue;
                     }
                     
-                    $patchOperation.path += $objDetail.Name;
+                    $patchOperation.path += $objDetail.Name.ToLower() ;
                     $patchOperation.value = $objDetail.Value.ToString();
                     $postInfoCollection += $patchOperation;
                 }
             }
 
         }
-        return $postInfoCollection
+        return [pscustomobject[]] $postInfoCollection
     }
     
     [string] buildUrl ([string] $relativePathUri)
@@ -584,7 +584,7 @@ class CWApiRestClientSvc
         return $response;
     }
     
-    [pscustomobject] UpdateRequest ([string] $relativePathUri, [pscustomobject] $itemUpdates)
+    [pscustomobject] UpdateRequest ([string] $relativePathUri, [pscustomobject[]] $itemUpdates)
     {
         $request = [CWApiRequestInfo]::New();
         $request.RelativePathUri = $relativePathUri;
@@ -663,7 +663,7 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
     }
     
     [pscustomobject] 
-    UpdateItem ([uint32] $ticketId, [uint32] $boardId, [uint32] $contactId, [uint32] $statusId, [uint32] $priorityID)
+    UpdateTicket ([uint32] $ticketId, [uint32] $boardId, [uint32] $contactId, [uint32] $statusId, [uint32] $priorityID)
     {
         [pscustomobject] $UpdatedTicket= $null;
         
