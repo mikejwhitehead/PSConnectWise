@@ -90,37 +90,37 @@ Describe 'CWServiceTicket' {
 		
 	} # end of Context "New-CWServiceTicket" 
 	
-	# Context "Update-CWServiceTicket"  {
+	Context "Update-CWServiceTicket"  {
 		
-	# 	$pstrTicketID  = $pstrGenSvc.ticketIds[0];
-	# 	$pstrStatusID  = $pstrGenSvc.statusIds[0];
-	# 	$pstrBoardID   = $pstrGenSvc.boardIds[0];
+		$pstrTicketID  = $pstrGenSvc.ticketIds[0];
+		$pstrStatusID  = $pstrGenSvc.statusIds[0];
+		$pstrBoardID   = $pstrGenSvc.boardIds[0];
 	
-	# 	It "change the status of a ticket" {
-	# 		$ticketID = $pstrTicketID;
-	# 		$statusID = $pstrStatusID;
-	# 		$ticket = Update-CWServiceTicket -TicketID $ticketID -StatusID $statusID `
-	# 					-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
-	# 		$ticket.status.id -eq $statusID | Should Be $true; 
-	# 	}
+		It "change the status of a ticket" {
+			$ticketID = $pstrTicketID;
+			$statusID = $pstrStatusID;
+			$ticket = Update-CWServiceTicket -TicketID $ticketID -StatusID $statusID `
+						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$ticket.status.id -eq $statusID | Should Be $true; 
+		}
 		
-	# 	It "change the status of a ticket and set the board ID" {
-	# 		$ticketID = $pstrTicketID;
-	# 		$statusID = $pstrStatusID;
-	# 		$boardID  = $pstrBoardID;
-	# 		$ticket = Update-CWServiceTicket -TicketID $ticketID -StatusID $statusID -BoardID $pstrBoard `
-	# 					-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
-	# 		$ticket.status.id -eq $statusID -and $ticket.board.id -eq $pstrBoard | Should Be $true; 
-	# 	}
+		It "change the status of a ticket and set the board ID" {
+			$ticketID = $pstrTicketID;
+			$statusID = $pstrStatusID;
+			$boardID  = $pstrBoardID;
+			$ticket = Update-CWServiceTicket -TicketID $ticketID -StatusID $statusID -BoardID $boardID `
+						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$ticket.status.id -eq $statusID -and $ticket.board.id -eq $boardID | Should Be $true; 
+		}
 		
-	# 	It "add a ticket note to a ticket" {
-	# 		$ticketID = $pstrTicketID;
-	# 		$ticket = Update-CWServiceTicket -TicketID $ticketID `
-	# 		            -Message "Testing new ticket note via update ticket command." -Description `
-	# 					-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
-	# 		$ticket.id -eq $pstrTicketID | Should Be $true; 
-	# 	}
+		It "add a ticket note to a ticket" {
+			$ticketID = $pstrTicketID;
+			$ticket = Update-CWServiceTicket -TicketID $ticketID `
+			            -Message "Testing new ticket note via update ticket command." -AddToDescription `
+						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$ticket.id -eq $ticketID | Should Be $true; 
+		}
 		
-	# } # end of Context "Update-CWServiceTicket" 
+	} # end of Context "Update-CWServiceTicket" 
 		
 } # end of Describe 'CWServiceTicket'
