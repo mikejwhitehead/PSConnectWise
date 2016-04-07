@@ -1,6 +1,8 @@
 # Development and Testing items
 .hidden/
 .vscode/
+scripts/
+scripts/Sandbox.ps1
 testSettings.json
 
 
