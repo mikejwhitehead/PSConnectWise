@@ -1,0 +1,40 @@
+{
+    // connection info to the ConnectWise server    
+    "server": {
+        "url": "",
+        "companyName": "",
+        "publicKey": "",
+        "privateKey": ""
+    },
+    
+    // ids of items that, in general, will be used for the get/read requests
+    "general": {
+        
+        // variables to be used when making calls to ConnectWise's Service module
+        "service": {
+            "ticketIds": [1000, 1001, 1002, 1003, 1004, 1005],
+            "boardIds": [1, 2, 3, 4, 5],
+            "statusIds": [105, 104, 103, 102, 101],
+            "priorityIds": [8, 7, 6, 5, 4],
+            "ticketNoteIds": [123456]
+        }
+        
+    },
+    
+    // variables to be used for jobs/action specific tasks
+    "actions": {
+        
+        // values to be used when testing the creation of new tickets.
+        "newTicket": {
+            "ticketTitle": "[Test] PowerShell Created Ticket",
+            "ticketBody": "Do not close or delete this ticket without talking to your manager",
+            "ticketCompany": 43,
+            "ticketBoard": 1,
+            "ticketContact": 777,
+            "ticketStatus": 105,
+            "ticketPriority": 8
+        }   
+             
+    }
+    
+}
