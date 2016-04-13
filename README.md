@@ -2,7 +2,7 @@
 
 Collection of PowerShell CmdLet that interface with ConnectWise's REST API service. This project is meant to target the latest general releases of PowerShell and ConnectWise.
 
-##TODO for v1.0.0 
+##Roadmap for v1.0.0 
 Milestone Requirement: Create the minimum required CmdLets that is needed to properly create, read, update, and delete a ConnectWise ticket. 
 
 ###CmdLets
@@ -28,7 +28,7 @@ Milestone Requirement: Create the minimum required CmdLets that is needed to pro
   - CmdLet: **Completed**
   - Documentation: *Not Completed*
 0. `Remove-CWServiceTicket`
-  - CmdLet: *Not Completed*
+  - CmdLet: **Completed**
   - Documentation: *Not Completed*
 0. `Update-CWServiceTicket`
   - CmdLet: **Completed**
