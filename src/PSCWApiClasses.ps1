@@ -60,12 +60,12 @@ class WebRestApiRequest
         if ([String]::IsNullOrWhiteSpace($this.Body))
         {
             Write-Debug "REST Request Details:  $($this | Select Url, Header, Verb | ConvertTo-Json -Depth 10 | Out-String)";
-            $this.Response = Invoke-WebRequest -Uri $this.Url -Method $this.Verb -Headers $this.Header -ContentType $this.contentType;   
+            $this.Response = Invoke-WebRequest -Uri $this.Url -Method $this.Verb -Headers $this.Header -ContentType $this.contentType -UseBasicParsing;   
         }
         else
         {
             Write-Debug "REST Request Details:  $($this | Select Url, Header, Verb, Body | ConvertTo-Json -Depth 10 | Out-String)";
-            $this.Response = Invoke-WebRequest -Uri $this.Url -Method $this.Verb -Headers $this.Header -Body $this.Body -ContentType $this.contentType;       
+            $this.Response = Invoke-WebRequest -Uri $this.Url -Method $this.Verb -Headers $this.Header -Body $this.Body -ContentType $this.contentType -UseBasicParsing;       
         }
     
         return $this.Response;
@@ -552,7 +552,7 @@ class CWApiRestClientSvc
         $request.RelativePathUri = $relativePathUri;
         $request.Verb = "Delete";
         
-        $response = $this.CWApiClient.DeleteRequest($request);
+        $response = $this.CWApiClient.Delete($request);
         return $response;
     }
     
