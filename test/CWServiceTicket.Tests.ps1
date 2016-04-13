@@ -6,7 +6,8 @@ Import-Module "$WorkspaceRoot\src\CWServiceTicketCmdLets.psm1" -Force
 Describe 'CWServiceTicket' {
 	
 	. "$WorkspaceRoot\test\LoadTestSettings.ps1"
-
+	[hashtable] $pstrSharedValues = @{};
+ 
 	Context 'Get-CWServiceTicket' {
 		
 		$pstrTicketID  = $pstrGenSvc.ticketIds[0];
@@ -85,8 +86,9 @@ Describe 'CWServiceTicket' {
 						-Status $pstrTicketStatus -PriorityID $pstrTicketPriority `
 						-Subject $pstrTicketTitle -Description $pstrTicketBody `
 						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
-			$ticket.id -gt 0 | Should Be $true; 
-		}
+			$pstrSharedValues.Add("newTicketId", $ticket.id);
+			$pstrSharedValues["newTicketId"] -gt 0 | Should Be $true; 
+		} 
 		
 	} # end of Context "New-CWServiceTicket" 
 	
@@ -108,6 +110,7 @@ Describe 'CWServiceTicket' {
 			$ticketID = $pstrTicketID;
 			$statusID = $pstrStatusID;
 			$boardID  = $pstrBoardID;
+			
 			$ticket = Update-CWServiceTicket -TicketID $ticketID -StatusID $statusID -BoardID $boardID `
 						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$ticket.status.id -eq $statusID -and $ticket.board.id -eq $boardID | Should Be $true; 
@@ -122,5 +125,16 @@ Describe 'CWServiceTicket' {
 		}
 		
 	} # end of Context "Update-CWServiceTicket" 
+	
+	Context "Remove-CWServiceTicket"  {
+		
+		It "deletes a ticket and check for a return value of true if successful" {
+			$wasDeleted = Remove-CWServiceTicket -TicketID $pstrSharedValues["newTicketId"] `
+						   -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$wasDeleted | Should Be $true; 
+		}
+	
+	}
+	
 		
 } # end of Describe 'CWServiceTicket'

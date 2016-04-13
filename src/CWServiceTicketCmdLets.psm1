@@ -288,6 +288,50 @@ function Update-CWServiceTicket
     
 }
 
+function Remove-CWServiceTicket 
+{
+    [CmdLetBinding()]
+    param
+    (
+        [Parameter(ParameterSetName='Tickets', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
+        [ValidateNotNullOrEmpty()]
+        [int[]]$TicketID,
+        [Parameter(ParameterSetName='Tickets', Position=2, Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$BaseApiUrl,
+        [Parameter(ParameterSetName='Tickets', Position=3, Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$CompanyName,
+        [Parameter(ParameterSetName='Tickets', Position=4, Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$PublicKey,
+        [Parameter(ParameterSetName='Tickets', Position=5, Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$PrivateKey
+    )
+    
+    Begin
+    {
+        
+        # get the ticket service
+        $TicketSvc = [CwApiServiceTicketSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        
+    }
+    Process
+    {
+        Write-Debug "Deleting ConnectWise Tickets by Ticket ID"
+        foreach ($ticket in $TicketID)
+        {
+            $TicketSvc.DeleteTicket($ticket);
+        }
+    }
+    End 
+    {
+        # do nothing here
+    }
+}
+
 Export-ModuleMember -Function 'Get-CWServiceTicket';
 Export-ModuleMember -Function 'New-CWServiceTicket';
 Export-ModuleMember -Function 'Update-CWServiceTicket';
+Export-ModuleMember -Function 'Remove-CWServiceTicket';
