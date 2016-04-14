@@ -1,7 +1,7 @@
 {
     // connection info to the ConnectWise server    
     "server": {
-        "url": "",
+        "url": "https://cw.example.com/v2016_3/apis/3.0",
         "companyName": "",
         "publicKey": "",
         "privateKey": ""
@@ -17,6 +17,11 @@
             "statusIds": [105, 104, 103, 102, 101],
             "priorityIds": [8, 7, 6, 5, 4],
             "ticketNoteIds": [123456]
+        },
+        
+        // variables to be used when making calls to ConnectWise's Company module
+        "company": {
+            "companyIds": [1, 2]
         }
         
     },

@@ -6,6 +6,7 @@ $testSettings = Get-Content -Path "$WorkspaceRoot\testSettings.json" | ? { $_.Tr
 $pstrSvr           = $testSettings.server;
 $pstrGenSvc        = $testSettings.general.service;
 $pstrProcNewTicket = $testSettings.actions.newTicket;
+$pstrComp          = $testSettings.general.company;
 
 # defining server variables
 $pstrSvrUrl     = $pstrSvr.url;
