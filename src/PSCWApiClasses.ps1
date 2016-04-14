@@ -1040,26 +1040,52 @@ class CwApiCompanyContactsSvc : CWApiRestClientSvc
     
     [pscustomobject] ReadContact([uint32] $companyId, [uint32] $contactId)
     {
+        return $this.ReadContact($companyId, $contactId, $null)
+    }
+    
+    [pscustomobject] ReadContact([uint32] $companyId, [uint32] $contactId, $fields)
+    {
+        [hashtable] $queryHashtable = @{
+            fields = $null;
+        }
+        
+        if ($fields -ne $null)
+        {
+            $queryHashtable.fields = ([string] [String]::Join(",", $fields)).TrimEnd(",");
+        }
+        
         $relativePathUri = "/$companyId/contacts/$contactId";
-        return $this.ReadRequest($relativePathUri, $null);
+        
+        return $this.ReadRequest($relativePathUri, $queryHashtable);
     }
     
     [pscustomobject[]] ReadContacts ([string] $companyConditions)
     {        
-        return $this.ReadContacts($companyConditions, 1);
+        return $this.ReadContacts($companyConditions, $null);
     }
     
-    [pscustomobject[]] ReadContacts ([string] $companyConditions, [uint32] $pageNum)
+    [pscustomobject[]] ReadContacts ([string] $companyConditions, [string[]] $fields)
+    {        
+        return $this.ReadContacts($companyConditions, $fields, 1);
+    }
+    
+    [pscustomobject[]] ReadContacts ([string] $companyConditions, [string[]] $fields, [uint32] $pageNum)
     {         
-        return $this.ReadContacts($companyConditions, 1, 0);
+        return $this.ReadContacts($companyConditions, $fields, 1, 0);
     }
     
-    [pscustomobject[]] ReadContacts ([string] $companyConditions, [uint32] $pageNum, [uint32] $pageSize)
+    [pscustomobject[]] ReadContacts ([string] $companyConditions, [string[]] $fields,  [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
             conditions = $companyConditions;
             page       = $pageNum;
             pageSize   = $pageSize;
+            fields     = $null;
+        }
+        
+        if ($fields -ne $null)
+        {
+            $queryHashtable.fields = ([string] [String]::Join(",", $fields)).TrimEnd(",");
         }
         
         return $this.ReadRequest($null, $queryHashtable);
