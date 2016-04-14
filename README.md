@@ -33,6 +33,9 @@ Milestone Requirement: Create the minimum required CmdLets that is needed to pro
 0. `Update-CWServiceTicket`
   - CmdLet: **Completed**
   - Documentation: *Not Completed*
+0. `Get-CWCompany`
+  - CmdLet: **Completed**
+  - Documentation: *Not Completed*
 0. `Get-CWCompanyContact`
   - CmdLet: *Not Completed*
   - Documentation: *Not Completed*
