@@ -619,15 +619,18 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         $this.CWApiClient.HttpBasePathUri = "/service/tickets";
     }
     
-    [pscustomobject] ReadTicket ([int] $ticketId)
+    [pscustomobject] ReadTicket ([uint32] $ticketId)
     {
         return $this.ReadTicket($ticketId, "*");
     }
     
-    [pscustomobject] ReadTicket ([int] $ticketId, [string[]] $fields)
+    [pscustomobject] ReadTicket ([uint32] $ticketId, [string[]] $fields)
     {
-        [hashtable] $queryHashtable = @{ 
-            fields = ([string] [String]::Join(",", $fields)).TrimEnd(",");
+        [hashtable] $queryHashtable = @{}
+        
+        if ($fields -ne $null)
+        {
+            $queryHashtable["fields"] = ([string] [String]::Join(",", $fields)).TrimEnd(",");
         }
         
         $relativePathUri = "/$ticketID";
@@ -654,9 +657,13 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
     {
         [hashtable] $queryParams = @{
             conditions = $ticketConditions;
-            fields     = ([string] [String]::Join(",", $fields)).TrimEnd(",");
             page       = $pageNum;
             pageSize   = $pageSize;
+        }
+        
+        if ($fields -ne $null)
+        {
+            $queryParams.Add("fields", ([string] [String]::Join(",", $fields)).TrimEnd(","));
         }
         
         return $this.ReadRequest($null, $queryParams);
@@ -944,4 +951,129 @@ class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
         $relativePathUri = "/$ticketId/notes/count";
         return $this.GetCount($null, $relativePathUri);
     }
+}
+
+class CwApiCompanySvc : CWApiRestClientSvc
+{
+
+    CwApiCompanySvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    {
+        $this.CWApiClient.HttpBasePathUri = "/company/companies";
+    }
+    
+    [pscustomobject] ReadCompany([uint32] $companyId)
+    {
+        return $this.ReadCompany($companyId, "*");
+    }
+    
+    [pscustomobject] ReadCompany([uint32] $companyId, [string[]] $fields)
+    {
+        [hashtable] $queryHashtable = @{}
+        
+        if ($fields -ne $null)
+        {
+            $queryHashtable["fields"] = ([string] [String]::Join(",", $fields)).TrimEnd(",");
+        }
+        
+        $relativePathUri = "/$companyId";
+        
+        return $this.ReadRequest($relativePathUri, $queryHashtable);
+    }
+    
+    [pscustomobject] ReadCompany([string] $companIdenifier)
+    {
+        return $this.ReadCompany($companIdenifier, "*");
+    }
+
+    [pscustomobject] ReadCompany([string] $companIdenifier, $fields)
+    {
+        $query = "identifier='$companIdenifier'";
+        [pscustomobject[]] $company =  $this.ReadCompanies($query, $fields);
+        return $company[0];
+    }
+    
+    [pscustomobject[]] ReadCompanies ([string] $companyConditions)
+    {        
+        return $this.ReadCompanies($companyConditions, "*");
+    }
+    
+    [pscustomobject[]] ReadCompanies ([string] $companyConditions, [string[]] $fields)
+    {        
+        return $this.ReadCompanies($companyConditions, $fields, 1);
+    }
+    
+    [pscustomobject[]] ReadCompanies ([string] $companyConditions, [string[]] $fields, [uint32] $pageNum)
+    {         
+        return $this.ReadCompanies($companyConditions, $fields, $pageNum, 0);
+    }
+    
+    [pscustomobject[]] ReadCompanies ([string] $companyConditions, [string[]] $fields, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        [hashtable] $queryHashtable = @{
+            conditions = $companyConditions;
+            page       = $pageNum;
+            pageSize   = $pageSize;
+        }
+        
+        if ($fields -ne $null)
+        {
+            $queryHashtable.Add("fields", ([string] [String]::Join(",", $fields)).TrimEnd(","));
+        }
+        
+        return $this.ReadRequest($null, $queryHashtable);
+    }
+    
+    [uint32] GetCompanyCount([string] $companyConditions)
+    {
+        return $this.GetCount($companyConditions);
+    }
+    
+}
+
+class CwApiCompanyContactsSvc : CWApiRestClientSvc
+{
+    
+    CwApiCompanyContactsSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    {
+        $this.CWApiClient.HttpBasePathUri = "/company/companies";
+    }
+    
+    [pscustomobject] ReadContact([uint32] $companyId, [uint32] $contactId)
+    {
+        $relativePathUri = "/$companyId/contacts/$contactId";
+        return $this.ReadRequest($relativePathUri, $null);
+    }
+    
+    [pscustomobject[]] ReadContacts ([string] $companyConditions)
+    {        
+        return $this.ReadContacts($companyConditions, 1);
+    }
+    
+    [pscustomobject[]] ReadContacts ([string] $companyConditions, [uint32] $pageNum)
+    {         
+        return $this.ReadContacts($companyConditions, 1, 0);
+    }
+    
+    [pscustomobject[]] ReadContacts ([string] $companyConditions, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        [hashtable] $queryHashtable = @{
+            conditions = $companyConditions;
+            page       = $pageNum;
+            pageSize   = $pageSize;
+        }
+        
+        return $this.ReadRequest($null, $queryHashtable);
+    }
+    
+    [uint32] GetContactCount([uint32] $companyId)
+    {
+        return $this.GetContactCount($companyId, $null);
+    }
+    
+    [uint32] GetContactCount([uint32] $companyId, [string] $companyConditions)
+    {
+        $relativePathUri = "/$companyId/contacts/count";
+        return $this.GetCount($companyConditions, $relativePathUri);
+    }
+    
 }
