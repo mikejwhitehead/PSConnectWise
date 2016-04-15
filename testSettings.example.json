@@ -2,9 +2,11 @@
     // connection info to the ConnectWise server    
     "server": {
         "url": "https://cw.example.com/v2016_3/apis/3.0",
+        "domain": "",
         "companyName": "",
         "publicKey": "",
-        "privateKey": ""
+        "privateKey": "",
+        "overridessl": false
     },
     
     // ids of items that, in general, will be used for the get/read requests
