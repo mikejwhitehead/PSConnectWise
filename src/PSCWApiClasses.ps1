@@ -146,18 +146,93 @@ class CWApiRequestInfo
     
 }
 
+class CWApiRestConnectionInfo 
+{
+    [string] $Domain;
+    [string] $CompanyName;
+    [string] $PublicKey;
+    [string] $PrivateKey;
+    [string] $CodeBase;
+    [string] $BaseUrl;
+    [hashtable] $Header;
+    [string] $ApiVersion = "3.0";
+    [bool] $OverrideSSL = $false;
+    
+    CWApiRestConnectionInfo ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey)
+    {
+        $this.Domain      = $domain;
+        $this.CompanyName = $companyName;
+        $this.PublicKey   = $publicKey;
+        $this.PrivateKey  = $privateKey;
+        
+        if (!$this._setCodeBase())
+        {
+           throw
+        }
+        
+        $this._buildBaseUri();
+        $this._buildHttpHeader();
+    }   
+     
+    CWApiRestConnectionInfo ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey, [bool] $overrideSSL)
+    {
+        $this.Domain      = $domain;
+        $this.CompanyName = $companyName;
+        $this.PublicKey   = $publicKey;
+        $this.PrivateKey  = $privateKey;
+        $this.OverrideSSL = $overrideSSL;
+        
+        if (!$this._setCodeBase())
+        {
+           throw
+        }
+        
+        $this._buildBaseUri();
+        $this._buildHttpHeader();
+    }
+    
+    hidden [boolean] _setCodeBase () 
+    {
+        $companyInfoRaw = Invoke-WebRequest -Uri $([String]::Format("https://{0}/login/companyinfo/{1}", $this.Domain, $this.CompanyName));
+        $companyInfo = ConvertFrom-Json -InputObject $companyInfoRaw; 
+        
+        $this.CodeBase = $companyInfo.Codebase;
+        
+        return $true;
+    }
+    
+    hidden [void] _buildBaseUri ()
+    {
+        $this.BaseUrl = [String]::Format("https://{0}/{1}apis/{2}", $this.Domain, $this.CodeBase, $this.apiVersion);
+    }
+    
+    hidden [void] _buildHttpHeader () 
+    {
+        $this.Header = [hashtable] @{
+            "Authorization"    = $this._createCWAuthenticationString();
+            "Accept"           = "application/vnd.connectwise.com+json; version=v2015_3";
+            "Type"             = "application/json"; 
+        }
+        
+        if ($this.OverrideSSL)
+        {
+            $this.Header.Add("x-cw-overridessl", "True");
+        }
+    }
+    
+    hidden [string] _createCWAuthenticationString ()
+    {   
+        [string] $encodedString = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}+{1}:{2}" -f $this.CompanyName, $this.PublicKey, $this.PrivateKey)));
+        return [String]::Format("Basic {0}", $encodedString);
+    }
+    
+}
+
 class CWApiRestClient 
 {
     # public properties
-    [string] $HttpBaseUrl;
-    [string] $HttpBasePathUri;
-    [hashtable] $HttpHeader;
-    [string] $CWCompanyName;
-    [string] $CWApiPublicKey;
-    [string] $CWApiPrivateKey;
-    
-    # private properties
-    hidden [string] $_headerAthenticationString;
+    [string] $RelativeBaseEndpointUri = "";
+    [CWApiRestConnectionInfo] $CWConnectionInfo;
     
     #
     # Constructors
@@ -165,40 +240,13 @@ class CWApiRestClient
     
     CWApiRestClient ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey)
     {
-        $this.HttpBaseUrl     = $baseUrl;
-        $this.HttpBasePathUri = "";
-        $this.CWCompanyName   = $companyName;
-        $this.CWApiPublicKey  = $publicKey;
-        $this.CWApiPrivateKey = $privateKey;
-        
-        $this._validateCWApiRequestParams();
-        $this.HttpHeader = $this._buildHttpHeader();
+        [string] $domain = [RegEx]::Match($baseUrl, "https*:\/{2}([^\/]+)").Groups[1].Value
+        $this.CWConnectionInfo = [CWApiRestConnectionInfo]::New($domain, $companyName, $publicKey, $privateKey, $true)
     }
     
-    CWApiRestClient ([string] $baseUrl, [string] $pathUri, [string] $companyName, [string] $publicKey, [string] $privateKey)
+    CWApiRestClient ([CWApiRestConnectionInfo] $connectionInfo)
     {
-        $this.HttpBaseUrl     = $baseUrl;
-        $this.HttpBasePathUri = $pathUri;
-        $this.CWCompanyName   = $companyName;
-        $this.CWApiPublicKey  = $publicKey;
-        $this.CWApiPrivateKey = $privateKey;
-        
-        $this._validateCWApiRequestParams();
-        $this.HttpHeader = $this._buildHttpHeader();
-    }
-    
-    CWApiRestClient ([string] $baseUrl, [string] $pathUri, [hashtable] $header, [string] $companyName, [string] $publicKey, [string] $privateKey)
-    {
-        $this.HttpBaseUrl     = $baseUrl;
-        $this.HttpBasePathUri = $pathUri;
-        $this.CWCompanyName   = $companyName;
-        $this.CWApiPublicKey  = $publicKey;
-        $this.CWApiPrivateKey = $privateKey;
-        
-        $this._validateCWApiRequestParams();
-        $this.HttpHeader = $this._buildHttpHeader();
-        
-        $this.transformHttpHeader($header);
+        $this.CWConnectionInfo = $connectionInfo
     }
     
     #
@@ -209,7 +257,7 @@ class CWApiRestClient
     {
         [pscustomobject[]] $response = $null;
         
-        $header = $this.HttpHeader;
+        $header = $this.CWConnectionInfo.Header;
         $verb   = "GET";
         
         [PSObject] $rawResponse = $this._request($header, $fullUrl, $verb);
@@ -226,7 +274,7 @@ class CWApiRestClient
     {
         [pscustomobject[]] $response = $null;
         
-        $header = $this.HttpHeader;
+        $header = $this.CWConnectionInfo.Header;
         $url    = $this.buildUrl($request.RelativePathUri, $request.QueryString);
         $verb   = $request.Verb;
         
@@ -244,7 +292,7 @@ class CWApiRestClient
     {
         $wasDeleted = $false;
         
-        $header = $this.HttpHeader;
+        $header = $this.CWConnectionInfo.Header;
         $verb   = "DELETE";
         
         $rawResponse = $this._request($header, $fullUrl, $verb)
@@ -261,7 +309,7 @@ class CWApiRestClient
     {
         $wasDeleted = $false;
         
-        $header = $this.HttpHeader;
+        $header = $this.CWConnectionInfo.Header;
         $url    = $this.buildUrl($request.RelativePathUri);
         $verb   = $request.Verb;
         
@@ -279,7 +327,7 @@ class CWApiRestClient
     {
         [pscustomobject] $response = $null;
         
-        $header = $this.HttpHeader;
+        $header = $this.CWConnectionInfo.Header;
         $url    = $this.buildUrl($request.RelativePathUri);
         $verb   = $request.Verb;
         $body   = ConvertTo-Json -InputObject @($request.Body) -Depth 100 -Compress | Out-String
@@ -293,7 +341,7 @@ class CWApiRestClient
     {
         [pscustomobject] $response = $null;
         
-        $header = $this.HttpHeader;
+        $header = $this.CWConnectionInfo.Header;
         $url    = $this.buildUrl($request.RelativePathUri);
         $verb   = $request.Verb;
         $body   = $request.Body | ConvertTo-Json -Depth 100 -Compress | Out-String
@@ -325,7 +373,7 @@ class CWApiRestClient
             {
                 $vettedQueryParams.Add($p.Key, $p.Value);   
             }    
-    } 
+        } 
        
         if ($vettedQueryParams.Count -gt 0)
         {
@@ -413,43 +461,15 @@ class CWApiRestClient
             $queryString = "";
         }
         
-        $url = [String]::Format("{0}{1}{2}{3}", $this.HttpBaseUrl, $this.HttpBasePathUri, $relativePathUri, $queryString);
+        $url = [String]::Format("{0}{1}{2}{3}", $this.CWConnectionInfo.BaseUrl, $this.RelativeBaseEndpointUri, $relativePathUri, $queryString);
         
         return $url;
-    }
-    
-    
-    
-    hidden [void] transformHttpHeader ([hashtable] $transformHeaderHashtable)
-    {
-        foreach ($p in $transformHeaderHashtable)
-        {
-            if ($this.HttpHeader.Contains($p.Key))
-            {
-                $this.HttpHeader[$p.Key];
-            }    
-            else 
-            {
-                $this.HttpHeader.Add($p.Key, $p.Value);
-            }
-        }
     }
     
     #
     # Helper Functions - Used Internally Only
     #
     
-    hidden [hashtable] _buildHttpHeader () 
-    {
-        $header = [hashtable] @{
-            "Authorization"    = $this._createCWAuthenticationString();
-            "Accept"           = "application/vnd.connectwise.com+json; version=v2015_3";
-            "Type"             = "application/json"; 
-            "x-cw-overridessl" = "True";
-        }
-        
-        return $header;
-    }
     
     [pscustomobject] _request ($header, $url, $verb)
     {
@@ -480,28 +500,6 @@ class CWApiRestClient
         
         return $response;
     }
-
-    hidden [string] _createCWAuthenticationString ()
-    {   
-        [string] $encodedString = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}+{1}:{2}" -f $this.CWCompanyName, $this.CWApiPublicKey, $this.CWApiPrivateKey)));
-        return [String]::Format("Basic {0}", $encodedString);
-    }
-    
-    hidden [void] _validateCWApiRequestParams ()
-    {
-        [string[]] $requiredProperties = @("HttpBaseUrl", "CWCompanyName", "CWApiPublicKey", "CWApiPrivateKey");
-        
-        Write-Debug $("Checking if required CWApiRestClient properties are not null or empty.");
-        
-        foreach ($p in $requiredProperties)
-        {
-            if([String]::IsNullOrWhiteSpace($this.PSObject.Properties[$p].Value))
-            {
-                Write-Error -Message "Property is null or empty" -Category InvalidArgument;
-            }
-        }
-        
-    }
 }
 
 class CWApiRestClientSvc
@@ -528,7 +526,7 @@ class CWApiRestClientSvc
         $MAX_PAGE_REQUEST_SIZE = 50;
         
         $request = [CWApiRequestInfo]::New();
-        $request.RelativePathUri = $RelativePathUri;
+        $request.RelativePathUri = $relativePathUri;
         $request.Verb = "GET"; 
         
         if ($queryHashtable -ne $null)
@@ -616,7 +614,7 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
 {
     CwApiServiceTicketSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
-        $this.CWApiClient.HttpBasePathUri = "/service/tickets";
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
     
     [pscustomobject] ReadTicket ([uint32] $ticketId)
@@ -720,7 +718,7 @@ class CwApiServiceBoardSvc : CWApiRestClientSvc
 {
     CwApiServiceBoardSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
-        $this.CWApiClient.HttpBasePathUri = "/service/boards";;
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";;
     }
     
     [pscustomobject] ReadBoard ([int] $boardId)
@@ -761,7 +759,7 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
 {
     CwApiServiceBoardStatusSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base ($baseUrl, $companyName, $publicKey, $privateKey)
     {
-        $this.CWApiClient.HttpBasePathUri = "/service/boards";
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
     }
     
     [pscustomobject] ReadStatus([int] $boardId, $statusId)
@@ -813,7 +811,7 @@ class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
 {
     CwApiServiceBoardTypeSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base ($baseUrl, $companyName, $publicKey, $privateKey)
     {
-        $this.CWApiClient.HttpBasePathUri = "/service/boards";
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
     }
     
     [pscustomobject] ReadType([int] $boardId, $typeId)
@@ -866,7 +864,7 @@ class CwApiServicePrioritySvc : CWApiRestClientSvc
 
     CwApiServicePrioritySvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
-        $this.CWApiClient.HttpBasePathUri = "/service/priorities";
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/priorities";
     }
     
     [pscustomobject] ReadPriority([uint32] $priorityId)
@@ -907,7 +905,7 @@ class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
 {
     CwApiServiceTicketNoteSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
-        $this.CWApiClient.HttpBasePathUri = "/service/tickets";
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
     
     [pscustomobject] ReadNote ([uint32] $ticketId, [int] $timeEntryId)
@@ -958,7 +956,7 @@ class CwApiCompanySvc : CWApiRestClientSvc
 
     CwApiCompanySvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
-        $this.CWApiClient.HttpBasePathUri = "/company/companies";
+        $this.CWApiClient.RelativeBaseEndpointUri = "/company/companies";
     }
     
     [pscustomobject] ReadCompany([uint32] $companyId)
@@ -1035,7 +1033,7 @@ class CwApiCompanyContactSvc : CWApiRestClientSvc
     
     CwApiCompanyContactSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
-        $this.CWApiClient.HttpBasePathUri = "/company/contacts";
+        $this.CWApiClient.RelativeBaseEndpointUri = "/company/contacts";
     }
     
     [pscustomobject] ReadContact ([uint32] $contactId)
