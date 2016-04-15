@@ -12,7 +12,7 @@ function Get-CWServiceBoardStatus
         [Parameter(ParameterSetName='SingleBoard', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='BoardQuery', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$BaseApiUrl,
+        [string]$Domain,
         [Parameter(ParameterSetName='SingleBoard', Position=3, Mandatory=$true)]
         [Parameter(ParameterSetName='BoardQuery', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -32,7 +32,7 @@ function Get-CWServiceBoardStatus
         $MAX_ITEMS_PER_PAGE = 50;
         
         # get the Board service
-        $BoardStatusSvc = [CwApiServiceBoardStatusSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        $BoardStatusSvc = [CwApiServiceBoardStatusSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
         [uint32] $statusCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

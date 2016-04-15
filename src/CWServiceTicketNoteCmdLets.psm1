@@ -16,7 +16,7 @@ function Get-CWServiceTicketNote
         [Parameter(ParameterSetName='TicketNotes', Position=1, Mandatory=$true)]
         [Parameter(ParameterSetName='SingleNote', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$BaseApiUrl,
+        [string]$Domain,
         [Parameter(ParameterSetName='TicketNotes', Position=1, Mandatory=$true)]
         [Parameter(ParameterSetName='SingleNote', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -36,7 +36,7 @@ function Get-CWServiceTicketNote
         $MAX_ITEMS_PER_PAGE = 50;
         
         # get the TimeEntry service
-        $NoteSvc = [CwApiServiceTicketNoteSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
         [uint32] $noteCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
@@ -114,7 +114,7 @@ function Add-CWServiceTicketNote
         [switch]$AddToResolution,
         [Parameter(ParameterSetName='Normal', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$BaseApiUrl,
+        [string]$Domain,
         [Parameter(ParameterSetName='Normal', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$CompanyName,
@@ -129,7 +129,7 @@ function Add-CWServiceTicketNote
     Begin
     {
         # get the ticket service
-        $NoteSvc = [CwApiServiceTicketNoteSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
         [ServiceTicketNoteTypes[]] $addTo = @();
         

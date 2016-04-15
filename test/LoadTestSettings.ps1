@@ -9,7 +9,7 @@ $pstrProcNewTicket = $testSettings.actions.newTicket;
 $pstrComp          = $testSettings.general.company;
 
 # defining server variables
-$pstrSvrUrl     = $pstrSvr.url;
+$pstrSvrDomain  = $pstrSvr.domain;
 $pstrSvrCompany = $pstrSvr.companyName;
 $pstrSvrPrivate = $pstrSvr.privateKey;
 $pstrSvrPublic  = $pstrSvr.publicKey;

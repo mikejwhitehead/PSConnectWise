@@ -238,9 +238,8 @@ class CWApiRestClient
     # Constructors
     #
     
-    CWApiRestClient ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey)
+    CWApiRestClient ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey)
     {
-        [string] $domain = [RegEx]::Match($baseUrl, "https*:\/{2}([^\/]+)").Groups[1].Value
         $this.CWConnectionInfo = [CWApiRestConnectionInfo]::New($domain, $companyName, $publicKey, $privateKey, $true)
     }
     
@@ -506,9 +505,9 @@ class CWApiRestClientSvc
 {
     hidden [CWApiRestClient] $CWApiClient; 
     
-    CWApiRestClientSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey)
+    CWApiRestClientSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey)
     {
-        $this.CWApiClient = [CWApiRestClient]::New($baseUrl, $companyName, $publicKey, $privateKey);
+        $this.CWApiClient = [CWApiRestClient]::New($domain, $companyName, $publicKey, $privateKey);
     }
     
     CWApiRestClientSvc ([CWApiRestConnectionInfo] $connectionInfo)
@@ -617,7 +616,7 @@ class CWApiRestClientSvc
 
 class CwApiServiceTicketSvc : CWApiRestClientSvc
 {
-    CwApiServiceTicketSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiServiceTicketSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
@@ -726,7 +725,7 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
 
 class CwApiServiceBoardSvc : CWApiRestClientSvc
 {
-    CwApiServiceBoardSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiServiceBoardSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";;
     }
@@ -772,7 +771,7 @@ class CwApiServiceBoardSvc : CWApiRestClientSvc
 
 class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
 {
-    CwApiServiceBoardStatusSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base ($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiServiceBoardStatusSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
     }
@@ -829,7 +828,7 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
 
 class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
 {
-    CwApiServiceBoardTypeSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base ($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiServiceBoardTypeSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
     }
@@ -887,7 +886,7 @@ class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
 class CwApiServicePrioritySvc : CWApiRestClientSvc
 {
 
-    CwApiServicePrioritySvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiServicePrioritySvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/priorities";
     }
@@ -933,7 +932,7 @@ class CwApiServicePrioritySvc : CWApiRestClientSvc
 
 class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
 {
-    CwApiServiceTicketNoteSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiServiceTicketNoteSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
@@ -989,7 +988,7 @@ class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
 class CwApiCompanySvc : CWApiRestClientSvc
 {
 
-    CwApiCompanySvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiCompanySvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/company/companies";
     }
@@ -1071,7 +1070,7 @@ class CwApiCompanySvc : CWApiRestClientSvc
 class CwApiCompanyContactSvc : CWApiRestClientSvc
 {
     
-    CwApiCompanyContactSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiCompanyContactSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/company/contacts";
     }

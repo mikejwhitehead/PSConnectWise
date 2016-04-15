@@ -15,14 +15,14 @@ Describe 'CWCompany' {
         It 'gets company and checks for the id field' {
 			$companyID = $pstrCompanyID;
 			$company = Get-CWCompany -ID $companyID `
-						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+						-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$company.id | Should Be $companyID;		
 		} 
 		
 		It 'gets company and pipes it through the Select-Object cmdlet for the id property' {
 			$companyID = $pstrCompanyID;
 			$company = Get-CWCompany -ID $companyID `
-						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+						-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$company | Select-Object -ExpandProperty id | Should Be $companyID;		
 		}
 		
@@ -30,40 +30,40 @@ Describe 'CWCompany' {
 			$companyID = $pstrCompanyID;
 			$fields = @("id", "idenifier, name");
 			$company = Get-CWCompany -ID $companyID -Property $fields `
-				-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+				-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$company.PSObject.Properties | Measure-Object | Select -ExpandProperty Count | Should Be $fields.Count;		
 		}
 		
 		It 'gets tickets by passing array of company ids to the -ID param' {
 			$companyIDs = $pstrCompanyIDs;
 			$tickets = Get-CWCompany -ID $companyIDs `
-							-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+							-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $companyIDs.Count;		
 		}
 		
 		It 'gets list of tickets that were piped to the cmdlet' {
 			$companyIDs = $pstrCompanyIDs;
-			$tickets = $companyIDs | Get-CWCompany -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$tickets = $companyIDs | Get-CWCompany -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $companyIDs.Count;		
 		}
 		
 		It 'gets company based on the -Filter param' {
 			$filter = "id = $pstrCompanyID";
 			$company = Get-CWCompany -Filter $filter `
-							-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+							-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$company.id | Should Be $pstrCompanyID;		
 		}
 		
 		It 'gets company based on the -Filter param and uses the SizeLimit param' {
 			$filter = "id IN ($([String]::Join(',', $pstrCompanyIDs)))";
 			$sizeLimit =  2;
-			$tickets = Get-CWCompany -Filter $filter -SizeLimit $sizeLimit -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$tickets = Get-CWCompany -Filter $filter -SizeLimit $sizeLimit -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit;
 		}
 		
 		It 'gets tickets and sorts company id by descending piping cmdlet through Sort-Object cmdlet' {
 			$companyIDs = $pstrCompanyIDs;
-			$tickets = Get-CWCompany -ID $companyIDs -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate | Sort -Descending id;
+			$tickets = Get-CWCompany -ID $companyIDs -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate | Sort -Descending id;
 			$maxTicketId = $companyIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
 			$tickets[0].id | Should Be $maxTicketId;		
 		}

@@ -1,7 +1,6 @@
 {
     // connection info to the ConnectWise server    
     "server": {
-        "url": "https://cw.example.com/v2016_3/apis/3.0",
         "domain": "",
         "companyName": "",
         "publicKey": "",

@@ -13,13 +13,13 @@ Describe 'CWServiceBoardStatus' {
 		
 		It 'gets board status and check that the results is an array' {
 			$boardID = $pstrBoardID;
-			$statuses = Get-CWServiceBoardStatus -BoardID $boardID -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$statuses = Get-CWServiceBoardStatus -BoardID $boardID -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$statuses.GetType().BaseType.Name | Should Be "Array";		
 		}
 		
 		It 'gets board and pipes it through the Select-Object cmdlet for the id property of the first object' {
 			$boardID = $pstrBoardID;
-			$status = Get-CWServiceBoardStatus -BoardID $boardID -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate | Select-Object boardId -First 1;
+			$status = Get-CWServiceBoardStatus -BoardID $boardID -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate | Select-Object boardId -First 1;
 			$status | Select-Object -ExpandProperty boardId | Should Be $boardID;		
 		}
 	

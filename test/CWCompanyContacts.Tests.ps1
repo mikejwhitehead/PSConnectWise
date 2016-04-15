@@ -16,19 +16,19 @@ Describe 'CWCompanyContact' {
 	
 		It 'gets company contact entries for a company and check that the results is an array' {
 			$companyID = $pstrCompanyID;
-			$contacts = Get-CWCompanyContact -CompanyID $companyID -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$contacts = Get-CWCompanyContact -CompanyID $companyID -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$contacts.GetType().BaseType.Name | Should Be "Array";		
 		}
 		
 		It 'gets a single contact from a company and pipes it through the Select-Object cmdlet for the id property of the first object' {
 			$companyID = $pstrCompanyID;
-			$contact = Get-CWCompanyContact -CompanyID $companyID -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate | Select-Object -First 1;
+			$contact = Get-CWCompanyContact -CompanyID $companyID -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate | Select-Object -First 1;
 			$contact.company.id | Should Be $companyID;		
 		}
 		
 		It 'gets a single contact' {
 			$contactID = $pstrContactID;
-			$contact = Get-CWCompanyContact -ID $contactID -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$contact = Get-CWCompanyContact -ID $contactID -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$contact | Select-Object -ExpandProperty id | Should Be $contactID;		
 		}
 				

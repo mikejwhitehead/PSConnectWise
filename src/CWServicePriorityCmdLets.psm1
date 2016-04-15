@@ -17,7 +17,7 @@ function Get-CWServicePriority
         [Parameter(ParameterSetName='SinglePriority', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='PriorityQuery', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$BaseApiUrl,
+        [string]$Domain,
         [Parameter(ParameterSetName='SinglePriority', Position=3, Mandatory=$true)]
         [Parameter(ParameterSetName='PriorityQuery', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -37,7 +37,7 @@ function Get-CWServicePriority
         $MAX_ITEMS_PER_PAGE = 50;
         
         # get the Priority service
-        $PrioritySvc = [CwApiServicePrioritySvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        $PrioritySvc = [CwApiServicePrioritySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
         [uint32] $priorityCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

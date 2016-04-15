@@ -21,7 +21,7 @@ function Get-CWServiceTicket
         [Parameter(ParameterSetName='SingleTicket', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='TicketQuery', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$BaseApiUrl,
+        [string]$Domain,
         [Parameter(ParameterSetName='SingleTicket', Position=3, Mandatory=$true)]
         [Parameter(ParameterSetName='TicketQuery', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -41,7 +41,7 @@ function Get-CWServiceTicket
         $MAX_ITEMS_PER_PAGE = 50 
         
         # get the ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
         [uint32] $ticketCount = 1  
         [uint32] $pageCount   = 1  
@@ -144,7 +144,7 @@ function New-CWServiceTicket
         [uint32]$StatusID,
         [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$BaseApiUrl,
+        [string]$Domain,
         [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$CompanyName,
@@ -159,7 +159,7 @@ function New-CWServiceTicket
     Begin
     {
         # get the ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
     }
     Process
     {
@@ -217,7 +217,7 @@ function Update-CWServiceTicket
         [Parameter(ParameterSetName='Simple', Mandatory=$true)]
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [string]$BaseApiUrl,
+        [string]$Domain,
         [Parameter(ParameterSetName='Simple', Mandatory=$true)]
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
@@ -235,8 +235,8 @@ function Update-CWServiceTicket
     Begin
     {
         # get the ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
-        $NoteSvc   = [CwApiServiceTicketNoteSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        $NoteSvc   = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
         [ServiceTicketNoteTypes[]] $addToForNote = @();
         if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
@@ -298,7 +298,7 @@ function Remove-CWServiceTicket
         [int[]]$TicketID,
         [Parameter(ParameterSetName='Tickets', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$BaseApiUrl,
+        [string]$Domain,
         [Parameter(ParameterSetName='Tickets', Position=3, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$CompanyName,
@@ -314,7 +314,7 @@ function Remove-CWServiceTicket
     {
         
         # get the ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
     }
     Process

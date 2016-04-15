@@ -16,14 +16,14 @@ Describe 'CWServiceTicket' {
 		It 'gets ticket and checks for the id field' {
 			$ticketID = $pstrTicketID;
 			$ticket = Get-CWServiceTicket -TicketID $ticketID `
-						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+						-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$ticket.id | Should Be $ticketID;		
 		} 
 		
 		It 'gets ticket and pipes it through the Select-Object cmdlet for the id property' {
 			$ticketID = $pstrTicketID;
 			$ticket = Get-CWServiceTicket -TicketID $ticketID `
-						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+						-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$ticket | Select-Object -ExpandProperty id | Should Be $ticketID;		
 		}
 		
@@ -31,40 +31,40 @@ Describe 'CWServiceTicket' {
 			$ticketID = $pstrTicketID;
 			$fields = @("id", "summary");
 			$ticket = Get-CWServiceTicket -TicketID $ticketID -Property $fields `
-				-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+				-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$ticket.PSObject.Properties | Measure-Object | Select -ExpandProperty Count | Should Be $fields.Count;		
 		}
 		
 		It 'gets tickets by passing array of ticket ids to the -TicketID param' {
 			$ticketIDs = $pstrTicketIDs;
 			$tickets = Get-CWServiceTicket -TicketID $ticketIDs `
-							-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+							-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $ticketIDs.Count;		
 		}
 		
 		It 'gets list of tickets that were piped to the cmdlet' {
 			$ticketIDs = $pstrTicketIDs;
-			$tickets = $ticketIDs | Get-CWServiceTicket -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$tickets = $ticketIDs | Get-CWServiceTicket -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $ticketIDs.Count;		
 		}
 		
 		It 'gets ticket based on the -Filter param' {
 			$filter = "id = $pstrTicketID";
 			$ticket = Get-CWServiceTicket -Filter $filter `
-							-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+							-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$ticket.id | Should Be $pstrTicketID;		
 		}
 		
 		It 'gets ticket based on the -Filter param and uses the SizeLimit param' {
 			$filter = "id IN ($([String]::Join(',', $pstrTicketIDs)))";
 			$sizeLimit =  2;
-			$tickets = Get-CWServiceTicket -Filter $filter -SizeLimit $sizeLimit -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$tickets = Get-CWServiceTicket -Filter $filter -SizeLimit $sizeLimit -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit;
 		}
 		
 		It 'gets tickets and sorts ticket id by descending piping cmdlet through Sort-Object cmdlet' {
 			$ticketIDs = $pstrTicketIDs;
-			$tickets = Get-CWServiceTicket -TicketID $ticketIDs -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate | Sort -Descending id;
+			$tickets = Get-CWServiceTicket -TicketID $ticketIDs -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate | Sort -Descending id;
 			$maxTicketId = $ticketIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
 			$tickets[0].id | Should Be $maxTicketId;		
 		}
@@ -85,7 +85,7 @@ Describe 'CWServiceTicket' {
 			$ticket = New-CWServiceTicket -BoardID $pstrTicketBoard -CompanyID $pstrTicketCompany -ContactID $pstrNewTicketContact `
 						-Status $pstrTicketStatus -PriorityID $pstrTicketPriority `
 						-Subject $pstrTicketTitle -Description $pstrTicketBody `
-						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+						-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$pstrSharedValues.Add("newTicketId", $ticket.id);
 			$pstrSharedValues["newTicketId"] -gt 0 | Should Be $true; 
 		} 
@@ -102,7 +102,7 @@ Describe 'CWServiceTicket' {
 			$ticketID = $pstrTicketID;
 			$statusID = $pstrStatusID;
 			$ticket = Update-CWServiceTicket -TicketID $ticketID -StatusID $statusID `
-						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+						-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$ticket.status.id -eq $statusID | Should Be $true; 
 		}
 		
@@ -112,7 +112,7 @@ Describe 'CWServiceTicket' {
 			$boardID  = $pstrBoardID;
 			
 			$ticket = Update-CWServiceTicket -TicketID $ticketID -StatusID $statusID -BoardID $boardID `
-						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+						-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$ticket.status.id -eq $statusID -and $ticket.board.id -eq $boardID | Should Be $true; 
 		}
 		
@@ -120,7 +120,7 @@ Describe 'CWServiceTicket' {
 			$ticketID = $pstrTicketID;
 			$ticket = Update-CWServiceTicket -TicketID $ticketID `
 			            -Message "Testing new ticket note via update ticket command." -AddToDescription `
-						-BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+						-Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$ticket.id -eq $ticketID | Should Be $true; 
 		}
 		
@@ -130,7 +130,7 @@ Describe 'CWServiceTicket' {
 		
 		It "deletes a ticket and check for a return value of true if successful" {
 			$wasDeleted = Remove-CWServiceTicket -TicketID $pstrSharedValues["newTicketId"] `
-						   -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+						   -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$wasDeleted | Should Be $true; 
 		}
 	

@@ -26,7 +26,7 @@ function Get-CWCompany
         [Parameter(ParameterSetName='ByIdentifier', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='ByQuery', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$BaseApiUrl,
+        [string]$Domain,
         [Parameter(ParameterSetName='ByID', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='ByIdentifier', Position=3, Mandatory=$true)]
         [Parameter(ParameterSetName='ByQuery', Position=2, Mandatory=$true)]
@@ -49,7 +49,7 @@ function Get-CWCompany
         $MAX_ITEMS_PER_PAGE = 50;
         
         # get the Company service
-        $CompanySvc = [CwApiCompanySvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        $CompanySvc = [CwApiCompanySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
         [uint32] $CompanyCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

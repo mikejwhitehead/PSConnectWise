@@ -13,13 +13,13 @@ Describe 'CWServiceBoardType' {
 	
 		It 'gets board status and check that the results is an array' {
 			$boardID = $pstrBoardID;
-			$types = Get-CWServiceBoardType -BoardID $boardID -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$types = Get-CWServiceBoardType -BoardID $boardID -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 			$types.GetType().BaseType.Name | Should Be "Array";		
 		}
 		
 		It 'gets board and pipes it through the Select-Object cmdlet for the id property of the first object' {
 			$boardID = $pstrBoardID;
-			$type = Get-CWServiceBoardType -BoardID $boardID -BaseApiUrl $pstrSvrUrl -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate | Select-Object boardId -First 1;
+			$type = Get-CWServiceBoardType -BoardID $boardID -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate | Select-Object boardId -First 1;
 			$type | Select-Object -ExpandProperty boardId | Should Be $boardID;		
 		}
 	

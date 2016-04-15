@@ -15,7 +15,7 @@ function Get-CWCompanyContact
         [Parameter(ParameterSetName='CompanyContacts', Position=1, Mandatory=$true)]
         [Parameter(ParameterSetName='SingleContact', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$BaseApiUrl,
+        [string]$Domain,
         [Parameter(ParameterSetName='CompanyContacts', Position=1, Mandatory=$true)]
         [Parameter(ParameterSetName='SingleContact', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -35,7 +35,7 @@ function Get-CWCompanyContact
         $MAX_ITEMS_PER_PAGE = 50;
         
         # get the TimeEntry service
-        $ContactSvc = [CwApiCompanyContactSvc]::new($BaseApiUrl, $CompanyName, $PublicKey, $PrivateKey);
+        $ContactSvc = [CwApiCompanyContactSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
         [uint32] $contactCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
