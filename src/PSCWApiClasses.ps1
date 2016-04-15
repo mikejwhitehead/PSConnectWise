@@ -1030,20 +1030,20 @@ class CwApiCompanySvc : CWApiRestClientSvc
     
 }
 
-class CwApiCompanyContactsSvc : CWApiRestClientSvc
+class CwApiCompanyContactSvc : CWApiRestClientSvc
 {
     
-    CwApiCompanyContactsSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    CwApiCompanyContactSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
-        $this.CWApiClient.HttpBasePathUri = "/company/companies";
+        $this.CWApiClient.HttpBasePathUri = "/company/contacts";
     }
     
-    [pscustomobject] ReadContact([uint32] $companyId, [uint32] $contactId)
+    [pscustomobject] ReadContact ([uint32] $contactId)
     {
-        return $this.ReadContact($companyId, $contactId, $null)
+        return $this.ReadContact($contactId, $null)
     }
     
-    [pscustomobject] ReadContact([uint32] $companyId, [uint32] $contactId, $fields)
+    [pscustomobject] ReadContact ([uint32] $contactId, $fields)
     {
         [hashtable] $queryHashtable = @{
             fields = $null;
@@ -1054,9 +1054,30 @@ class CwApiCompanyContactsSvc : CWApiRestClientSvc
             $queryHashtable.fields = ([string] [String]::Join(",", $fields)).TrimEnd(",");
         }
         
-        $relativePathUri = "/$companyId/contacts/$contactId";
+        $relativePathUri = "/$contactId";
         
         return $this.ReadRequest($relativePathUri, $queryHashtable);
+    }
+    
+    [pscustomobject[]] ReadCompanyContacts ([uint32] $companyId)
+    {
+        return $this.ReadCompanyContacts($companyId, $null);
+    }
+    
+    [pscustomobject[]] ReadCompanyContacts ([uint32] $companyId, [string[]] $fields)
+    {
+        return $this.ReadCompanyContacts($companyId, $fields, 1);
+    }
+    
+    [pscustomobject[]] ReadCompanyContacts ([uint32] $companyId, [string[]] $fields, [uint32] $pageNum)
+    {
+        return $this.ReadCompanyContacts($companyId, $fields, 1, 0);
+    }
+    
+    [pscustomobject[]] ReadCompanyContacts ([uint32] $companyId, [string[]] $fields, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        $query = "company/id=$companyId";
+        return $this.ReadContacts($query, $fields, $pageNum, $pageSize);
     }
     
     [pscustomobject[]] ReadContacts ([string] $companyConditions)
@@ -1093,13 +1114,13 @@ class CwApiCompanyContactsSvc : CWApiRestClientSvc
     
     [uint32] GetContactCount([uint32] $companyId)
     {
-        return $this.GetContactCount($companyId, $null);
+        [string] $query = "company/id=$companyId";
+        return $this.GetContactCount($query);
     }
     
-    [uint32] GetContactCount([uint32] $companyId, [string] $companyConditions)
+    [uint32] GetContactCount([string] $companyConditions)
     {
-        $relativePathUri = "/$companyId/contacts/count";
-        return $this.GetCount($companyConditions, $relativePathUri);
+        return $this.GetCount($companyConditions);
     }
     
 }
