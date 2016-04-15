@@ -37,7 +37,7 @@ Milestone Requirement: Create the minimum required CmdLets that is needed to pro
   - CmdLet: **Completed**
   - Documentation: *Not Completed*
 0. `Get-CWCompanyContact`
-  - CmdLet: *Not Completed*
+  - CmdLet: **Completed**
   - Documentation: *Not Completed*
         
 ###Other
