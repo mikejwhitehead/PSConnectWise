@@ -508,7 +508,12 @@ class CWApiRestClientSvc
     
     CWApiRestClientSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey)
     {
-        $this.CWApiClient = [CWApiRestClient]::new($baseUrl, $companyName, $publicKey, $privateKey);
+        $this.CWApiClient = [CWApiRestClient]::New($baseUrl, $companyName, $publicKey, $privateKey);
+    }
+    
+    CWApiRestClientSvc ([CWApiRestConnectionInfo] $connectionInfo)
+    {
+        $this.CWApiClient = [CWApiRestClient]::New($connectionInfo)
     }
     
     [pscustomobject[]] QuickRead ([string] $url)
@@ -617,6 +622,11 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
     
+    CwApiServiceTicketSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
+    }
+    
     [pscustomobject] ReadTicket ([uint32] $ticketId)
     {
         return $this.ReadTicket($ticketId, "*");
@@ -721,6 +731,11 @@ class CwApiServiceBoardSvc : CWApiRestClientSvc
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";;
     }
     
+    CwApiServiceBoardSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
+    }
+    
     [pscustomobject] ReadBoard ([int] $boardId)
     {
         $relativePathUri = "/$boardId";
@@ -760,6 +775,11 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
     CwApiServiceBoardStatusSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base ($baseUrl, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
+    }
+    
+    CwApiServiceBoardStatusSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
     
     [pscustomobject] ReadStatus([int] $boardId, $statusId)
@@ -812,6 +832,11 @@ class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
     CwApiServiceBoardTypeSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base ($baseUrl, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
+    }
+    
+    CwApiServiceBoardTypeSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
     
     [pscustomobject] ReadType([int] $boardId, $typeId)
@@ -867,6 +892,11 @@ class CwApiServicePrioritySvc : CWApiRestClientSvc
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/priorities";
     }
     
+    CwApiServicePrioritySvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
+    }
+    
     [pscustomobject] ReadPriority([uint32] $priorityId)
     {
         $relativePathUri = "/$priorityId";
@@ -904,6 +934,11 @@ class CwApiServicePrioritySvc : CWApiRestClientSvc
 class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
 {
     CwApiServiceTicketNoteSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
+    }
+    
+    CwApiServiceTicketNoteSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
@@ -957,6 +992,11 @@ class CwApiCompanySvc : CWApiRestClientSvc
     CwApiCompanySvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/company/companies";
+    }
+    
+    CwApiCompanySvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
     
     [pscustomobject] ReadCompany([uint32] $companyId)
@@ -1034,6 +1074,11 @@ class CwApiCompanyContactSvc : CWApiRestClientSvc
     CwApiCompanyContactSvc ([string] $baseUrl, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($baseUrl, $companyName, $publicKey, $privateKey)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/company/contacts";
+    }
+    
+    CwApiCompanyContactSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
     
     [pscustomobject] ReadContact ([uint32] $contactId)
