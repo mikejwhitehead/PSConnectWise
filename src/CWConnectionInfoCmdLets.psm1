@@ -4,6 +4,7 @@
 function Get-CWConnectionInfo
 {
     [CmdLetBinding()]
+    [OutputType("CWApiRestConnectionInfo", ParameterSetName="Normal")]
     param
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true)]
@@ -19,12 +20,12 @@ function Get-CWConnectionInfo
         [ValidateNotNullOrEmpty()]
         [string]$PrivateKey,
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
-        [switch]$Override
+        [switch]$OverrideSSL
     )
     
     Begin
     {
-        [CWApiRestConnectionInfo] $connectionInfo;
+        [CWApiRestConnectionInfo] $connectionInfo = $null;
         
         if ($Override)
         {
@@ -34,13 +35,10 @@ function Get-CWConnectionInfo
         {
             $connectionInfo = [CWApiRestConnectionInfo]::New($Domain, $CompanyName, $PublicKey, $PrivateKey, $true);
         }
-        
     }
     Process
     {
-        
-        return $connectionInfo;
-        
+        $connectionInfo
     }
     End
     {
