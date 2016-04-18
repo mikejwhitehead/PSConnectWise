@@ -4,38 +4,38 @@
 function Get-CWCompanyContact
 {
     [CmdLetBinding()]
+    [OutputType("PSObject[]", ParameterSetName="Normal")]
+    [OutputType("PSObject", ParameterSetName="Single")]
     param
     (
-        [Parameter(ParameterSetName='CompanyContacts', Position=0, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$CompanyID,
-        [Parameter(ParameterSetName='SingleContact', Position=0, Mandatory=$true)]
+        [Parameter(ParameterSetName='Single', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$ID,
-        [Parameter(ParameterSetName='CompanyContacts', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='SingleContact', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Single', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$Domain,
-        [Parameter(ParameterSetName='CompanyContacts', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='SingleContact', Position=2, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$CompanyName,
-        [Parameter(ParameterSetName='CompanyContacts', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='SingleContact', Position=3, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PublicKey,
-        [Parameter(ParameterSetName='CompanyContacts', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='SingleContact', Position=4, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PrivateKey
+        [PSObject]$Server
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
         
-        # get the TimeEntry service
-        $ContactSvc = [CwApiCompanyContactSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        [CwApiCompanyContactSvc] $ContactSvc = $null; 
+        
+        # get the Company service
+        if ($Server -ne $null)
+        {
+            $ContactSvc = [CwApiCompanyContactSvc]::new($Server);
+        } 
+        else 
+        {
+            # TODO: determine whether or not to keep this as an option
+            $ContactSvc = [CwApiCompanyContactSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
         
         [uint32] $contactCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
