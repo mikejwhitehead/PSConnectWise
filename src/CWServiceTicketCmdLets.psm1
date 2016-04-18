@@ -4,44 +4,42 @@
 function Get-CWServiceTicket 
 {
     [CmdLetBinding()]
+    [OutputType("PSObject", ParameterSetName="Normal")]
+    [OutputType("PSObject[]", ParameterSetName="Query")]
     param
     (
-        [Parameter(ParameterSetName='SingleTicket', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
+        [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [int[]]$TicketID,
-        [Parameter(ParameterSetName='TicketQuery', Position=0, Mandatory=$true)]
+        [Parameter(ParameterSetName='Query', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
-        [Parameter(ParameterSetName='SingleTicket', Position=1, Mandatory=$false)]
-        [Parameter(ParameterSetName='TicketQuery', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string[]]$Property,
-        [Parameter(ParameterSetName='TicketQuery', Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [int]$SizeLimit,
-        [Parameter(ParameterSetName='SingleTicket', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='TicketQuery', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=2)]
+        [Parameter(ParameterSetName='Query', Position=2)]
         [ValidateNotNullOrEmpty()]
-        [string]$Domain,
-        [Parameter(ParameterSetName='SingleTicket', Position=3, Mandatory=$true)]
-        [Parameter(ParameterSetName='TicketQuery', Position=2, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$CompanyName,
-        [Parameter(ParameterSetName='SingleTicket', Position=4, Mandatory=$true)]
-        [Parameter(ParameterSetName='TicketQuery', Position=3, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PublicKey,
-        [Parameter(ParameterSetName='SingleTicket', Position=5, Mandatory=$true)]
-        [Parameter(ParameterSetName='TicketQuery', Position=4, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PrivateKey
+        [PSCustomObject]$Server
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50 
+        [CwApiServiceTicketSvc] $TicketSvc = $null; 
         
-        # get the ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        # get the Company service
+        if ($Server -ne $null)
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
+        } 
+        else 
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
         
         [uint32] $ticketCount = 1  
         [uint32] $pageCount   = 1  
@@ -116,50 +114,51 @@ function Get-CWServiceTicket
 function New-CWServiceTicket 
 {
     [CmdLetBinding()]
+    [OutputType("PSObject", ParameterSetName="Normal")]
     param
     (
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$BoardID,
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$CompanyID,
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [uint32]$ContactID,
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Subject,
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string]$Description,
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string]$Internal,
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [uint32]$PriorityID,
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [uint32]$StatusID,
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal')]
         [ValidateNotNullOrEmpty()]
-        [string]$Domain,
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$CompanyName,
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PublicKey,
-        [Parameter(ParameterSetName='ByProperties', Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PrivateKey
+        [PSCustomObject]$Server
     )
     
     Begin
     {
-        # get the ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        [CwApiServiceTicketSvc] $TicketSvc = $null; 
+        
+        # get the Company service
+        if ($Server -ne $null)
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
+        } 
+        else 
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
     }
     Process
     {
@@ -175,33 +174,34 @@ function New-CWServiceTicket
 function Update-CWServiceTicket  
 {
     [CmdLetBinding()]
+    [OutputType("PSObject", ParameterSetName="Normal")]
     param
     (
-        [Parameter(ParameterSetName='Simple', Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
         [Parameter(ParameterSetName='WithMessage', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$TicketID,
-        [Parameter(ParameterSetName='Simple', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [uint32]$BoardID,
-        [Parameter(ParameterSetName='Simple', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [uint32]$ContactID,
-        [Parameter(ParameterSetName='Simple', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string]$Subject,
-        [Parameter(ParameterSetName='Simple', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [uint32]$PriorityID,
-        [Parameter(ParameterSetName='Simple', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [uint32]$StatusID,
-        [Parameter(ParameterSetName='Simple', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [Parameter(ParameterSetName='WithMessage', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Message,
@@ -214,29 +214,30 @@ function Update-CWServiceTicket
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [switch]$AddToResolution,
-        [Parameter(ParameterSetName='Simple', Mandatory=$true)]
-        [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Position=2)]
+        [Parameter(ParameterSetName='WithMessage', Position=2)]
         [ValidateNotNullOrEmpty()]
-        [string]$Domain,
-        [Parameter(ParameterSetName='Simple', Mandatory=$true)]
-        [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [string]$CompanyName,
-        [Parameter(ParameterSetName='Simple', Mandatory=$true)]
-        [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PublicKey,
-        [Parameter(ParameterSetName='Simple', Mandatory=$true)]
-        [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PrivateKey
+        [PSCustomObject]$Server
     )
     
     Begin
     {
         # get the ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
-        $NoteSvc   = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        [CwApiServiceTicketSvc] $TicketSvc = $null; 
+        [CwApiServiceTicketNoteSvc] $NoteSvc = $null; 
+        
+        # get the Company service
+        if ($Server -ne $null)
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
+            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Server);
+        } 
+        else 
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+            $NoteSvc   = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
+        
         
         [ServiceTicketNoteTypes[]] $addToForNote = @();
         if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
@@ -291,30 +292,31 @@ function Update-CWServiceTicket
 function Remove-CWServiceTicket 
 {
     [CmdLetBinding()]
+    [OutputType("Boolean", ParameterSetName="Normal")]
     param
     (
-        [Parameter(ParameterSetName='Tickets', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
+        [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [int[]]$TicketID,
-        [Parameter(ParameterSetName='Tickets', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=2)]
         [ValidateNotNullOrEmpty()]
-        [string]$Domain,
-        [Parameter(ParameterSetName='Tickets', Position=3, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$CompanyName,
-        [Parameter(ParameterSetName='Tickets', Position=4, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PublicKey,
-        [Parameter(ParameterSetName='Tickets', Position=5, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PrivateKey
+        [PSCustomObject]$Server
     )
     
     Begin
     {
         
-        # get the ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        [CwApiServiceTicketSvc] $TicketSvc = $null; 
+        
+        # get the Company service
+        if ($Server -ne $null)
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
+        } 
+        else 
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
         
     }
     Process
