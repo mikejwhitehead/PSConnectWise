@@ -5,14 +5,12 @@ function Get-CWServiceBoardStatus
 {
     [CmdLetBinding()]
     [OutputType("PSObject[]", ParameterSetName="Normal")]
-    [OutputType("PSObject", ParameterSetName="Single")]
     param
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$BoardID,
         [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [PSObject]$Server
     )
