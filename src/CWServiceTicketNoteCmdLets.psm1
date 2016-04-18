@@ -4,39 +4,37 @@
 function Get-CWServiceTicketNote
 {
     [CmdLetBinding()]
+    [OutputType("PSObject", ParameterSetName="Normal")]
+    [OutputType("PSObject", ParameterSetName="Single")]
     param
     (
-        [Parameter(ParameterSetName='TicketNotes', Position=0, Mandatory=$true)]
-        [Parameter(ParameterSetName='SingleNote', Position=0, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true)]
+        [Parameter(ParameterSetName='Single', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [int32]$TicketID,
-        [Parameter(ParameterSetName='SingleNote', Position=0, Mandatory=$true)]
+        [Parameter(ParameterSetName='Single', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [int32]$NoteID,
-        [Parameter(ParameterSetName='TicketNotes', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='SingleNote', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Single', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$Domain,
-        [Parameter(ParameterSetName='TicketNotes', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='SingleNote', Position=2, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$CompanyName,
-        [Parameter(ParameterSetName='TicketNotes', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='SingleNote', Position=3, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PublicKey,
-        [Parameter(ParameterSetName='TicketNotes', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='SingleNote', Position=4, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PrivateKey
+        [PSCustomObject]$Server
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
+        [CwApiServiceTicketNoteSvc] $NoteSvc = $null; 
         
-        # get the TimeEntry service
-        $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        # get the Note service
+        if ($Server -ne $null)
+        {
+            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Server);
+        } 
+        else 
+        {
+            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
         
         [uint32] $noteCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
@@ -112,24 +110,24 @@ function Add-CWServiceTicketNote
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [switch]$AddToResolution,
-        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=2)]
         [ValidateNotNullOrEmpty()]
-        [string]$Domain,
-        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$CompanyName,
-        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PublicKey,
-        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PrivateKey
+        [PSCustomObject]$Server
     )
     
     Begin
     {
-        # get the ticket service
-        $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        [CwApiServiceTicketNoteSvc] $NoteSvc = $null; 
+        
+        # get the Note service
+        if ($Server -ne $null)
+        {
+            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Server);
+        } 
+        else 
+        {
+            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
         
         [ServiceTicketNoteTypes[]] $addTo = @();
         
