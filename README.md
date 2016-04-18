@@ -72,11 +72,11 @@ Get-CWServiceTicket -TicketID 1234567 -Server $Server;
 ```
 #####Returns
 ```powershell
-id                         : 7857582
-summary                    : [Master][Test Alert] Test - Internal Ticket for Testing for LabTech Consulting
+id                         : 1234567
+summary                    : My Computer is Broken
 recordType                 : ServiceTicket
-board                      : @{id=297; name=LT-Consulting; _info=}
-status                     : @{id=6993; name=New; _info=}
+board                      : @{id=1; name=BreakFix; _info=}
+status                     : @{id=1; name=New; _info=}
 ... 
 ```
 
