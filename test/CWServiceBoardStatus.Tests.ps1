@@ -10,7 +10,7 @@ Describe 'CWServiceBoardStatus' {
 	# get the server connnection
 	$pstrServer = Get-CWConnectionInfo -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 	
-	Context 'Get-CWServiceBoardStatus w/o ConnectionInfo Obj' {
+	Context 'Get-CWServiceBoardStatus' {
 		
 		$pstrBoardID = $pstrGenSvc.boardIds[0];
 		

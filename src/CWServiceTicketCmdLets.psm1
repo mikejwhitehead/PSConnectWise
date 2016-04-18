@@ -20,8 +20,8 @@ function Get-CWServiceTicket
         [string[]]$Property,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [int]$SizeLimit,
-        [Parameter(ParameterSetName='Normal', Position=2)]
-        [Parameter(ParameterSetName='Query', Position=2)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [Parameter(ParameterSetName='Query', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [PSCustomObject]$Server
     )
@@ -31,7 +31,7 @@ function Get-CWServiceTicket
         $MAX_ITEMS_PER_PAGE = 50 
         [CwApiServiceTicketSvc] $TicketSvc = $null; 
         
-        # get the Company service
+        # get the Ticket service
         if ($Server -ne $null)
         {
             $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
@@ -141,7 +141,7 @@ function New-CWServiceTicket
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [uint32]$StatusID,
-        [Parameter(ParameterSetName='Normal')]
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [PSCustomObject]$Server
     )
@@ -150,7 +150,7 @@ function New-CWServiceTicket
     {
         [CwApiServiceTicketSvc] $TicketSvc = $null; 
         
-        # get the Company service
+        # get the Ticket service
         if ($Server -ne $null)
         {
             $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
@@ -214,19 +214,18 @@ function Update-CWServiceTicket
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [switch]$AddToResolution,
-        [Parameter(ParameterSetName='Normal', Position=2)]
-        [Parameter(ParameterSetName='WithMessage', Position=2)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [Parameter(ParameterSetName='WithMessage', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [PSCustomObject]$Server
     )
     
     Begin
     {
-        # get the ticket service
         [CwApiServiceTicketSvc] $TicketSvc = $null; 
         [CwApiServiceTicketNoteSvc] $NoteSvc = $null; 
         
-        # get the Company service
+        # get the Ticket service
         if ($Server -ne $null)
         {
             $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
@@ -237,7 +236,6 @@ function Update-CWServiceTicket
             $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
             $NoteSvc   = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         }
-        
         
         [ServiceTicketNoteTypes[]] $addToForNote = @();
         if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
@@ -298,17 +296,16 @@ function Remove-CWServiceTicket
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [int[]]$TicketID,
-        [Parameter(ParameterSetName='Normal', Position=2)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [PSCustomObject]$Server
     )
     
     Begin
     {
-        
         [CwApiServiceTicketSvc] $TicketSvc = $null; 
         
-        # get the Company service
+        # get the Ticket service
         if ($Server -ne $null)
         {
             $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
