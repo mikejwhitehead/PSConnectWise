@@ -4,40 +4,39 @@
 function Get-CWServiceBoard
 {
     [CmdLetBinding()]
+    [OutputType("PSObject[]", ParameterSetName="Normal")]
+    [OutputType("PSObject", ParameterSetName="Single")]
     param
     (
-        [Parameter(ParameterSetName='SingleBoard', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
+        [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [int[]]$BoardID,
-        [Parameter(ParameterSetName='BoardQuery', Position=0, Mandatory=$true)]
+        [Parameter(ParameterSetName='Query', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
-        [Parameter(ParameterSetName='BoardQuery', Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [int]$SizeLimit,
-        [Parameter(ParameterSetName='SingleBoard', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='BoardQuery', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$Domain,
-        [Parameter(ParameterSetName='SingleBoard', Position=3, Mandatory=$true)]
-        [Parameter(ParameterSetName='BoardQuery', Position=2, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$CompanyName,
-        [Parameter(ParameterSetName='SingleBoard', Position=4, Mandatory=$true)]
-        [Parameter(ParameterSetName='BoardQuery', Position=3, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PublicKey,
-        [Parameter(ParameterSetName='SingleBoard', Position=5, Mandatory=$true)]
-        [Parameter(ParameterSetName='BoardQuery', Position=4, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PrivateKey
+        [PSObject]$Server
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
+        [CwApiServiceBoardSvc] $BoardSvc = $null; 
         
-        # get the Board service
-        $BoardSvc = [CwApiServiceBoardSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        # get the Company service
+        if ($Server -ne $null)
+        {
+            $BoardSvc = [CwApiServiceBoardSvc]::new($Server);
+        } 
+        else 
+        {
+            # TODO: determine whether or not to keep this as an option
+            $BoardSvc = [CwApiServiceBoardSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
         
         [uint32] $boardCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
