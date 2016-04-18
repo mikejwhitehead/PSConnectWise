@@ -4,6 +4,9 @@
 function Get-CWCompany
 {
     [CmdLetBinding()]
+    [OutputType("PSObject", ParameterSetName="ByID")]
+    [OutputType("PSObject", ParameterSetName="ByIdentifier")]
+    [OutputType("PSObject[]", ParameterSetName="ByQuery")]
     param
     (
         [Parameter(ParameterSetName='ByID', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
@@ -15,8 +18,8 @@ function Get-CWCompany
         [Parameter(ParameterSetName='ByQuery', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
-        [Parameter(ParameterSetName='ByID', Position=2, Mandatory=$false)]
-        [Parameter(ParameterSetName='ByIdentifier', Position=2, Mandatory=$false)]
+        [Parameter(ParameterSetName='ByID', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='ByIdentifier', Position=1, Mandatory=$false)]
         [Parameter(ParameterSetName='ByQuery', Position=1, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string[]]$Property,
@@ -24,32 +27,26 @@ function Get-CWCompany
         [uint32]$SizeLimit,
         [Parameter(ParameterSetName='ByID', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='ByIdentifier', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='ByQuery', Position=1, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$Domain,
-        [Parameter(ParameterSetName='ByID', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='ByIdentifier', Position=3, Mandatory=$true)]
         [Parameter(ParameterSetName='ByQuery', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$CompanyName,
-        [Parameter(ParameterSetName='ByID', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='ByIdentifier', Position=4, Mandatory=$true)]
-        [Parameter(ParameterSetName='ByQuery', Position=3, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PublicKey,
-        [Parameter(ParameterSetName='ByID', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='ByIdentifier', Position=5, Mandatory=$true)]
-        [Parameter(ParameterSetName='ByQuery', Position=4, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PrivateKey
+        [PSCustomObject]$Server
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
+        [CwApiCompanySvc] $CompanySvr = $null; 
         
         # get the Company service
-        $CompanySvc = [CwApiCompanySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        if ($Server -ne $null)
+        {
+            $CompanySvc = [CwApiCompanySvc]::new($Server);
+        } 
+        else 
+        {
+            # TODO: determine whether or not to keep this as an option
+            $CompanySvc = [CwApiCompanySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
         
         [uint32] $CompanyCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
@@ -93,7 +90,7 @@ function Get-CWCompany
                 
                 Write-Debug "Requesting Company IDs that Meets this Filter: $Filter";
                 $queriedCompanys = $CompanySvc.ReadCompanies($Filter, $Properties, $pageNum, $itemsPerPage);
-                [pscustomobject[]] $Companies = $queriedCompanys;
+                [psobject[]] $Companies = $queriedCompanys;
                 
                 foreach ($Company in $Companies)
                 {
