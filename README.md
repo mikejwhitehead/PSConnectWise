@@ -63,10 +63,23 @@ Milestone Requirement: Create the minimum required CmdLets that is needed to pro
    - `Import-Module "C:\Path\To\ConnectWisePSModule\scr\ConnectWisePSModule.psm1" -Force;`
 0. CmdLets are Imported and Ready to Use
 
-### Get ConnectWise Ticket
-0. Open PS and Import Module (*see above*)
-0. Execute in PowerShell:
-   - `Get-CWServiceTicket -TicketID 1234567 -BaseApiUrl "https://TechInUrPocket.example.com/v4_6_Release/apis/3.0" -CompanyName "TechInUrPocket" -PublicKey 'Pub1icK3yH3r3' -PrivateKey 'Pri@t3K3yH3r3';`
+### Getting a ConnectWise Ticket
+
+#####Execute in PowerShell (Import Module Firsat (*see above*)):
+```powershell
+$Server = Get-CWConnectionInfo -Domain "TechInUrPocket.example.com" -CompanyName "TechInUrPocket" -PublicKey 'Pub1icK3yH3r3' -PrivateKey 'Pri@t3K3yH3r3';`
+Get-CWServiceTicket -TicketID 1234567 -Server $Server;
+```
+#####Returns
+```powershell
+id                         : 7857582
+summary                    : [Master][Test Alert] Test - Internal Ticket for Testing for LabTech Consulting
+recordType                 : ServiceTicket
+board                      : @{id=297; name=LT-Consulting; _info=}
+status                     : @{id=6993; name=New; _info=}
+... 
+```
+
 
 #Extra Information
 - There is no module manifest until initial v1.0.0 milestones are meet. 
