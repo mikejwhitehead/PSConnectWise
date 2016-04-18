@@ -4,40 +4,39 @@
 function Get-CWServicePriority
 {
     [CmdLetBinding()]
+    [OutputType("PSObject[]", ParameterSetName="Normal")]
+    [OutputType("PSObject[]", ParameterSetName="Query")]
     param
     (
-        [Parameter(ParameterSetName='SinglePriority', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
+        [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [int[]]$PriorityID,
-        [Parameter(ParameterSetName='PriorityQuery', Position=0, Mandatory=$true)]
+        [Parameter(ParameterSetName='Query', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
-        [Parameter(ParameterSetName='PriorityQuery', Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [int]$SizeLimit,
-        [Parameter(ParameterSetName='SinglePriority', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='PriorityQuery', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Query', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string]$Domain,
-        [Parameter(ParameterSetName='SinglePriority', Position=3, Mandatory=$true)]
-        [Parameter(ParameterSetName='PriorityQuery', Position=2, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$CompanyName,
-        [Parameter(ParameterSetName='SinglePriority', Position=4, Mandatory=$true)]
-        [Parameter(ParameterSetName='PriorityQuery', Position=3, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PublicKey,
-        [Parameter(ParameterSetName='SinglePriority', Position=5, Mandatory=$true)]
-        [Parameter(ParameterSetName='PriorityQuery', Position=4, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$PrivateKey
+        [PSObject]$Server
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
+        [CwApiServicePrioritySvc] $PrioritySvc = $null; 
         
-        # get the Priority service
-        $PrioritySvc = [CwApiServicePrioritySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        # get the Company service
+        if ($Server -ne $null)
+        {
+            $PrioritySvc = [CwApiServicePrioritySvc]::new($Server);
+        } 
+        else 
+        {
+            # TODO: determine whether or not to keep this as an option
+            $PrioritySvc = [CwApiServicePrioritySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
         
         [uint32] $priorityCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
