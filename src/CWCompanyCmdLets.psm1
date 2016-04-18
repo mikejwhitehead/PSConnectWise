@@ -4,32 +4,32 @@
 function Get-CWCompany
 {
     [CmdLetBinding()]
-    [OutputType("PSObject", ParameterSetName="ByID")]
-    [OutputType("PSObject", ParameterSetName="ByIdentifier")]
-    [OutputType("PSObject[]", ParameterSetName="ByQuery")]
+    [OutputType("PSObject", ParameterSetName="Normal")]
+    [OutputType("PSObject", ParameterSetName="Identifier")]
+    [OutputType("PSObject[]", ParameterSetName="Query")]
     param
     (
-        [Parameter(ParameterSetName='ByID', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
+        [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32[]]$ID,
-        [Parameter(ParameterSetName='ByIdentifier', Position=0, Mandatory=$true)]
+        [Parameter(ParameterSetName='Identifier', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string[]]$Identifier,
-        [Parameter(ParameterSetName='ByQuery', Position=0, Mandatory=$true)]
+        [Parameter(ParameterSetName='Query', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
-        [Parameter(ParameterSetName='ByID', Position=1, Mandatory=$false)]
-        [Parameter(ParameterSetName='ByIdentifier', Position=1, Mandatory=$false)]
-        [Parameter(ParameterSetName='ByQuery', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Identifier', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Position=1, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string[]]$Property,
-        [Parameter(ParameterSetName='ByQuery', Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [uint32]$SizeLimit,
-        [Parameter(ParameterSetName='ByID', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='ByIdentifier', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='ByQuery', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Identifier', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server
+        [PSObject]$Server
     )
     
     Begin
