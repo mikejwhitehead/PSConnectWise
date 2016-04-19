@@ -7,7 +7,7 @@ function Get-CWServicePriority
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
-        [int[]]$PriorityID,
+        [int[]]$ID,
         [Parameter(ParameterSetName='Query', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
@@ -85,7 +85,7 @@ function Get-CWServicePriority
             } else {
                 
                 Write-Debug "Retrieving ConnectWise Priorities by Priority ID"
-                foreach ($Priority in $PriorityID)
+                foreach ($Priority in $ID)
                 {
                     Write-Verbose "Requesting ConnectWise Priority Number: $Priority";
                     if ($Properties -eq $null -or $Properties.Length -eq 0)

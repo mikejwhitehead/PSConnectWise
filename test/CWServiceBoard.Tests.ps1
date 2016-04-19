@@ -17,19 +17,19 @@ Describe 'CWServiceBoard' {
 	
 		It 'gets board and checks for the id field' {
 			$boardID = $pstrBoardID;
-			$board = Get-CWServiceBoard -BoardID $boardID -Server $pstrServer;
+			$board = Get-CWServiceBoard -ID $boardID -Server $pstrServer;
 			$board.id | Should Be $boardID;		
 		}
 		
 		It 'gets board and pipes it through the Select-Object cmdlet for the id property' {
 			$boardID = $pstrBoardID;
-			$board = Get-CWServiceBoard -BoardID $boardID -Server $pstrServer;
+			$board = Get-CWServiceBoard -ID $boardID -Server $pstrServer;
 			$board | Select-Object -ExpandProperty id | Should Be $boardID;		
 		}
 		
-		It 'gets boards by passing array of board ids to the -BoardID param' {
+		It 'gets boards by passing array of board ids to the -ID param' {
 			$boardIDs = $pstrBoardIDs;
-			$boards = Get-CWServiceBoard -BoardID $boardIDs -Server $pstrServer;
+			$boards = Get-CWServiceBoard -ID $boardIDs -Server $pstrServer;
 			$boards | Measure-Object | Select -ExpandProperty Count | Should Be $boardIDs.Count;		
 		}
 		
@@ -54,7 +54,7 @@ Describe 'CWServiceBoard' {
 		
 		It 'gets boards and sorts board id by descending piping cmdlet through Sort-Object cmdlet' {
 			$boardIDs = $pstrBoardIDs;
-			$boards = Get-CWServiceBoard -BoardID $boardIDs -Server $pstrServer | Sort -Descending id;
+			$boards = Get-CWServiceBoard -ID $boardIDs -Server $pstrServer | Sort -Descending id;
 			$maxBoardId = $boardIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
 			$boards[0].id | Should Be $maxBoardId;		
 		}

@@ -7,7 +7,7 @@ function Get-CWServiceTicket
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
-        [int[]]$TicketID,
+        [int[]]$ID,
         [Parameter(ParameterSetName='Query', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
@@ -81,12 +81,12 @@ function Get-CWServiceTicket
                 
                 Write-Debug "Requesting Ticket IDs that Meets this Filter: $Filter";
                 $queriedTickets = $TicketSvc.ReadTickets($Filter, [string[]] @("id"), $pageNum, $ticketsPerPage);
-                [int[]] $TicketID = $queriedTickets.id   }  
+                [int[]] $ID = $queriedTickets.id   }  
         
-            if ($TicketID -ne $null)
+            if ($ID -ne $null)
             {
                 Write-Debug "Retrieving ConnectWise Tickets by Ticket ID"
-                foreach ($ticket in $TicketID)
+                foreach ($ticket in $ID)
                 {
                     Write-Verbose "Requesting ConnectWise Ticket Number: $ticket";
                     if ($Properties -eq $null -or $Properties.Length -eq 0)
@@ -177,7 +177,7 @@ function Update-CWServiceTicket
         [Parameter(ParameterSetName='Normal', Mandatory=$true)]
         [Parameter(ParameterSetName='WithMessage', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [uint32]$TicketID,
+        [uint32]$ID,
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
@@ -259,7 +259,7 @@ function Update-CWServiceTicket
         #create a ticket note
         if (![String]::IsNullOrWhiteSpace($Message))
         {
-            $note = $NoteSvc.CreateNote($TicketID, $Message, $addToForNote);
+            $note = $NoteSvc.CreateNote($ID, $Message, $addToForNote);
             
             if (!$note.id -gt 0)
             {
@@ -270,11 +270,11 @@ function Update-CWServiceTicket
         #update the ticket
         if ($BoardID -gt 0 -or $ContactID -gt 0 -or $StatusID -gt 0 -or $PriorityID -gt 0)
         {
-            return $TicketSvc.UpdateTicket($TicketID, $BoardID, $ContactID, $StatusID, $PriorityID);
+            return $TicketSvc.UpdateTicket($ID, $BoardID, $ContactID, $StatusID, $PriorityID);
         }
         else
         {
-            return $TicketSvc.ReadTicket($TicketID);
+            return $TicketSvc.ReadTicket($ID);
         }    
     }
     End
@@ -292,7 +292,7 @@ function Remove-CWServiceTicket
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
-        [int[]]$TicketID,
+        [int[]]$ID,
         [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [PSCustomObject]$Server
@@ -316,7 +316,7 @@ function Remove-CWServiceTicket
     Process
     {
         Write-Debug "Deleting ConnectWise Tickets by Ticket ID"
-        foreach ($ticket in $TicketID)
+        foreach ($ticket in $ID)
         {
             $TicketSvc.DeleteTicket($ticket);
         }

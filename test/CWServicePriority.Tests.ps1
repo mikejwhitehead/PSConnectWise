@@ -17,19 +17,19 @@ Describe -Tag 'ReqPriorityPermission' 'CWServicePriority' {
 	
 		It 'gets priority and checks for the id field' {
 			$priorityID = $pstrPriorityID;
-			$priority = Get-CWServicePriority -PriorityID $priorityID -Server $pstrServer;
+			$priority = Get-CWServicePriority -ID $priorityID -Server $pstrServer;
 			$priority.id | Should Be $priorityID;		
 		}
 		
 		It 'gets priority and pipes it through the Select-Object cmdlet for the id property' {
 			$priorityID = $pstrPriorityID;
-			$priority = Get-CWServicePriority -PriorityID $priorityID -Server $pstrServer;
+			$priority = Get-CWServicePriority -ID $priorityID -Server $pstrServer;
 			$priority | Select-Object -ExpandProperty id | Should Be $priorityID;		
 		}
 		
-		It 'gets priorities by passing array of priority ids to the -PriorityID param' {
+		It 'gets priorities by passing array of priority ids to the -ID param' {
 			$priorityIDs = $pstrPriorityIDs;
-			$priorities = Get-CWServicePriority -PriorityID $priorityIDs -Server $pstrServer;
+			$priorities = Get-CWServicePriority -ID $priorityIDs -Server $pstrServer;
 			$priorities | Measure-Object | Select -ExpandProperty Count | Should Be $priorityIDs.Count;		
 		}
 		
@@ -54,7 +54,7 @@ Describe -Tag 'ReqPriorityPermission' 'CWServicePriority' {
 		
 		It 'gets priorities and sorts priority id by descending piping cmdlet through Sort-Object cmdlet' {
 			$priorityIDs = $pstrPriorityIDs;
-			$priorities = Get-CWServicePriority -PriorityID $priorityIDs -Server $pstrServer | Sort -Descending id;
+			$priorities = Get-CWServicePriority -ID $priorityIDs -Server $pstrServer | Sort -Descending id;
 			$maxpriorityID = $priorityIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
 			$priorities[0].id | Should Be $maxpriorityID;		
 		}

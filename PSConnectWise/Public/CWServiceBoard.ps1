@@ -7,7 +7,7 @@ function Get-CWServiceBoard
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
-        [int[]]$BoardID,
+        [int[]]$ID,
         [Parameter(ParameterSetName='Query', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
@@ -95,7 +95,7 @@ function Get-CWServiceBoard
             } else {
                 
                 Write-Debug "Retrieving ConnectWise Boards by Board ID"
-                foreach ($Board in $BoardID)
+                foreach ($Board in $ID)
                 {
                     Write-Verbose "Requesting ConnectWise Board Number: $Board";
                     if ($Properties -eq $null -or $Properties.Length -eq 0)
