@@ -1,6 +1,6 @@
-#Readme  
+#PSConnectWise  
 
-Collection of PowerShell CmdLet that interface with ConnectWise's REST API service. This project is meant to target the latest general releases of PowerShell and ConnectWise.
+Collection of PowerShell functions that interface with ConnectWise's REST API service. This project is meant to target the latest general releases of PowerShell (i.e. PS v5.0) and ConnectWise.
 
 ##Functions
 Goal of the version of v1.0 was to create the minimum required PowerShell functions that is needed to properly create, read, update, and delete a ConnectWise ticket. 
