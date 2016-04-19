@@ -2,7 +2,7 @@
 
 Collection of PowerShell CmdLet that interface with ConnectWise's REST API service. This project is meant to target the latest general releases of PowerShell and ConnectWise.
 
-###Functions
+##Functions
 Goal of the version of v1.0 was to create the minimum required PowerShell functions that is needed to properly create, read, update, and delete a ConnectWise ticket. 
 
 ######Service Module
@@ -21,25 +21,26 @@ Goal of the version of v1.0 was to create the minimum required PowerShell functi
 0. `Get-CWCompanyContact`
         
         
-#Requirements
+##Requirements
 
 - PowerShell 5.0
 - ConnectWise Server v2015.3 or Newer
 - CW Member's Public and Private API Key
 - ConnectWise Service's Base URL for API Request
 
-#Example
+##Import Module to PS Session
 
-###Import Module for the current PS Session
 0. Download or Clone this Repository
 0. Open PowerShell
 0. Import the Module (.psm1) within the `PSConnectWise` Directory
    - `Import-Module "...\PSConnectWise\PSConnectWise\PSConnectWise.psm1" -Force;`
 0. CmdLets are Imported and Ready to Use
 
-### Getting a ConnectWise Ticket
+##Examples
 
-#####Execute in PowerShell (Import Module Firsat (*see above*)):
+####Get ConnectWise Ticket
+
+#####Execute
 ```powershell
 $Server = Get-CWConnectionInfo -Domain "TechInUrPocket.example.com" -CompanyName "TechInUrPocket" -PublicKey 'Pub1icK3yH3r3' -PrivateKey 'Pri@t3K3yH3r3';`
 Get-CWServiceTicket -TicketID 1234567 -Server $Server;
@@ -55,7 +56,7 @@ status                     : @{id=1; name=New; _info=}
 ```
 
 
-#Extra Information
+##Extra Information
 - The *pester* Directory Stores the Unit Test Scripts
   - See [Readme](https://github.com/sgtoj/ConnectWisePSModule/tree/master/pester)
 - [Documented Architecture](https://github.com/sgtoj/ConnectWisePSModule/blob/master/doc/ClassArchitectures.md) of the Dependent PS Classes
