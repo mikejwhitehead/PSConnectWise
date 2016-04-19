@@ -1,3 +1,28 @@
+<#
+.SYNOPSIS
+    Gets ConnectWise company information. 
+.PARAMETER ID
+    ConnectWise company ID
+.PARAMETER Identifier
+    ConnectWise company identifier name
+.PARAMETER Filter
+    Query String 
+.PARAMETER Property
+    Name of the properties to return
+.PARAMETER SizeLimit
+    Max number of items to return
+.PARAMETER Server
+    Variable to the object created via Get-CWConnectWiseInfo
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWCompany -ID 1 -Server $CWServer;
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWCompany -Identifier "LabTechSoftware" -Server $CWServer;
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWCompany -Query "ID in (1, 2, 3, 4, 5)" -Server $CWServer;
+#>
 function Get-CWCompany
 {
     

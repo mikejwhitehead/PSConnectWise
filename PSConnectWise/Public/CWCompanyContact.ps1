@@ -1,3 +1,19 @@
+<#
+.SYNOPSIS
+    Gets ConnectWise contact information. 
+.PARAMETER ID
+    ConnectWise contact ID
+.PARAMETER CompanyID
+    ConnectWise company ID
+.PARAMETER Server
+    Variable to the object created via Get-CWConnectWiseInfo
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWCompanyContact -ID 1 -Server $CWServer;
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWCompanyContact -CompanyID 1 -Server $CWServer;
+#>
 function Get-CWCompanyContact
 {
     [CmdLetBinding()]

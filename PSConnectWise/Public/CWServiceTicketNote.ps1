@@ -1,3 +1,19 @@
+<#
+.SYNOPSIS
+    Gets notes/messsage of a ConnectWise ticket. 
+.PARAMETER TicketID
+    ConnectWise ticket ID
+.PARAMETER NoteID
+    ConnectWise ticket note ID
+.PARAMETER Server
+    Variable to the object created via Get-CWConnectWiseInfo
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWCompanyContact -ID 1 -Server $CWServer;
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWServiceTicketNote -TicketID 123 -Server $CWServer;
+#>
 function Get-CWServiceTicketNote
 {
     [CmdLetBinding()]
@@ -87,6 +103,23 @@ function Get-CWServiceTicketNote
     }
 }
 
+<#
+.SYNOPSIS
+    Adds a new note to a ConnectWise ticket. 
+.PARAMETER Ticket
+    ID of the ConnectWise ticket to update
+.PARAMETER Message
+    New message to be added to Detailed Description, Internal Analysis, and/or Resolution section
+.PARAMETER AddToDescription
+    Instructs the value of `-Message` to the Detailed Description
+.PARAMETER AddToInternal
+    Instructs the value of `-Message` to the Internal Analysis
+.PARAMETER AddToResolution
+    Instructs the value of `-Message` to the Resolution
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Add-CWServiceTicketNote -ID 123 -Message "Added ticket note added to ticket via PowerShell." -Server $CWServer;
+#>
 function Add-CWServiceTicketNote 
 {
     [CmdLetBinding()]

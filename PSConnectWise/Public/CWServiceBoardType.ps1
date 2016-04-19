@@ -1,3 +1,14 @@
+<#
+.SYNOPSIS
+    Gets ConnectWise board's type and subtype information. 
+.PARAMETER BoardID
+    ConnectWise board ID
+.PARAMETER Server
+    Variable to the object created via Get-CWConnectWiseInfo
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWServiceBoardType -BoardID 1 -Server $CWServer;
+#>
 function Get-CWServiceBoardType
 {
     [CmdLetBinding()]

@@ -1,3 +1,23 @@
+<#
+.SYNOPSIS
+    Gets ConnectWise ticket information. 
+.PARAMETER ID
+    ConnectWise ticket ID
+.PARAMETER Filter
+    Query String 
+.PARAMETER Property
+    Name of the properties to return
+.PARAMETER SizeLimit
+    Max number of items to return
+.PARAMETER Server
+    Variable to the object created via Get-CWConnectWiseInfo
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWServiceTicket -ID 1 -Server $CWServer;
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWServiceTicket -Query "ID in (123, 456, 789, 321, 654, 987)" -Server $CWServer;
+#>
 function Get-CWServiceTicket 
 {
     [CmdLetBinding()]
@@ -108,6 +128,29 @@ function Get-CWServiceTicket
     }
 }
 
+<#
+.SYNOPSIS
+    Creates a ConnectWise ticket. 
+.PARAMETER BoardID
+    ID of the ConnectWise board
+.PARAMETER CompanyID
+    ID of the ConnectWise company
+.PARAMETER ContactID
+    ID of the contact in ConnectWise 
+.PARAMETER Subject
+    Subject of the ticket
+.PARAMETER Description
+    Initial body of the ticket placed in the ticket's Detailed Description section
+.PARAMETER Internal
+    Initial message of the ticket placed in the ticket's Internal Analysis section
+.PARAMETER PriorityID
+    ID of the ConnectWise priority
+.PARAMETER StatusID
+    ID of the ConnectWise board status
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    New-CWServiceTicket -BoardID 1 -CompanyID 7 -ContactID 10 -Subject "My First Ticket" Description "This is my first ticket created via PowerShell." -Server $CWServer;
+#>
 function New-CWServiceTicket 
 {
     [CmdLetBinding()]
@@ -168,6 +211,33 @@ function New-CWServiceTicket
     }
 } 
 
+<#
+.SYNOPSIS
+    Updates a ConnectWise ticket. 
+.PARAMETER ID
+    ID of the ConnectWise ticket to update
+.PARAMETER BoardID
+    New ConnectWise board id for the ticket
+.PARAMETER ContactID
+    ID of the contact in ConnectWise 
+.PARAMETER Subject
+    New ConnectWise ticket subject
+.PARAMETER Message
+    New message to be added to Detailed Description, Internal Analysis, and/or Resolution section
+.PARAMETER AddToDescription
+    Instructs the value of `-Message` to the Detailed Description
+.PARAMETER AddToInternal
+    Instructs the value of `-Message` to the Internal Analysis
+.PARAMETER AddToResolution
+    Instructs the value of `-Message` to the Resolution
+.PARAMETER PriorityID
+    New ConnectWise priority id for the ticket
+.PARAMETER StatusID
+    New ConnectWise status id for the ticket 
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Update-CWServiceTicket -ID 123 -StatusID 11 -Message "Changed the ticket status and added ticket note added to ticket via PowerShell." -Server $CWServer;
+#>
 function Update-CWServiceTicket  
 {
     [CmdLetBinding()]
@@ -284,6 +354,17 @@ function Update-CWServiceTicket
     
 }
 
+<#
+.SYNOPSIS
+    Removes ConnectWise ticket information. 
+.PARAMETER ID
+    ConnectWise ticket ID
+.PARAMETER Server
+    Variable to the object created via Get-CWConnectWiseInfo
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Remove-CWServiceTicket -ID 1 -Server $CWServer;
+#>
 function Remove-CWServiceTicket 
 {
     [CmdLetBinding()]

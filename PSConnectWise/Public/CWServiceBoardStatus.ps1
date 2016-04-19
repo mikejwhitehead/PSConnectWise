@@ -1,3 +1,14 @@
+<#
+.SYNOPSIS
+    Gets ConnectWise board's status information. 
+.PARAMETER BoardID
+    ConnectWise board ID
+.PARAMETER Server
+    Variable to the object created via Get-CWConnectWiseInfo
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWServiceBoardStatus -BoardID 1 -Server $CWServer;
+#>
 function Get-CWServiceBoardStatus
 {
     [CmdLetBinding()]

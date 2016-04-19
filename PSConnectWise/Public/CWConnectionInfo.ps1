@@ -1,3 +1,17 @@
+<#
+.SYNOPSIS
+    Return object with API connection information to the ConnectWise server.
+.PARAMETER Domain
+    Fully qualify domain name of the ConnectWise (API) server
+.PARAMETER CompanyName
+    ConnectWise company name
+.PARAMETER PublicKey
+    ConnectWise API public key
+.PARAMETER PrivateKey
+    ConnectWise API private key
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+#>
 function Get-CWConnectionInfo
 {
     [CmdLetBinding()]

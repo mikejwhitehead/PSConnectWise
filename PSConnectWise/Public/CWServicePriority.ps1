@@ -1,3 +1,21 @@
+<#
+.SYNOPSIS
+    Gets ConnectWise (global) priority information. 
+.PARAMETER ID
+    ConnectWise priority ID
+.PARAMETER Filter
+    Query String 
+.PARAMETER SizeLimit
+    Max number of items to return
+.PARAMETER Server
+    Variable to the object created via Get-CWConnectWiseInfo
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWServicePriority -ID 1 -Server $CWServer;
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Get-CWServicePriority -Filter "name like '*normal*'" -Server $CWServer;
+#>
 function Get-CWServicePriority
 {
     [CmdLetBinding()]
