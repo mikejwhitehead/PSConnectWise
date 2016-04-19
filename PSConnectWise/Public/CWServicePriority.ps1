@@ -1,6 +1,3 @@
-#dot-source import the classes
-. "$PSScriptRoot\PSCWApiClasses.ps1"
-
 function Get-CWServicePriority
 {
     [CmdLetBinding()]

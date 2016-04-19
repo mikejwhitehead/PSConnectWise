@@ -1,7 +1,7 @@
 # remove module if it exist and re-imports it
 $WorkspaceRoot = $(Get-Item $PSScriptRoot).Parent.FullName
-Remove-Module "CWServicePriorityCmdLets" -ErrorAction Ignore
-Import-Module "$WorkspaceRoot\src\CWServicePriorityCmdLets.psm1" -Force 
+Remove-Module "PSConnectWise" -ErrorAction Ignore
+Import-Module "$WorkspaceRoot\PSConnectWise\PSConnectWise.psm1" -Force 
 
 Describe -Tag 'ReqPriorityPermission' 'CWServicePriority' {
 	

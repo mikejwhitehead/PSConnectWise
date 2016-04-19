@@ -1,9 +1,7 @@
 # remove module if it exist and re-imports it
 $WorkspaceRoot = $(Get-Item $PSScriptRoot).Parent.FullName
-Remove-Module "CWConnectionInfoCmdLets" -ErrorAction Ignore
-Import-Module "$WorkspaceRoot\src\CWConnectionInfoCmdLets.psm1" -Force 
-Remove-Module "CWCompanyCmdLets" -ErrorAction Ignore
-Import-Module "$WorkspaceRoot\src\CWCompanyCmdLets.psm1" -Force 
+Remove-Module "PSConnectWise" -ErrorAction Ignore
+Import-Module "$WorkspaceRoot\PSConnectWise\PSConnectWise.psm1" -Force 
 
 Describe 'CWCompany' {
 		

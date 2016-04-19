@@ -1,8 +1,6 @@
-#dot-source import the classes
-. "$PSScriptRoot\PSCWApiClasses.ps1"
-
 function Get-CWCompany
 {
+    
     [CmdLetBinding()]
     [OutputType("PSObject", ParameterSetName="Normal")]
     [OutputType("PSObject", ParameterSetName="Identifier")]
