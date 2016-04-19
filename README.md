@@ -2,7 +2,7 @@
 
 Collection of PowerShell functions that interface with ConnectWise's REST API service. This project is meant to target the latest general releases of PowerShell (i.e. PS v5.0) and ConnectWise.
 
-##Functions
+###Functions
 Goal of the version of v1.0 was to create the minimum required PowerShell functions that is needed to properly create, read, update, and delete a ConnectWise ticket. 
 
 ######Service Module
@@ -55,6 +55,9 @@ status                     : @{id=1; name=New; _info=}
 ... 
 ```
 
+##Contributing
+
+See the [Contributing Documentation](./CONTRIBUTING.md)
 
 ##Extra Information
 - The *pester* Directory Stores the Unit Test Scripts
