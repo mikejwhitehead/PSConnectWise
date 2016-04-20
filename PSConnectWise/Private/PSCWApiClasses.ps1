@@ -193,7 +193,7 @@ class CWApiRestConnectionInfo
     
     hidden [boolean] _setCodeBase () 
     {
-        $companyInfoRaw = Invoke-WebRequest -Uri $([String]::Format("https://{0}/login/companyinfo/{1}", $this.Domain, $this.CompanyName));
+        $companyInfoRaw = Invoke-WebRequest -Uri $([String]::Format("https://{0}/login/companyinfo/{1}", $this.Domain, $this.CompanyName)) -UseBasicParsing;
         $companyInfo = ConvertFrom-Json -InputObject $companyInfoRaw; 
         
         $this.CodeBase = $companyInfo.Codebase;
