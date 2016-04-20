@@ -27,10 +27,22 @@ function Get-CWCompanyContact
         [Parameter(ParameterSetName='Single', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$ID,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='Single', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Single', Position=1, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$Server
+        [String]$Domain = $script:SavedDomain,
+        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
+        [Parameter(ParameterSetName='Single', Position=2, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$CompanyName = $script:SavedCompanyName,
+        [Parameter(ParameterSetName='Normal', Position=3, Mandatory=$false)]
+        [Parameter(ParameterSetName='Single', Position=3, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$PublicKey = $script:SavedPublicKey,
+        [Parameter(ParameterSetName='Normal', Position=4, Mandatory=$false)]
+        [Parameter(ParameterSetName='Single', Position=4, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$PrivateKey = $script:SavedPrivateKey
     )
     
     Begin
@@ -40,15 +52,7 @@ function Get-CWCompanyContact
         [CwApiCompanyContactSvc] $ContactSvc = $null; 
         
         # get the Company service
-        if ($Server -ne $null)
-        {
-            $ContactSvc = [CwApiCompanyContactSvc]::new($Server);
-        } 
-        else 
-        {
-            # TODO: determine whether or not to keep this as an option
-            $ContactSvc = [CwApiCompanyContactSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
-        }
+        $ContactSvc = [CwApiCompanyContactSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
         [uint32] $contactCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

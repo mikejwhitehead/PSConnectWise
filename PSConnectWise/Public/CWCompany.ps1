@@ -48,28 +48,35 @@ function Get-CWCompany
         [string[]]$Property,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [uint32]$SizeLimit,
-        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='Identifier', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
+        [Parameter(ParameterSetName='Identifier', Position=2, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$Server
+        [String]$Domain = $script:SavedDomain,
+        [Parameter(ParameterSetName='Normal', Position=3, Mandatory=$false)]
+        [Parameter(ParameterSetName='Identifier', Position=3, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Position=3, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$CompanyName = $script:SavedCompanyName,
+        [Parameter(ParameterSetName='Normal', Position=4, Mandatory=$false)]
+        [Parameter(ParameterSetName='Identifier', Position=4, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Position=4, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$PublicKey = $script:SavedPublicKey,
+        [Parameter(ParameterSetName='Normal', Position=5, Mandatory=$false)]
+        [Parameter(ParameterSetName='Identifier', Position=5, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Position=5, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$PrivateKey = $script:SavedPrivateKey
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        [CwApiCompanySvc] $CompanySvr = $null; 
+        [CwApiCompanySvc] $CompanySvr = $null;
         
         # get the Company service
-        if ($Server -ne $null)
-        {
-            $CompanySvc = [CwApiCompanySvc]::new($Server);
-        } 
-        else 
-        {
-            # TODO: determine whether or not to keep this as an option
-            $CompanySvc = [CwApiCompanySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
-        }
+        $CompanySvc = [CwApiCompanySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
         [uint32] $CompanyCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

@@ -37,26 +37,31 @@ function Get-CWServiceTicket
         [string[]]$Property,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [int]$SizeLimit,
-        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
-        [Parameter(ParameterSetName='Query', Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server
+        [String]$Domain = $script:SavedDomain,
+        [Parameter(ParameterSetName='Normal', Position=3, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Position=3, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$CompanyName = $script:SavedCompanyName,
+        [Parameter(ParameterSetName='Normal', Position=4, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Position=4, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$PublicKey = $script:SavedPublicKey,
+        [Parameter(ParameterSetName='Normal', Position=5, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Position=5, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$PrivateKey = $script:SavedPrivateKey
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50 
-        [CwApiServiceTicketSvc] $TicketSvc = $null; 
+        [CwApiServiceTicketSvc] $TicketSvc = $null;
         
         # get the Ticket service
-        if ($Server -ne $null)
-        {
-            $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
-        } 
-        else 
-        {
-            $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
-        }
+        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
         [uint32] $ticketCount = 1  
         [uint32] $pageCount   = 1  
