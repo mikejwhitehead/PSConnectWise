@@ -10,14 +10,15 @@ that will easly allow for future functions to be added.
 
 ######Service Module
 0. `Get-CWServiceTicket`
+0. `New-CWServiceTicket`
+0. `Update-CWServiceTicket`
+0. `Remove-CWServiceTicket`
 0. `Get-CWServiceBoard`
 0. `Get-CWServiceBoardStatus`
+0. `Get-CWServiceBoardType`
 0. `Get-CWServicePriority`
-0. `New-CWServiceTicket`
 0. `Get-CWServiceTicketNote`
 0. `Add-CWServiceTicketNote`
-0. `Remove-CWServiceTicket`
-0. `Update-CWServiceTicket`
 
 ######Company Module
 0. `Get-CWCompany`
