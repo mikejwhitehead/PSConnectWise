@@ -1,9 +1,12 @@
 #PSConnectWise  
 
-Collection of PowerShell functions that interface with ConnectWise's REST API service. This project is meant to target the latest general releases of PowerShell (i.e. PS v5.0) and ConnectWise.
+Collection of PowerShell functions that interface with ConnectWise's REST API service. This project
+is meant to target the latest general releases of PowerShell (i.e. PS v5.0) and ConnectWise.
 
 ###Functions
-Goal of the version of v1.0 was to create the minimum required PowerShell functions that is needed to properly create, read, update, and delete a ConnectWise ticket. 
+Goal of the version of v1.0 was to create the minimum required PowerShell functions that is needed 
+to properly create, read, update, and delete a ConnectWise ticket. While doing so, develop a core 
+that will easly allow for future functions to be added. 
 
 ######Service Module
 0. `Get-CWServiceTicket`
@@ -25,8 +28,10 @@ Goal of the version of v1.0 was to create the minimum required PowerShell functi
 
 - PowerShell 5.0
 - ConnectWise Server v2015.3 or Newer
-- CW Member's Public and Private API Key
-- ConnectWise Service's Base URL for API Request
+- [CW Member's Public and Private API Key](./doc/DevCreateCWApiKey.md)
+- FQDN to the ConnectWise (API) Server
+  - On permise CW server and CW API server are the same.
+  - Cloud based CW server and CW API server are **not** the same.
 
 ##Import Module to PS Session
 
@@ -34,7 +39,7 @@ Goal of the version of v1.0 was to create the minimum required PowerShell functi
 0. Open PowerShell
 0. Import the Module (.psm1) within the `PSConnectWise` Directory
    - `Import-Module "...\PSConnectWise\PSConnectWise\PSConnectWise.psm1" -Force;`
-0. CmdLets are Imported and Ready to Use
+0. Functions are Imported and Ready to Use
 
 ##Examples
 
@@ -42,8 +47,8 @@ Goal of the version of v1.0 was to create the minimum required PowerShell functi
 
 #####Execute
 ```powershell
-$Server = Get-CWConnectionInfo -Domain "TechInUrPocket.example.com" -CompanyName "TechInUrPocket" -PublicKey 'Pub1icK3yH3r3' -PrivateKey 'Pri@t3K3yH3r3';`
-Get-CWServiceTicket -TicketID 1234567 -Server $Server;
+$Server = Get-CWConnectionInfo -Domain 'TechInUrPocket.example.com' -CompanyName 'TechInUrPocket' -PublicKey '...' -PrivateKey '...';`
+Get-CWServiceTicket -ID 1234567 -Server $Server;
 ```
 #####Returns
 ```powershell
@@ -63,5 +68,5 @@ See the [Contributing Documentation](./CONTRIBUTING.md)
 - The *pester* Directory Stores the Unit Test Scripts
   - See [Readme](https://github.com/sgtoj/ConnectWisePSModule/tree/master/pester)
 - [Documented Architecture](https://github.com/sgtoj/ConnectWisePSModule/blob/master/doc/ClassArchitectures.md) of the Dependent PS Classes
-  - It is not required to read or understand it to use PowerShell CmdLets.
+  - It is not required to read or understand it to use PowerShell function.
   - Its target is future contributors to this project.
