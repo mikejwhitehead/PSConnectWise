@@ -145,9 +145,18 @@ function Add-CWServiceTicketNote
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [switch]$AddToResolution,
-        [Parameter(ParameterSetName='Normal', Position=2)]
+        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server
+        [String]$Domain = $script:SavedDomain,
+        [Parameter(ParameterSetName='Normal', Position=3, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$CompanyName = $script:SavedCompanyName,
+        [Parameter(ParameterSetName='Normal', Position=4, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$PublicKey = $script:SavedPublicKey,
+        [Parameter(ParameterSetName='Normal', Position=5, Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$PrivateKey = $script:SavedPrivateKey
     )
     
     Begin
@@ -155,14 +164,7 @@ function Add-CWServiceTicketNote
         [CwApiServiceTicketNoteSvc] $NoteSvc = $null; 
         
         # get the Note service
-        if ($Server -ne $null)
-        {
-            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Server);
-        } 
-        else 
-        {
-            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
-        }
+        $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         
         [ServiceTicketNoteTypes[]] $addTo = @();
         

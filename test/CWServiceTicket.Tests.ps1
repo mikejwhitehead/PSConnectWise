@@ -82,8 +82,7 @@ Describe 'CWServiceTicket' {
 		It "create a new service ticket and check for the ticket number" {
 			$ticket = New-CWServiceTicket -BoardID $pstrTicketBoard -CompanyID $pstrTicketCompany -ContactID $pstrNewTicketContact `
 						-Status $pstrTicketStatus -PriorityID $pstrTicketPriority `
-						-Subject $pstrTicketTitle -Description $pstrTicketBody `
-						-Server $pstrServer;
+						-Subject $pstrTicketTitle -Description $pstrTicketBody
 			$pstrSharedValues.Add("newTicketId", $ticket.id);
 			$pstrSharedValues["newTicketId"] -gt 0 | Should Be $true; 
 		} 
