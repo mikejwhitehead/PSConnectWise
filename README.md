@@ -71,3 +71,8 @@ See the [Contributing Documentation](./CONTRIBUTING.md)
 - [Documented Architecture](https://github.com/sgtoj/ConnectWisePSModule/blob/master/doc/ClassArchitectures.md) of the Dependent PS Classes
   - It is not required to read or understand it to use PowerShell function.
   - Its target is future contributors to this project.
+  
+  
+##License
+
+[MIT](./LICENSE.txt)
