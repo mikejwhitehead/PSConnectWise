@@ -100,8 +100,8 @@ function Get-CWServiceTicket
                 if ($ticketCount -ne $null -and $ticketCount -gt 0)
                 {
                     # find how many Companies to retrieve
-                    $itemsLeftToRetrived = $ticketCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
-                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                    $itemsRemainCount = $ticketCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsRemainCount, $MAX_ITEMS_PER_PAGE);
                 }    
                 
                 Write-Debug "Requesting Ticket IDs that Meets this Filter: $Filter";

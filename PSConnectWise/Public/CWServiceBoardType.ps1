@@ -67,8 +67,8 @@ function Get-CWServiceBoardType
                 if ($typeCount -ne $null -and $typeCount -gt 0)
                 {
                     # find how many Companies to retrieve
-                    $itemsLeftToRetrived = $typeCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
-                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                    $itemsRemainCount = $typeCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsRemainCount, $MAX_ITEMS_PER_PAGE);
                 }                
                 
                 Write-Debug "Requesting Type IDs for BoardID: $BoardID";

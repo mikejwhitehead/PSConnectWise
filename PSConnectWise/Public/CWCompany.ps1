@@ -71,21 +71,21 @@ function Get-CWCompany
             $CompanySvc = [CwApiCompanySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         }
         
-        [uint32] $CompanyCount = $MAX_ITEMS_PER_PAGE;
+        [uint32] $companyCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
         
         # get the number of pages of ticket to request and total ticket count
         if (![String]::IsNullOrWhiteSpace($Filter))
         {
-            $CompanyCount = $CompanySvc.GetCompanyCount($Filter);
-            Write-Debug "Total Count Company the Filter ($Filter): $CompanyCount";
+            $companyCount = $CompanySvc.GetCompanyCount($Filter);
+            Write-Debug "Total Count Company the Filter ($Filter): $companyCount";
             
             if ($SizeLimit -ne $null -and $SizeLimit -gt 0)
             {
                 Write-Verbose "Total Company Count Excess SizeLimit; Setting Company Count to the SizeLimit: $SizeLimit"
-                $CompanyCount = [Math]::Min($CompanyCount, $SizeLimit);
+                $companyCount = [Math]::Min($companyCount, $SizeLimit);
             }
-            $pageCount = [Math]::Ceiling([double]($CompanyCount / $MAX_ITEMS_PER_PAGE));
+            $pageCount = [Math]::Ceiling([double]($companyCount / $MAX_ITEMS_PER_PAGE));
             
             Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Companies Per Pages): $pageCount";
         }
@@ -108,16 +108,16 @@ function Get-CWCompany
         {
             if (![String]::IsNullOrWhiteSpace($Filter))
             {
-                if ($CompanyCount -ne $null -and $CompanyCount -gt 0)
+                if ($companyCount -ne $null -and $companyCount -gt 0)
                 {
                     # find how many Companies to retrieve
-                    $itemsLeftToRetrived = $CompanyCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
-                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                    $itemsRemainCount = $companyCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsRemainCount, $MAX_ITEMS_PER_PAGE);
                 }
                 
                 Write-Debug "Requesting Company IDs that Meets this Filter: $Filter";
-                $queriedCompanys = $CompanySvc.ReadCompanies($Filter, $Properties, $pageNum, $itemsPerPage);
-                [psobject[]] $Companies = $queriedCompanys;
+                $queriedCompanies = $CompanySvc.ReadCompanies($Filter, $Properties, $pageNum, $itemsPerPage);
+                [psobject[]] $Companies = $queriedCompanies;
                 
                 foreach ($Company in $Companies)
                 {

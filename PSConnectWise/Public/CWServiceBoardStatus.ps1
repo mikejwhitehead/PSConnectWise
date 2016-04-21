@@ -67,8 +67,8 @@ function Get-CWServiceBoardStatus
                 if ($statusCount -ne $null -and $statusCount -gt 0)
                 {
                     # find how many Companies to retrieve
-                    $itemsLeftToRetrived = $statusCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
-                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                    $itemsRemainCount = $statusCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsRemainCount, $MAX_ITEMS_PER_PAGE);
                 }
                 
                 Write-Debug "Requesting Ticket IDs that Meets this Filter: $Filter";

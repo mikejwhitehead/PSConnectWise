@@ -84,8 +84,8 @@ function Get-CWServicePriority
                 if ($priorityCount -ne $null -and $priorityCount -gt 0)
                 {
                     # find how many Companies to retrieve
-                    $itemsLeftToRetrived = $priorityCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
-                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                    $itemsRemainCount = $priorityCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsRemainCount, $MAX_ITEMS_PER_PAGE);
                 }    
                 
                 Write-Debug "Requesting Priority IDs that Meets this Filter: $Filter";
