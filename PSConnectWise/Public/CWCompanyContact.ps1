@@ -76,8 +76,13 @@ function Get-CWCompanyContact
         {
             if ($ID -eq 0)
             {
-                # find how many contacts a company has to retrieve
-                $itemsPerPage = $contactCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+
+                if ($contactCount -ne $null -and $contactCount -gt 0)
+                {
+                    # find how many Companies to retrieve
+                    $itemsLeftToRetrived = $contactCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                }
                 
                 Write-Debug "Requesting Contact Entries for Company: $CompanyID";
                 $queriedContacts = $ContactSvc.ReadCompanyContacts($CompanyID, $null, $pageNum, $itemsPerPage);

@@ -63,11 +63,16 @@ function Get-CWServiceBoardStatus
         {
             if ($BoardID -gt 0)
             {
-                # find how many Status to retrieve
-                $statusesPerPage = $statusCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                
+                if ($statusCount -ne $null -and $statusCount -gt 0)
+                {
+                    # find how many Companies to retrieve
+                    $itemsLeftToRetrived = $statusCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                }
                 
                 Write-Debug "Requesting Ticket IDs that Meets this Filter: $Filter";
-                $queriedStatuses = $BoardStatusSvc.ReadStatuses($boardId, [string[]] @("*"), $pageNum, $statusesPerPage);
+                $queriedStatuses = $BoardStatusSvc.ReadStatuses($boardId, [string[]] @("*"), $pageNum, $itemsPerPage);
                 [pscustomobject[]] $Statuses = $queriedStatuses;
                 
                 foreach ($Status in $Statuses)

@@ -96,11 +96,16 @@ function Get-CWServiceTicket
         {
             if (![String]::IsNullOrWhiteSpace($Filter))
             {
-                # find how many tickets to retrieve
-                $ticketsPerPage = $ticketCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                
+                if ($ticketCount -ne $null -and $ticketCount -gt 0)
+                {
+                    # find how many Companies to retrieve
+                    $itemsLeftToRetrived = $ticketCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                }    
                 
                 Write-Debug "Requesting Ticket IDs that Meets this Filter: $Filter";
-                $queriedTickets = $TicketSvc.ReadTickets($Filter, [string[]] @("id"), $pageNum, $ticketsPerPage);
+                $queriedTickets = $TicketSvc.ReadTickets($Filter, [string[]] @("id"), $pageNum, $itemsPerPage);
                 [int[]] $ID = $queriedTickets.id   }  
         
             if ($ID -ne $null)

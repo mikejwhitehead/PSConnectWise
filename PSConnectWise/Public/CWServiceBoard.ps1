@@ -90,8 +90,13 @@ function Get-CWServiceBoard
         {
             if (![String]::IsNullOrWhiteSpace($Filter))
             {
-                # find how many boards to retrieve
-                $itemsPerPage = $boardCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                
+                if ($boardCount -ne $null -and $boardCount -gt 0)
+                {
+                    # find how many Companies to retrieve
+                    $itemsLeftToRetrived = $boardCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                }
                 
                 Write-Debug "Requesting Board IDs that Meets this Filter: $Filter";
                 $queriedBoards = $BoardSvc.ReadBoards($Filter, $pageNum, $itemsPerPage);

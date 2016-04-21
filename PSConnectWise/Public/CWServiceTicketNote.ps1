@@ -75,8 +75,13 @@ function Get-CWServiceTicketNote
         {
             if ($NoteID -eq 0)
             {
-                # find how many notes a ticket has to retrieve
-                $itemsPerPage = $noteCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                
+                if ($noteCount -ne $null -and $noteCount -gt 0)
+                {
+                    # find how many Companies to retrieve
+                    $itemsLeftToRetrived = $noteCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                }  
                 
                 Write-Debug "Requesting Note Entries for Ticket: $TicketID";
                 $queriedNotes = $NoteSvc.ReadNotes($TicketID, $pageNum, $itemsPerPage);

@@ -63,11 +63,16 @@ function Get-CWServiceBoardType
         {
             if ($BoardID -gt 0)
             {
-                # find how many Status to retrieve
-                $typesPerPage = $typeCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                
+                if ($typeCount -ne $null -and $typeCount -gt 0)
+                {
+                    # find how many Companies to retrieve
+                    $itemsLeftToRetrived = $typeCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                }                
                 
                 Write-Debug "Requesting Type IDs for BoardID: $BoardID";
-                $queriedTypes = $BoardTypeSvc.ReadTypes($boardId, [string[]] @("*"), $pageNum, $typesPerPage);
+                $queriedTypes = $BoardTypeSvc.ReadTypes($boardId, [string[]] @("*"), $pageNum, $itemsPerPage);
                 [pscustomobject[]] $Types = $queriedTypes;
                 
                 foreach ($Type in $Types)

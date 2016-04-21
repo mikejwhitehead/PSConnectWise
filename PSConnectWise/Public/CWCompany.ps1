@@ -108,8 +108,12 @@ function Get-CWCompany
         {
             if (![String]::IsNullOrWhiteSpace($Filter))
             {
-                # find how many Companies to retrieve
-                $itemsPerPage = $CompanyCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                if ($CompanyCount -ne $null -and $CompanyCount -gt 0)
+                {
+                    # find how many Companies to retrieve
+                    $itemsLeftToRetrived = $CompanyCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                }
                 
                 Write-Debug "Requesting Company IDs that Meets this Filter: $Filter";
                 $queriedCompanys = $CompanySvc.ReadCompanies($Filter, $Properties, $pageNum, $itemsPerPage);

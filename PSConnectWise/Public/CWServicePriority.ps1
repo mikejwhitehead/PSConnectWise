@@ -80,8 +80,13 @@ function Get-CWServicePriority
         {
             if (![String]::IsNullOrWhiteSpace($Filter))
             {
-                # find how many priorities to retrieve
-                $itemsPerPage = $priorityCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                
+                if ($priorityCount -ne $null -and $priorityCount -gt 0)
+                {
+                    # find how many Companies to retrieve
+                    $itemsLeftToRetrived = $priorityCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsLeftToRetrived, $MAX_ITEMS_PER_PAGE);
+                }    
                 
                 Write-Debug "Requesting Priority IDs that Meets this Filter: $Filter";
                 $queriedPriorities = $PrioritySvc.ReadPriorities($Filter, $pageNum, $itemsPerPage);
