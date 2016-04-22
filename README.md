@@ -16,6 +16,7 @@ that will easly allow for future functions to be added.
 0. `Get-CWServiceBoard`
 0. `Get-CWServiceBoardStatus`
 0. `Get-CWServiceBoardType`
+0. `Get-CWServiceBoardSubtype`
 0. `Get-CWServicePriority`
 0. `Get-CWServiceTicketNote`
 0. `Add-CWServiceTicketNote`
