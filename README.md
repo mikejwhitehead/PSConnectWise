@@ -16,6 +16,7 @@ that will easly allow for future functions to be added.
 0. `Get-CWServiceBoard`
 0. `Get-CWServiceBoardStatus`
 0. `Get-CWServiceBoardType`
+0. `Get-CWServiceBoardSubtype`
 0. `Get-CWServicePriority`
 0. `Get-CWServiceTicketNote`
 0. `Add-CWServiceTicketNote`
@@ -66,7 +67,7 @@ status                     : @{id=1; name=New; _info=}
 See the [Contributing Documentation](./CONTRIBUTING.md)
 
 ##Extra Information
-- The *pester* Directory Stores the Unit Test Scripts
+- [Test Directory](./test/) Stores the Unit Test Scripts for [Pester](https://github.com/pester/Pester).
   - See [Readme](https://github.com/sgtoj/ConnectWisePSModule/tree/master/pester)
 - [Documented Architecture](https://github.com/sgtoj/ConnectWisePSModule/blob/master/doc/ClassArchitectures.md) of the Dependent PS Classes
   - It is not required to read or understand it to use PowerShell function.
