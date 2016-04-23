@@ -12,7 +12,8 @@
 function Get-CWServiceBoardStatus
 {
     [CmdLetBinding()]
-    [OutputType("PSObject[]", ParameterSetName="Normal")]
+    [OutputType("PSObject[]", ParameterSetName="Normal")]    
+    [CmdletBinding(DefaultParameterSetName="Normal")]
     param
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]

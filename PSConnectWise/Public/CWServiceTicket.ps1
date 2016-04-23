@@ -5,12 +5,14 @@
     ConnectWise ticket ID
 .PARAMETER Filter
     Query String 
+.PARAMETER BoardID
+    ID of the ConnectWise board to retrieve tickets
 .PARAMETER Property
     Name of the properties to return
 .PARAMETER SizeLimit
     Max number of items to return
-.PARAMETER Server
-    Variable to the object created via Get-CWConnectWiseInfo
+.PARAMETER Descending
+    Changes the sorting to descending order by IDs
 .EXAMPLE
     $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWServiceTicket -ID 1 -Server $CWServer;
@@ -23,6 +25,7 @@ function Get-CWServiceTicket
     [CmdLetBinding()]
     [OutputType("PSObject", ParameterSetName="Normal")]
     [OutputType("PSObject[]", ParameterSetName="Query")]
+    [CmdletBinding(DefaultParameterSetName="Normal")]
     param
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
@@ -36,7 +39,10 @@ function Get-CWServiceTicket
         [ValidateNotNullOrEmpty()]
         [string[]]$Property,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
-        [int]$SizeLimit,
+        [ValidateRange(1, 2000)]
+        [int]$SizeLimit = 100,
+        [Parameter(ParameterSetName='Query')]
+        [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Mandatory=$true)]
         [Parameter(ParameterSetName='Query', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -45,8 +51,9 @@ function Get-CWServiceTicket
     
     Begin
     {
-        $MAX_ITEMS_PER_PAGE = 50 
+        $MAX_ITEMS_PER_PAGE = 50;
         [CwApiServiceTicketSvc] $TicketSvc = $null; 
+        [string]$OrderBy = [String]::Empty;
         
         # get the Ticket service
         if ($Server -ne $null)
@@ -58,8 +65,8 @@ function Get-CWServiceTicket
             $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         }
         
-        [uint32] $ticketCount = 1  
-        [uint32] $pageCount   = 1  
+        [uint32] $ticketCount = 1; 
+        [uint32] $pageCount   = 1;
         
         # get the number of pages of ticket to request and total ticket count
         if (![String]::IsNullOrWhiteSpace($Filter))
@@ -75,6 +82,11 @@ function Get-CWServiceTicket
             $pageCount = [Math]::Ceiling([double]($ticketCount / $MAX_ITEMS_PER_PAGE));
             
             Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Tickets Per Pages): $pageCount";
+        }
+        
+        if ($Descending)
+        {
+            $OrderBy = " id desc";
         }
         
         # determines if to select all fields or specific fields
@@ -94,20 +106,21 @@ function Get-CWServiceTicket
         
         for ($pageNum = 1; $pageNum -le $pageCount; $pageNum++)
         {
+            
             if (![String]::IsNullOrWhiteSpace($Filter))
             {
-                
                 if ($ticketCount -ne $null -and $ticketCount -gt 0)
                 {
                     # find how many Companies to retrieve
                     $itemsRemainCount = $ticketCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
                     $itemsPerPage = [Math]::Min($itemsRemainCount, $MAX_ITEMS_PER_PAGE);
-                }    
+                } 
                 
                 Write-Debug "Requesting Ticket IDs that Meets this Filter: $Filter";
-                $queriedTickets = $TicketSvc.ReadTickets($Filter, [string[]] @("id"), $pageNum, $itemsPerPage);
-                [int[]] $ID = $queriedTickets.id   }  
-        
+                $queriedTickets = $TicketSvc.ReadTickets($Filter, [string[]] @("id"), $OrderBy, $pageNum, $itemsPerPage);
+                [uint32[]] $ID = $queriedTickets.id;
+            }  
+            
             if ($ID -ne $null)
             {
                 Write-Debug "Retrieving ConnectWise Tickets by Ticket ID"
