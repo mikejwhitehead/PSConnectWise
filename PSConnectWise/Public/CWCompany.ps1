@@ -49,7 +49,7 @@ function Get-CWCompany
         [string[]]$Property,
         [Parameter(ParameterSetName='Identifier', Position=1, Mandatory=$false)]
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
-        [ValidateRange(1, 2000)]
+        [ValidateRange(1, 1000)]
         [uint32]$SizeLimit = 100,
         [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Identifier', Position=2, Mandatory=$true)]
