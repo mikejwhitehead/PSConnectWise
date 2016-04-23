@@ -28,7 +28,7 @@ function Get-CWCompany
     
     [CmdLetBinding()]
     [OutputType("PSObject", ParameterSetName="Normal")]
-    [OutputType("PSObject", ParameterSetName="Identifier")]
+    [OutputType("PSObject[]", ParameterSetName="Identifier")]
     [OutputType("PSObject[]", ParameterSetName="Query")]
     [CmdletBinding(DefaultParameterSetName="Normal")]
     param
@@ -47,6 +47,7 @@ function Get-CWCompany
         [Parameter(ParameterSetName='Query', Position=1, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string[]]$Property,
+        [Parameter(ParameterSetName='Identifier', Position=1, Mandatory=$false)]
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [ValidateRange(1, 2000)]
         [uint32]$SizeLimit = 100,
@@ -77,20 +78,31 @@ function Get-CWCompany
         [uint32] $pageCount  = 1;
         
         # get the number of pages of ticket to request and total ticket count
-        if (![String]::IsNullOrWhiteSpace($Filter))
+        if (![String]::IsNullOrWhiteSpace($Filter) -or ![String]::IsNullOrWhiteSpace($Identifier))
         {
+            if (![String]::IsNullOrWhiteSpace($Identifier))
+            {
+                $Filter = "identifier='$Identifier'";
+                if ($Identifier -contains "*")
+                {
+                    $Filter = "identifier like '$Identifier'";
+
+                }
+                Write-Verbose "Created a Filter String Based on the Identifier Value ($Identifier): $Filter";
+            }
+            
             $companyCount = $CompanySvc.GetCompanyCount($Filter);
-            Write-Debug "Total Count Company the Filter ($Filter): $companyCount";
+            Write-Debug "Total Count Company using Filter ($Filter): $companyCount";
             
             if ($SizeLimit -ne $null -and $SizeLimit -gt 0)
             {
                 Write-Verbose "Total Company Count Excess SizeLimit; Setting Company Count to the SizeLimit: $SizeLimit"
                 $companyCount = [Math]::Min($companyCount, $SizeLimit);
             }
-            $pageCount = [Math]::Ceiling([double]($companyCount / $MAX_ITEMS_PER_PAGE));
             
+            $pageCount = [Math]::Ceiling([double]($companyCount / $MAX_ITEMS_PER_PAGE));
             Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Companies Per Pages): $pageCount";
-        }
+        } # end if for filter/identifier check
         
         # determines if to select all fields or specific fields
         [string[]] $Properties = $null;
@@ -108,8 +120,9 @@ function Get-CWCompany
         
         for ($pageNum = 1; $pageNum -le $pageCount; $pageNum++)
         {
-            if (![String]::IsNullOrWhiteSpace($Filter))
+            if (![String]::IsNullOrWhiteSpace($Filter) -or ![String]::IsNullOrWhiteSpace($Identifier))
             {
+                
                 if ($companyCount -ne $null -and $companyCount -gt 0)
                 {
                     # find how many Companies to retrieve
@@ -126,43 +139,25 @@ function Get-CWCompany
                     $Company;
                 }
                 
-            } else {
+            } 
+            else 
+            {
                 
-                if ($Identifier -ne $null)
+                Write-Debug "Retrieving ConnectWise Companies by Company ID"
+                foreach ($CompanyID in $ID)
                 {
-                    
-                    Write-Debug "Retrieving ConnectWise Companies by Company Identifier"
-                    foreach ($Company in $Identifier)
+                    Write-Verbose "Requesting ConnectWise Company Number: $CompanyID";
+                    if ($Properties -eq $null -or $Properties.Length -eq 0)
                     {
-                        Write-Verbose "Requesting ConnectWise Company Number: $CompanyID";
-                        if ($Properties -eq $null -or $Properties.Length -eq 0)
-                        {
-                            $CompanySvc.ReadCompany([string] $Company);
-                        }
-                        else 
-                        {
-                            $CompanySvc.ReadCompany([string] $Company, $Properties);
-                        }
+                        $CompanySvc.ReadCompany([uint32] $CompanyID);
                     }
-                    
-                } else {                
-                    
-                    Write-Debug "Retrieving ConnectWise Companies by Company ID"
-                    foreach ($CompanyID in $ID)
+                    else 
                     {
-                        Write-Verbose "Requesting ConnectWise Company Number: $CompanyID";
-                        if ($Properties -eq $null -or $Properties.Length -eq 0)
-                        {
-                            $CompanySvc.ReadCompany([uint32] $CompanyID);
-                        }
-                        else 
-                        {
-                            $CompanySvc.ReadCompany($CompanyID, $Properties);
-                        }
+                        $CompanySvc.ReadCompany($CompanyID, $Properties);
                     }
-                    
-                } #end if              
-            }
+                }
+                           
+            } #end if
             
         } #end foreach for pagination   
     }
