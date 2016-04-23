@@ -12,8 +12,9 @@ Describe 'CWServiceBoard' {
 	
 	Context 'Get-CWServiceBoard' {
 		
-		$pstrBoardIDs = $pstrGenSvc.boardIds;
-		$pstrBoardID  = $pstrGenSvc.boardIds[0];
+		$pstrBoardIDs  = $pstrGenSvc.boardIds;
+		$pstrBoardID   = $pstrGenSvc.boardIds[0];
+		$pstrBoardName = $pstrGenSvc.boardName;
 	
 		It 'gets board and checks for the id field' {
 			$boardID = $pstrBoardID;
@@ -57,6 +58,17 @@ Describe 'CWServiceBoard' {
 			$boards = Get-CWServiceBoard -ID $boardIDs -Server $pstrServer | Sort -Descending id;
 			$maxBoardId = $boardIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
 			$boards[0].id | Should Be $maxBoardId;		
+		}
+		
+		It 'wildcard search using Name parameter with SizeLimit parameter' {
+			$sizeLimit = 5;
+			$boards = Get-CWServiceBoard -Name "*" -SizeLimit $sizeLimit -Server $pstrServer;
+			$boards.GetType().BaseType.Name | Should Be "Array";
+		}
+		
+		It 'get single board by Name parameter' {
+			$boards = Get-CWServiceBoard -Name $pstrBoardName -Server $pstrServer;
+			$boards.name | Should Be $pstrBoardName;
 		}
 	
 	}

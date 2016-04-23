@@ -3,6 +3,8 @@
     Gets ConnectWise board information. 
 .PARAMETER ID
     ConnectWise board ID
+.PARAMETER Name
+    Name of the board 
 .PARAMETER Filter
     Query String 
 .PARAMETER SizeLimit
@@ -19,21 +21,27 @@
 function Get-CWServiceBoard
 {
     [CmdLetBinding()]
-    [OutputType("PSObject[]", ParameterSetName="Normal")]
-    [OutputType("PSObject", ParameterSetName="Single")]
+    [OutputType("PSObject", ParameterSetName="Normal")]
+    [OutputType("PSObject[]", ParameterSetName="Name")]
+    [OutputType("PSObject[]", ParameterSetName="Query")]
     [CmdletBinding(DefaultParameterSetName="Normal")]
     param
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [int[]]$ID,
+        [Parameter(ParameterSetName='Name', Position=0, Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Name,
         [Parameter(ParameterSetName='Query', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
-        [Parameter(ParameterSetName='Query', Mandatory=$false)]
-        [ValidateRange(1, 2000)]
+        [Parameter(ParameterSetName='Name')]
+        [Parameter(ParameterSetName='Query')]
+        [ValidateRange(1, 1000)]
         [uint32]$SizeLimit = 100,
         [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Name', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [PSObject]$Server
@@ -59,8 +67,19 @@ function Get-CWServiceBoard
         [uint32] $pageCount  = 1;
         
         # get the number of pages of ticket to request and total ticket count
-        if (![String]::IsNullOrWhiteSpace($Filter))
+        if (![String]::IsNullOrWhiteSpace($Filter) -or ![String]::IsNullOrWhiteSpace($Name))
         {
+            if (![String]::IsNullOrWhiteSpace($Name))
+            {
+                $Filter = "name='$Name'";
+                if ($Name -contains "*")
+                {
+                    $Filter = "name like '$Name'";
+
+                }
+                Write-Verbose "Created a Filter String Based on the Identifier Value ($Name): $Filter";
+            }
+            
             $boardCount = $BoardSvc.GetBoardCount($Filter);
             Write-Debug "Total Count Board the Filter ($Filter): $boardCount";
             
