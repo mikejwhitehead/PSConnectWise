@@ -19,6 +19,7 @@ function Get-CWCompanyContact
     [CmdLetBinding()]
     [OutputType("PSObject[]", ParameterSetName="Normal")]
     [OutputType("PSObject", ParameterSetName="Single")]
+    [CmdletBinding(DefaultParameterSetName="Normal")]
     param
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
@@ -27,6 +28,9 @@ function Get-CWCompanyContact
         [Parameter(ParameterSetName='Single', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$ID,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateRange(1, 2000)]
+        [uint32]$SizeLimit = 100,
         [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
         [Parameter(ParameterSetName='Single', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]

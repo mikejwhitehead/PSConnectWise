@@ -19,6 +19,7 @@ function Get-CWServiceTicketNote
     [CmdLetBinding()]
     [OutputType("PSObject", ParameterSetName="Normal")]
     [OutputType("PSObject", ParameterSetName="Single")]
+    [CmdletBinding(DefaultParameterSetName="Normal")]
     param
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true)]

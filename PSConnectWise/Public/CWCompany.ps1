@@ -30,6 +30,7 @@ function Get-CWCompany
     [OutputType("PSObject", ParameterSetName="Normal")]
     [OutputType("PSObject", ParameterSetName="Identifier")]
     [OutputType("PSObject[]", ParameterSetName="Query")]
+    [CmdletBinding(DefaultParameterSetName="Normal")]
     param
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
@@ -47,7 +48,8 @@ function Get-CWCompany
         [ValidateNotNullOrEmpty()]
         [string[]]$Property,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
-        [uint32]$SizeLimit,
+        [ValidateRange(1, 2000)]
+        [uint32]$SizeLimit = 100,
         [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Identifier', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]

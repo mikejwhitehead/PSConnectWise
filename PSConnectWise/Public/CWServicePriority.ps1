@@ -21,6 +21,7 @@ function Get-CWServicePriority
     [CmdLetBinding()]
     [OutputType("PSObject[]", ParameterSetName="Normal")]
     [OutputType("PSObject[]", ParameterSetName="Query")]
+    [CmdletBinding(DefaultParameterSetName="Normal")]
     param
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
@@ -30,7 +31,8 @@ function Get-CWServicePriority
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
-        [uint32]$SizeLimit,
+        [ValidateRange(1, 2000)]
+        [uint32]$SizeLimit = 100,
         [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
         [Parameter(ParameterSetName='Query', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
