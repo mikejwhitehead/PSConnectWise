@@ -30,7 +30,7 @@ function Get-CWServicePriority
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
-        [int]$SizeLimit,
+        [uint32]$SizeLimit,
         [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
         [Parameter(ParameterSetName='Query', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]

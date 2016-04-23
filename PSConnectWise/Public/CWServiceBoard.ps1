@@ -30,7 +30,7 @@ function Get-CWServiceBoard
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
-        [int]$SizeLimit,
+        [uint32]$SizeLimit,
         [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
