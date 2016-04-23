@@ -22,6 +22,7 @@
         
         // variables to be used when making calls to ConnectWise's Company module
         "company": {
+            "companyIdentifier": "connectwise",
             "companyIds": [1, 2],
             "contactIds": [1, 2, 3, 4, 5]
         }

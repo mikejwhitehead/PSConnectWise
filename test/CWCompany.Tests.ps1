@@ -12,9 +12,9 @@ Describe 'CWCompany' {
 	
 	Context 'Get-CWCompany' {
         
-        $pstrCompanyIDs = $pstrComp.companyIds;
-		$pstrCompanyID  = $pstrComp.companyIds[0];
-    
+        $pstrCompanyIDs        = $pstrComp.companyIds;
+		$pstrCompanyID         = $pstrComp.companyIds[0];
+		$pstrCompanyIdentifier = $pstrComp.companyIdentifier;
 	
         It 'gets company and checks for the id field' {
 			$companyID = $pstrCompanyID;
@@ -35,16 +35,16 @@ Describe 'CWCompany' {
 			$company.PSObject.Properties | Measure-Object | Select -ExpandProperty Count | Should Be $fields.Count;		
 		}
 		
-		It 'gets tickets by passing array of company ids to the -ID param' {
+		It 'gets companies by passing array of company ids to the -ID param' {
 			$companyIDs = $pstrCompanyIDs;
-			$tickets = Get-CWCompany -ID $companyIDs -Server $pstrServer;
-			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $companyIDs.Count;		
+			$companies = Get-CWCompany -ID $companyIDs -Server $pstrServer;
+			$companies | Measure-Object | Select -ExpandProperty Count | Should Be $companyIDs.Count;		
 		}
 		
-		It 'gets list of tickets that were piped to the cmdlet' {
+		It 'gets list of companies that were piped to the cmdlet' {
 			$companyIDs = $pstrCompanyIDs;
-			$tickets = $companyIDs | Get-CWCompany -Server $pstrServer
-			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $companyIDs.Count;		
+			$companies = $companyIDs | Get-CWCompany -Server $pstrServer;
+			$companies | Measure-Object | Select -ExpandProperty Count | Should Be $companyIDs.Count;		
 		}
 		
 		It 'gets company based on the -Filter param' {
@@ -56,15 +56,26 @@ Describe 'CWCompany' {
 		It 'gets company based on the -Filter param and uses the SizeLimit param' {
 			$filter = "id IN ($([String]::Join(',', $pstrCompanyIDs)))";
 			$sizeLimit =  2;
-			$tickets = Get-CWCompany -Filter $filter -SizeLimit $sizeLimit -Server $pstrServer;
-			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit;
+			$companies = Get-CWCompany -Filter $filter -SizeLimit $sizeLimit -Server $pstrServer;
+			$companies | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit;
 		}
 		
-		It 'gets tickets and sorts company id by descending piping cmdlet through Sort-Object cmdlet' {
+		It 'gets companies and sorts company id by descending piping cmdlet through Sort-Object cmdlet' {
 			$companyIDs = $pstrCompanyIDs;
-			$tickets = Get-CWCompany -ID $companyIDs -Server $pstrServer | Sort -Descending id;
-			$maxTicketId = $companyIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
-			$tickets[0].id | Should Be $maxTicketId;		
+			$companies = Get-CWCompany -ID $companyIDs -Server $pstrServer | Sort -Descending id;
+			$maxCompanyId = $companyIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum;
+			$companies[0].id | Should Be $maxCompanyId;		
+		}
+		
+		It 'wildcard search using Identifier parameter with SizeLimit parameter' {
+			$sizeLimit = 5;
+			$companies = Get-CWCompany -Identifier "*" -SizeLimit $sizeLimit -Server $pstrServer;
+			$companies | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit ;
+		}
+		
+		It 'get single company by Identifier parameter' {
+			$companies = Get-CWCompany -Identifier $pstrCompanyIdentifier -Server $pstrServer;
+			$companies.identifier | Should Be $pstrCompanyIdentifier;
 		}
         
     }
