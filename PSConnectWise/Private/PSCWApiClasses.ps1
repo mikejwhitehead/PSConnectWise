@@ -662,10 +662,16 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
     
     [psobject[]] ReadTickets ([string] $ticketConditions, [string[]] $fields, [uint32] $pageNum, [uint32] $pageSize)
     {
+        return $this.ReadTickets($ticketConditions, $fields, $null, 1, 0);
+    }
+    
+    [psobject[]] ReadTickets ([string] $ticketConditions, [string[]] $fields, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
+    {
         [hashtable] $queryParams = @{
             conditions = $ticketConditions;
             page       = $pageNum;
             pageSize   = $pageSize;
+            orderBy    = $orderBy;
         }
         
         if ($fields -ne $null)
@@ -735,7 +741,7 @@ class CwApiServiceBoardSvc : CWApiRestClientSvc
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
     }
     
-    [psobject] ReadBoard ([int] $boardId)
+    [psobject] ReadBoard ([uint32] $boardId)
     {
         $relativePathUri = "/$boardId";
         return $this.ReadRequest($relativePathUri, $null);
@@ -838,7 +844,7 @@ class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
     }
     
-    [psobject] ReadType([int] $boardId, $typeId)
+    [psobject] ReadType([uint32] $boardId, $typeId)
     {
         $relativePathUri = "/$boardId/types/$typeId";
         return $this.ReadRequest($relativePathUri);
@@ -999,7 +1005,7 @@ class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
     
-    [psobject] ReadNote ([uint32] $ticketId, [int] $timeEntryId)
+    [psobject] ReadNote ([uint32] $ticketId, [uint32] $timeEntryId)
     {
         $relativePathUri = "/$ticketId/notes/$timeEntryId";
         return $this.ReadRequest($relativePathUri, $null);
