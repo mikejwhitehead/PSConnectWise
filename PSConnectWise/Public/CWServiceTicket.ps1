@@ -39,7 +39,7 @@ function Get-CWServiceTicket
         [ValidateNotNullOrEmpty()]
         [string[]]$Property,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
-        [ValidateRange(1, 2000)]
+        [ValidateRange(1, 1000)]
         [int]$SizeLimit = 100,
         [Parameter(ParameterSetName='Query')]
         [switch]$Descending,
