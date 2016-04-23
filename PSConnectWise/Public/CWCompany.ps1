@@ -5,6 +5,8 @@
     ConnectWise company ID
 .PARAMETER Identifier
     ConnectWise company identifier name
+.PARAMETER Name
+    ConnectWise company friendly name
 .PARAMETER Filter
     Query String 
 .PARAMETER Property
@@ -29,6 +31,7 @@ function Get-CWCompany
     [CmdLetBinding()]
     [OutputType("PSObject", ParameterSetName="Normal")]
     [OutputType("PSObject[]", ParameterSetName="Identifier")]
+    [OutputType("PSObject[]", ParameterSetName="Name")]
     [OutputType("PSObject[]", ParameterSetName="Query")]
     [CmdletBinding(DefaultParameterSetName="Normal")]
     param
@@ -39,20 +42,26 @@ function Get-CWCompany
         [Parameter(ParameterSetName='Identifier', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string[]]$Identifier,
+        [Parameter(ParameterSetName='Name', Position=0, Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string[]]$Name,
         [Parameter(ParameterSetName='Query', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
         [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
         [Parameter(ParameterSetName='Identifier', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Name', Position=1, Mandatory=$false)]
         [Parameter(ParameterSetName='Query', Position=1, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string[]]$Property,
         [Parameter(ParameterSetName='Identifier', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Name', Position=1, Mandatory=$false)]
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [ValidateRange(1, 1000)]
         [uint32]$SizeLimit = 100,
         [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Identifier', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Name', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [PSObject]$Server
@@ -67,18 +76,13 @@ function Get-CWCompany
         if ($Server -ne $null)
         {
             $CompanySvc = [CwApiCompanySvc]::new($Server);
-        } 
-        else 
-        {
-            # TODO: determine whether or not to keep this as an option
-            $CompanySvc = [CwApiCompanySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         }
         
         [uint32] $companyCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
         
         # get the number of pages of ticket to request and total ticket count
-        if (![String]::IsNullOrWhiteSpace($Filter) -or ![String]::IsNullOrWhiteSpace($Identifier))
+        if (![String]::IsNullOrWhiteSpace($Filter) -or ![String]::IsNullOrWhiteSpace($Identifier) -or ![String]::IsNullOrWhiteSpace($Name))
         {
             if (![String]::IsNullOrWhiteSpace($Identifier))
             {
@@ -86,6 +90,16 @@ function Get-CWCompany
                 if ($Identifier -contains "*")
                 {
                     $Filter = "identifier like '$Identifier'";
+
+                }
+                Write-Verbose "Created a Filter String Based on the Identifier Value ($Identifier): $Filter";
+            }
+            elseif (![String]::IsNullOrWhiteSpace($Name))
+            {
+                $Filter = "name='$Name'";
+                if ($Name -contains "*")
+                {
+                    $Filter = "name like '$Name'";
 
                 }
                 Write-Verbose "Created a Filter String Based on the Identifier Value ($Identifier): $Filter";

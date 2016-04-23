@@ -15,6 +15,7 @@ Describe 'CWCompany' {
         $pstrCompanyIDs        = $pstrComp.companyIds;
 		$pstrCompanyID         = $pstrComp.companyIds[0];
 		$pstrCompanyIdentifier = $pstrComp.companyIdentifier;
+		$pstrCompanyName       = $pstrComp.companyName;
 	
         It 'gets company and checks for the id field' {
 			$companyID = $pstrCompanyID;
@@ -76,6 +77,17 @@ Describe 'CWCompany' {
 		It 'get single company by Identifier parameter' {
 			$companies = Get-CWCompany -Identifier $pstrCompanyIdentifier -Server $pstrServer;
 			$companies.identifier | Should Be $pstrCompanyIdentifier;
+		}
+		
+		It 'wildcard search using Name parameter with SizeLimit parameter' {
+			$sizeLimit = 5;
+			$companies = Get-CWCompany -Name "*" -SizeLimit $sizeLimit -Server $pstrServer;
+			$companies | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit ;
+		}
+		
+		It 'get single company by Name parameter' {
+			$companies = Get-CWCompany -Name $pstrCompanyName -Server $pstrServer;
+			$companies -ne $null | Should Be $true;
 		}
         
     }
