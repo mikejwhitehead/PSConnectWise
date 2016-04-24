@@ -13,6 +13,8 @@
     Name of the properties to return
 .PARAMETER SizeLimit
     Max number of items to return
+.PARAMETER Descending
+    Changes the sorting to descending order by IDs
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
@@ -59,6 +61,10 @@ function Get-CWCompany
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [ValidateRange(1, 1000)]
         [uint32]$SizeLimit = 100,
+        [Parameter(ParameterSetName='Identifier')]
+        [Parameter(ParameterSetName='Name')]
+        [Parameter(ParameterSetName='Query')]
+        [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Identifier', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Name', Position=2, Mandatory=$true)]
@@ -70,7 +76,8 @@ function Get-CWCompany
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        [CwApiCompanySvc] $CompanySvr = $null; 
+        [CwApiCompanySvc] $CompanySvr = $null;
+        [string]$OrderBy = [String]::Empty;
         
         # get the Company service
         if ($Server -ne $null)
@@ -118,6 +125,12 @@ function Get-CWCompany
             Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Companies Per Pages): $pageCount";
         } # end if for filter/identifier check
         
+        #specify the ordering
+        if ($Descending)
+        {
+            $OrderBy = " id desc";
+        }
+        
         # determines if to select all fields or specific fields
         [string[]] $Properties = $null;
         if ($Property -ne $null)
@@ -145,7 +158,7 @@ function Get-CWCompany
                 }
                 
                 Write-Debug "Requesting Company IDs that Meets this Filter: $Filter";
-                $queriedCompanies = $CompanySvc.ReadCompanies($Filter, $Properties, $pageNum, $itemsPerPage);
+                $queriedCompanies = $CompanySvc.ReadCompanies($Filter, $Properties, $OrderBy, $pageNum, $itemsPerPage);
                 [psobject[]] $Companies = $queriedCompanies;
                 
                 foreach ($Company in $Companies)

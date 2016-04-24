@@ -3,6 +3,8 @@
     Gets ConnectWise board's status information. 
 .PARAMETER BoardID
     ConnectWise board ID
+.PARAMETER Descending
+    Changes the sorting to descending order by IDs
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
@@ -19,6 +21,8 @@ function Get-CWServiceBoardStatus
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$BoardID,
+        [Parameter(ParameterSetName='Normal')]
+        [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [PSObject]$Server
@@ -28,6 +32,7 @@ function Get-CWServiceBoardStatus
     {
         $MAX_ITEMS_PER_PAGE = 50;
         [CwApiServiceBoardStatusSvc] $BoardStatusSvc = $null; 
+        [string]$OrderBy = [String]::Empty;
         
         # get the Company service
         if ($Server -ne $null)
@@ -56,6 +61,12 @@ function Get-CWServiceBoardStatus
             $pageCount = [Math]::Ceiling([double]($statusCount / $MAX_ITEMS_PER_PAGE));
             
             Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Boards Per Pages): $pageCount";
+        }
+        
+        #specify the ordering
+        if ($Descending)
+        {
+            $OrderBy = " id desc";
         }
     }
     Process

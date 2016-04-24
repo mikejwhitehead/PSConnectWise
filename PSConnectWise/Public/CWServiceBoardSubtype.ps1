@@ -3,6 +3,8 @@
     Gets ConnectWise board's type and subtype information. 
 .PARAMETER BoardID
     ConnectWise board ID
+.PARAMETER Descending
+    Changes the sorting to descending order by IDs
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
@@ -19,6 +21,8 @@ function Get-CWServiceBoardSubtype
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$BoardID,
+        [Parameter(ParameterSetName='Normal')]
+        [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [PSObject]$Server
@@ -28,6 +32,7 @@ function Get-CWServiceBoardSubtype
     {
         $MAX_ITEMS_PER_PAGE = 50;
         [CwApiServiceBoardSubtypeSvc] $BoardTypeSvc = $null; 
+        [string]$OrderBy = [String]::Empty;
         
         # get the Company service
         if ($Server -ne $null)
@@ -56,6 +61,12 @@ function Get-CWServiceBoardSubtype
             $pageCount = [Math]::Ceiling([double]($typeCount / $MAX_ITEMS_PER_PAGE));
             
             Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Types Per Pages): $pageCount";
+        }
+        
+        #specify the ordering
+        if ($Descending)
+        {
+            $OrderBy = " id desc";
         }
     }
     Process

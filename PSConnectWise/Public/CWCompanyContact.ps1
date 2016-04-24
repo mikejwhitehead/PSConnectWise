@@ -5,6 +5,8 @@
     ConnectWise contact ID
 .PARAMETER CompanyID
     ConnectWise company ID
+.PARAMETER Descending
+    Changes the sorting to descending order by IDs
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
@@ -31,6 +33,8 @@ function Get-CWCompanyContact
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateRange(1, 1000)]
         [uint32]$SizeLimit = 100,
+        [Parameter(ParameterSetName='Normal')]
+        [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
         [Parameter(ParameterSetName='Single', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -40,8 +44,8 @@ function Get-CWCompanyContact
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        
         [CwApiCompanyContactSvc] $ContactSvc = $null; 
+        [string]$OrderBy = [String]::Empty;
         
         # get the Company service
         if ($Server -ne $null)
@@ -72,6 +76,13 @@ function Get-CWCompanyContact
             
             Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Company Contacts Per Pages): $pageCount";
         }
+        
+        #specify the ordering
+        if ($Descending)
+        {
+            $OrderBy = " id desc";
+        }
+        
     }
     Process
     {
