@@ -96,7 +96,7 @@ function Get-CWServiceTicketNote
                 }  
                 
                 Write-Debug "Requesting Note Entries for Ticket: $TicketID";
-                $queriedNotes = $NoteSvc.ReadNotes($TicketID, $pageNum, $itemsPerPage);
+                $queriedNotes = $NoteSvc.ReadNotes($TicketID, $OrderBy, $pageNum, $itemsPerPage);
                 [pscustomobject[]] $Notes = $queriedNotes;
             
             } else {

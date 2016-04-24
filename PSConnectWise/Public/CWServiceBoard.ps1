@@ -132,7 +132,7 @@ function Get-CWServiceBoard
                 }
                 
                 Write-Debug "Requesting Board IDs that Meets this Filter: $Filter";
-                $queriedBoards = $BoardSvc.ReadBoards($Filter, $pageNum, $itemsPerPage);
+                $queriedBoards = $BoardSvc.ReadBoards($Filter, $OrderBy, $pageNum, $itemsPerPage);
                 [pscustomobject[]] $Boards = $queriedBoards;
                 
                 foreach ($Board in $Boards)

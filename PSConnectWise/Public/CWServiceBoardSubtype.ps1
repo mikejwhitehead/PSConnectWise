@@ -84,7 +84,7 @@ function Get-CWServiceBoardSubtype
                 }                
                 
                 Write-Debug "Requesting Type IDs for BoardID: $BoardID";
-                $queriedTypes = $BoardTypeSvc.ReadTypes($boardId, [string[]] @("*"), $pageNum, $itemsPerPage);
+                $queriedTypes = $BoardTypeSvc.ReadTypes($boardId, [string[]] @("*"), $OrderBy, $pageNum, $itemsPerPage);
                 [pscustomobject[]] $Types = $queriedTypes;
                 
                 foreach ($Type in $Types)

@@ -102,7 +102,7 @@ function Get-CWServicePriority
                 }    
                 
                 Write-Debug "Requesting Priority IDs that Meets this Filter: $Filter";
-                $queriedPriorities = $PrioritySvc.ReadPriorities($Filter, $pageNum, $itemsPerPage);
+                $queriedPriorities = $PrioritySvc.ReadPriorities($Filter, $OrderBy, $pageNum, $itemsPerPage);
                 [pscustomobject[]] $Priorities = $queriedPriorities;
                 
                 foreach ($Priority in $Priorities)

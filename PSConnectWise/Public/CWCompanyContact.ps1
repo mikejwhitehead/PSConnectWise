@@ -100,7 +100,7 @@ function Get-CWCompanyContact
                 }
                 
                 Write-Debug "Requesting Contact Entries for Company: $CompanyID";
-                $queriedContacts = $ContactSvc.ReadCompanyContacts($CompanyID, $null, $pageNum, $itemsPerPage);
+                $queriedContacts = $ContactSvc.ReadCompanyContacts($CompanyID, $OrderBy, $pageNum, $itemsPerPage);
                 [pscustomobject[]] $Contacts = $queriedContacts;
             
             } else {

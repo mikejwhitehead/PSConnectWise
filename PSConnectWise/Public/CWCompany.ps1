@@ -107,7 +107,6 @@ function Get-CWCompany
                 if ($Name -contains "*")
                 {
                     $Filter = "name like '$Name'";
-
                 }
                 Write-Verbose "Created a Filter String Based on the Identifier Value ($Identifier): $Filter";
             }

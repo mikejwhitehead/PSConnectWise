@@ -84,7 +84,7 @@ function Get-CWServiceBoardStatus
                 }
                 
                 Write-Debug "Requesting Ticket IDs that Meets this Filter: $Filter";
-                $queriedStatuses = $BoardStatusSvc.ReadStatuses($boardId, [string[]] @("*"), $pageNum, $itemsPerPage);
+                $queriedStatuses = $BoardStatusSvc.ReadStatuses($boardId, [string[]] @("*"), $OrderBy, $pageNum, $itemsPerPage);
                 [pscustomobject[]] $Statuses = $queriedStatuses;
                 
                 foreach ($Status in $Statuses)
