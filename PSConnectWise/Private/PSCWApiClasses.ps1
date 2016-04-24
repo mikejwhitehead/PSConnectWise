@@ -657,12 +657,12 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
     
     [psobject[]] ReadTickets ([string] $ticketConditions, [string[]] $fields, [uint32] $pageNum)
     {        
-        return $this.ReadTickets($ticketConditions, $fields, 1, 0);
+        return $this.ReadTickets($ticketConditions, $fields, $pageNum, 0);
     }
     
     [psobject[]] ReadTickets ([string] $ticketConditions, [string[]] $fields, [uint32] $pageNum, [uint32] $pageSize)
     {
-        return $this.ReadTickets($ticketConditions, $fields, $null, 1, 0);
+        return $this.ReadTickets($ticketConditions, $fields, $null, $pageNum, $pageSize);
     }
     
     [psobject[]] ReadTickets ([string] $ticketConditions, [string[]] $fields, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
@@ -754,15 +754,21 @@ class CwApiServiceBoardSvc : CWApiRestClientSvc
     
     [psobject[]] ReadBoards ([string] $boardConditions, [uint32] $pageNum)
     {         
-        return $this.ReadBoards($boardConditions, 1, 0);
+        return $this.ReadBoards($boardConditions, $pageNum, 0);
     }
     
     [psobject[]] ReadBoards ([string] $boardConditions, [uint32] $pageNum, [uint32] $pageSize)
+    {         
+        return $this.ReadBoards($boardConditions, $null, $pageNum, $pageSize);
+    }
+    
+    [psobject[]] ReadBoards ([string] $boardConditions, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
             conditions = $boardConditions;
             page       = $pageNum;
             pageSize   = $pageSize;
+            orderBy    = $orderBy;
         }
         
         return $this.ReadRequest($null, $queryHashtable);
@@ -805,15 +811,21 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
     
     [psobject[]] ReadStatuses ([uint32] $boardId, [string] $fields, [uint32] $pageNum)
     {         
-        return $this.ReadStatuses($boardId, $fields, 1, 0);
+        return $this.ReadStatuses($boardId, $fields, $pageNum, 0);
     }
     
     [psobject[]] ReadStatuses ([uint32] $boardId, [string] $fields, [uint32] $pageNum, [uint32] $pageSize)
+    {         
+        return $this.ReadStatuses($boardId, $fields, $null, $pageNum, $pageSize);
+    }
+    
+    [psobject[]] ReadStatuses ([uint32] $boardId, [string] $fields, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
             fields     = $fields;
             page       = $pageNum;
             pageSize   = $pageSize;
+            orderBy    = $orderBy;
         }
 
         $relativePathUri = "/$boardId/statuses";
@@ -862,15 +874,21 @@ class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
     
     [psobject[]] ReadTypes ([uint32] $boardId, [string] $fields, [uint32] $pageNum)
     {         
-        return $this.ReadTypes($boardId, $fields, 1, 0);
+        return $this.ReadTypes($boardId, $fields, $pageNum, 0);
     }
     
     [psobject[]] ReadTypes ([uint32] $boardId, [string] $fields, [uint32] $pageNum, [uint32] $pageSize)
+    {         
+        return $this.ReadTypes($boardId, $fields, $null, $pageNum, $pageSize);
+    }
+    
+    [psobject[]] ReadTypes ([uint32] $boardId, [string] $fields, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
             fields     = $fields;
             page       = $pageNum;
             pageSize   = $pageSize;
+            orderBy    = $orderBy;
         }
 
         $relativePathUri = "/$boardId/types";
@@ -919,15 +937,21 @@ class CwApiServiceBoardSubtypeSvc : CWApiRestClientSvc
     
     [psobject[]] ReadTypes ([uint32] $boardId, [string] $fields, [uint32] $pageNum)
     {         
-        return $this.ReadTypes($boardId, $fields, 1, 0);
+        return $this.ReadTypes($boardId, $fields, $pageNum, 0);
     }
     
     [psobject[]] ReadTypes ([uint32] $boardId, [string] $fields, [uint32] $pageNum, [uint32] $pageSize)
+    {         
+        return $this.ReadTypes($boardId, $fields, $null, $pageNum, $pageSize);
+    }
+    
+    [psobject[]] ReadTypes ([uint32] $boardId, [string] $fields, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
             fields     = $fields;
             page       = $pageNum;
             pageSize   = $pageSize;
+            orderBy    = $orderBy;
         }
         
         $relativePathUri = "/$boardId/subtypes";
@@ -972,15 +996,21 @@ class CwApiServicePrioritySvc : CWApiRestClientSvc
     
     [psobject[]] ReadPriorities ([string] $priorityConditions, [uint32] $pageNum)
     {         
-        return $this.ReadPriorities($priorityConditions, 1, 0);
+        return $this.ReadPriorities($priorityConditions, $pageNum, 0);
+    }
+
+    [psobject[]] ReadPriorities ([string] $priorityConditions, [uint32] $pageNum, [uint32] $pageSize)
+    {         
+        return $this.ReadPriorities($priorityConditions, $null, $pageNum, $pageSize);
     }
     
-    [psobject[]] ReadPriorities ([string] $priorityConditions, [uint32] $pageNum, [uint32] $pageSize)
+    [psobject[]] ReadPriorities ([string] $priorityConditions, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
             conditions = $priorityConditions;
             page       = $pageNum;
             pageSize   = $pageSize;
+            orderBy    = $orderBy;
         }
         
         return $this.ReadRequest($null, $queryHashtable);
@@ -1013,14 +1043,20 @@ class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
     
     [psobject[]] ReadNotes ([uint32] $ticketId)
     {
-        return $this.ReadTimeEntries($ticketId, 1, 0)
+        return $this.ReadNotes($ticketId, 1, 0)
     }
     
     [psobject[]] ReadNotes ([uint32] $ticketId, [uint32] $pageNum, [uint32] $pageSize)
     {
+        return $this.ReadNotes($ticketId, $null, $pageNum, $pageSize)
+    }
+    
+    [psobject[]] ReadNotes ([uint32] $ticketId, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
+    {
         [hashtable] $queryHashtable = @{
             page       = $pageNum;
             pageSize   = $pageSize;
+            orderBy    = $orderBy;
         }
         
         $relativePathUri = "/$ticketId/notes";
@@ -1082,18 +1118,6 @@ class CwApiCompanySvc : CWApiRestClientSvc
         return $company
     }
     
-    [psobject] ReadCompany([string] $companIdenifier)
-    {
-        return $this.ReadCompany($companIdenifier, "*");
-    }
-
-    [psobject] ReadCompany([string] $companIdenifier, $fields)
-    {
-        $query = "identifier='$companIdenifier'";
-        [pscustomobject[]] $company = $this.ReadCompanies($query, $fields);
-        return $company[0];
-    }
-    
     [psobject[]] ReadCompanies ([string] $companyConditions)
     {        
         return $this.ReadCompanies($companyConditions, "*");
@@ -1111,10 +1135,16 @@ class CwApiCompanySvc : CWApiRestClientSvc
     
     [psobject[]] ReadCompanies ([string] $companyConditions, [string[]] $fields, [uint32] $pageNum, [uint32] $pageSize)
     {
+        return $this.ReadCompanies($companyConditions, $fields, $null, $pageNum, 0);
+    }
+    
+    [psobject[]] ReadCompanies ([string] $companyConditions, [string[]] $fields, [string]$orderBy, [uint32] $pageNum, [uint32] $pageSize)
+    {
         [hashtable] $queryHashtable = @{
             conditions = $companyConditions;
             page       = $pageNum;
             pageSize   = $pageSize;
+            orderBy    = $orderBy;
         }
         
         if ($fields -ne $null)
@@ -1178,13 +1208,18 @@ class CwApiCompanyContactSvc : CWApiRestClientSvc
     
     [psobject[]] ReadCompanyContacts ([uint32] $companyId, [string[]] $fields, [uint32] $pageNum)
     {
-        return $this.ReadCompanyContacts($companyId, $fields, 1, 0);
+        return $this.ReadCompanyContacts($companyId, $fields, $pageNum, 0);
     }
     
     [psobject[]] ReadCompanyContacts ([uint32] $companyId, [string[]] $fields, [uint32] $pageNum, [uint32] $pageSize)
     {
+        return $this.ReadCompanyContacts($companyId, $fields, $null, $pageNum, $pageSize);
+    }
+    
+    [psobject[]] ReadCompanyContacts ([uint32] $companyId, [string[]] $fields, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
+    {
         $query = "company/id=$companyId";
-        return $this.ReadContacts($query, $fields, $pageNum, $pageSize);
+        return $this.ReadContacts($query, $fields, $orderBy, $pageNum, $pageSize);
     }
     
     [psobject[]] ReadContacts ([string] $companyConditions)
@@ -1199,16 +1234,22 @@ class CwApiCompanyContactSvc : CWApiRestClientSvc
     
     [psobject[]] ReadContacts ([string] $companyConditions, [string[]] $fields, [uint32] $pageNum)
     {         
-        return $this.ReadContacts($companyConditions, $fields, 1, 0);
+        return $this.ReadContacts($companyConditions, $fields, $fields, 0);
     }
     
     [psobject[]] ReadContacts ([string] $companyConditions, [string[]] $fields,  [uint32] $pageNum, [uint32] $pageSize)
+    {         
+        return $this.ReadContacts($companyConditions, $fields, $null, $fields, $pageSize);
+    }
+    
+    [psobject[]] ReadContacts ([string] $companyConditions, [string[]] $fields, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
             conditions = $companyConditions;
             page       = $pageNum;
             pageSize   = $pageSize;
             fields     = $null;
+            orderBy    = $orderBy;
         }
         
         if ($fields -ne $null)
