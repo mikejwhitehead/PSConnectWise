@@ -24,12 +24,18 @@ function Get-CWCompanyContact
     [CmdletBinding(DefaultParameterSetName="Normal")]
     param
     (
-        [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
-        [ValidateNotNullOrEmpty()]
-        [uint32]$CompanyID,
         [Parameter(ParameterSetName='Single', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$ID,
+        [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$CompanyID,
+        [Parameter(ParameterSetName='Normal')]
+        [ValidateNotNullOrEmpty()]
+        [string]$FirstName,
+        [Parameter(ParameterSetName='Normal')]
+        [ValidateNotNullOrEmpty()]
+        [string]$LastName,
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateRange(1, 1000)]
         [uint32]$SizeLimit = 100,
@@ -64,7 +70,38 @@ function Get-CWCompanyContact
         # get the number of pages of company to request and total company count
         if ($ID -eq 0 -or $ID -eq $null)
         {
-            $contactCount = $ContactSvc.GetContactCount($CompanyID);
+            [uint32]$contactCount = 0;
+            
+            if (![String]::IsNullOrWhiteSpace($FirstName) -or ![String]::IsNullOrWhiteSpace($LastName))
+            {
+                $Filter = "company/id=$CompanyID";
+                
+                if ($FirstName -contains "*")
+                {
+                    $Filter += " and firstname like '$FirstName'"
+                }
+                elseif (![String]::IsNullOrWhiteSpace($FirstName))
+                {
+                    $Filter += " and firstname='$FirstName'"
+                }
+                    
+                if ($LastName -contains "*")
+                {
+                    $Filter += " and lastname like '$LastName'"
+                }
+                elseif (![String]::IsNullOrWhiteSpace($LastName))
+                {
+                    $Filter += " and lastname='$LastName'"
+                }
+                
+                Write-Debug "Created a Filter String Based on the CompanyID, FirstName, and LastName: $Filter";
+                $contactCount = $ContactSvc.GetContactCount($Filter);
+            }
+            else 
+            {
+                $contactCount = $ContactSvc.GetContactCount($CompanyID);
+            }
+
             Write-Debug "Total Count of Company Contact Entries for Company ($CompanyID): $contactCount";
             
             if ($SizeLimit -ne $null -and $SizeLimit -gt 0)
@@ -99,10 +136,21 @@ function Get-CWCompanyContact
                     $itemsPerPage = [Math]::Min($itemsRemainCount, $MAX_ITEMS_PER_PAGE);
                 }
                 
-                Write-Debug "Requesting Contact Entries for Company: $CompanyID";
-                $queriedContacts = $ContactSvc.ReadCompanyContacts($CompanyID, $OrderBy, $pageNum, $itemsPerPage);
-                [pscustomobject[]] $Contacts = $queriedContacts;
-            
+                [psobject[]] $Contacts = @();
+                
+                if ([String]::IsNullOrWhiteSpace($Filter))
+                {
+                    Write-Debug "Requesting Contact Entries for Company: $CompanyID";
+                    $queriedContacts = $ContactSvc.ReadCompanyContacts($CompanyID, $null, $OrderBy, $pageNum, $itemsPerPage);
+                    [psobject[]] $Contacts = $queriedContacts;
+                }
+                else 
+                {
+                    Write-Debug "Requesting Contact Entries for Company: $CompanyID";
+                    $queriedContacts = $ContactSvc.ReadContacts($Filter, $null, $OrderBy, $pageNum, $itemsPerPage);
+                    [psobject[]] $Contacts = $queriedContacts;
+                }
+                
             } else {
                 
                 $Contacts = $ContactSvc.ReadContact($ID);
