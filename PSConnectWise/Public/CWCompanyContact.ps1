@@ -76,7 +76,7 @@ function Get-CWCompanyContact
             {
                 $Filter = "company/id=$CompanyID";
                 
-                if ($FirstName -contains "*")
+                if ([RegEx]::IsMatch($FirstName, "\*"))
                 {
                     $Filter += " and firstname like '$FirstName'"
                 }
@@ -85,7 +85,7 @@ function Get-CWCompanyContact
                     $Filter += " and firstname='$FirstName'"
                 }
                     
-                if ($LastName -contains "*")
+                if ([RegEx]::IsMatch($LastName, "\*"))
                 {
                     $Filter += " and lastname like '$LastName'"
                 }

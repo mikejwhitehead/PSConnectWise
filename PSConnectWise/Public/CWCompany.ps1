@@ -94,7 +94,7 @@ function Get-CWCompany
             if (![String]::IsNullOrWhiteSpace($Identifier))
             {
                 $Filter = "identifier='$Identifier'";
-                if ($Identifier -contains "*")
+                if ([RegEx]::IsMatch($Identifier, "\*"))
                 {
                     $Filter = "identifier like '$Identifier'";
 

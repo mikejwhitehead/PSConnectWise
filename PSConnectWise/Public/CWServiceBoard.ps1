@@ -78,7 +78,7 @@ function Get-CWServiceBoard
             if (![String]::IsNullOrWhiteSpace($Name))
             {
                 $Filter = "name='$Name'";
-                if ($Name -contains "*")
+                if ([RegEx]::IsMatch($Name, "\*"))
                 {
                     $Filter = "name like '$Name'";
 
