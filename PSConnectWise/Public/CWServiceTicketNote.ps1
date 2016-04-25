@@ -5,6 +5,8 @@
     ConnectWise ticket ID
 .PARAMETER NoteID
     ConnectWise ticket note ID
+.PARAMETER Descending
+    Changes the sorting to descending order by IDs
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
@@ -17,7 +19,7 @@
 function Get-CWServiceTicketNote
 {
     [CmdLetBinding()]
-    [OutputType("PSObject", ParameterSetName="Normal")]
+    [OutputType("PSObject[]", ParameterSetName="Normal")]
     [OutputType("PSObject", ParameterSetName="Single")]
     [CmdletBinding(DefaultParameterSetName="Normal")]
     param
@@ -29,6 +31,8 @@ function Get-CWServiceTicketNote
         [Parameter(ParameterSetName='Single', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [int32]$NoteID,
+        [Parameter(ParameterSetName='Normal')]
+        [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
         [Parameter(ParameterSetName='Single', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -39,6 +43,7 @@ function Get-CWServiceTicketNote
     {
         $MAX_ITEMS_PER_PAGE = 50;
         [CwApiServiceTicketNoteSvc] $NoteSvc = $null; 
+        [string]$OrderBy = [String]::Empty;
         
         # get the Note service
         if ($Server -ne $null)
@@ -68,6 +73,12 @@ function Get-CWServiceTicketNote
             
             Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Ticket Notes Per Pages): $pageCount";
         }
+        
+        #specify the ordering
+        if ($Descending)
+        {
+            $OrderBy = " id desc";
+        }
     }
     Process
     {
@@ -85,7 +96,7 @@ function Get-CWServiceTicketNote
                 }  
                 
                 Write-Debug "Requesting Note Entries for Ticket: $TicketID";
-                $queriedNotes = $NoteSvc.ReadNotes($TicketID, $pageNum, $itemsPerPage);
+                $queriedNotes = $NoteSvc.ReadNotes($TicketID, $OrderBy, $pageNum, $itemsPerPage);
                 [pscustomobject[]] $Notes = $queriedNotes;
             
             } else {

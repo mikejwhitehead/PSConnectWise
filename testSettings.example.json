@@ -15,7 +15,6 @@
         "service": {
             "ticketIds": [1000, 1001, 1002, 1003, 1004, 1005],
             "boardIds": [1, 2, 3, 4, 5],
-            "boardName": "Help",
             "statusIds": [105, 104, 103, 102, 101],
             "priorityIds": [8, 7, 6, 5, 4],
             "ticketNoteIds": [123456]
@@ -23,7 +22,6 @@
         
         // variables to be used when making calls to ConnectWise's Company module
         "company": {
-            "companyIdentifier": "acme",
             "companyIds": [1, 2],
             "contactIds": [1, 2, 3, 4, 5]
         }

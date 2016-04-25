@@ -5,7 +5,8 @@ Import-Module "$WorkspaceRoot\PSConnectWise\PSConnectWise.psm1" -Force
 
 Describe 'CWCompany' {
 		
-	. "$WorkspaceRoot\test\LoadTestSettings.ps1"
+	. "$WorkspaceRoot\test\LoadTestSettings.ps1";
+	[hashtable] $pstrSharedValues = @{};
 	
 	# get the server connnection
 	$pstrServer = Get-CWConnectionInfo -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
@@ -15,11 +16,13 @@ Describe 'CWCompany' {
         $pstrCompanyIDs        = $pstrComp.companyIds;
 		$pstrCompanyID         = $pstrComp.companyIds[0];
 		$pstrCompanyIdentifier = $pstrComp.companyIdentifier;
+		$pstrCompanyName       = $pstrComp.companyName;
 	
         It 'gets company and checks for the id field' {
 			$companyID = $pstrCompanyID;
 			$company = Get-CWCompany -ID $companyID -Server $pstrServer
-			$company.id | Should Be $companyID;		
+			$pstrSharedValues.Add("company", $company);
+			$pstrSharedValues['company'].id | Should Be $companyID;		
 		} 
 		
 		It 'gets company and pipes it through the Select-Object cmdlet for the id property' {
@@ -74,8 +77,27 @@ Describe 'CWCompany' {
 		}
 		
 		It 'get single company by Identifier parameter' {
-			$companies = Get-CWCompany -Identifier $pstrCompanyIdentifier -Server $pstrServer;
-			$companies.identifier | Should Be $pstrCompanyIdentifier;
+			$companyIdentifier = $pstrSharedValues['company'].identifier
+			$companies = Get-CWCompany -Identifier $companyIdentifier -Server $pstrServer;
+			$companies.identifier | Should Be $companyIdentifier;
+		}
+		
+		It 'wildcard search using Name parameter with SizeLimit parameter' {
+			$sizeLimit = 5;
+			$companies = Get-CWCompany -Name "*" -SizeLimit $sizeLimit -Server $pstrServer;
+			$companies | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit ;
+		}
+		
+		It 'get single company by Name parameter' {
+			$companyName = $pstrSharedValues['company'].name
+			$companies = Get-CWCompany -Name $companyName -Server $pstrServer;
+			$companyName -ne $null | Should Be $true;
+		}
+		
+		It 'wildcard search using Name parameter with Descending parameter' {
+			$sizeLimit = 5;
+			$companies = Get-CWCompany -Name "*" -SizeLimit $sizeLimit -Descending -Server $pstrServer;
+			$companies[0].id -gt $companies[$companies.Count - 1].id | Should Be $true ;
 		}
         
     }

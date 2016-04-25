@@ -5,12 +5,16 @@
     ConnectWise company ID
 .PARAMETER Identifier
     ConnectWise company identifier name
+.PARAMETER Name
+    ConnectWise company friendly name
 .PARAMETER Filter
     Query String 
 .PARAMETER Property
     Name of the properties to return
 .PARAMETER SizeLimit
     Max number of items to return
+.PARAMETER Descending
+    Changes the sorting to descending order by IDs
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
@@ -29,6 +33,7 @@ function Get-CWCompany
     [CmdLetBinding()]
     [OutputType("PSObject", ParameterSetName="Normal")]
     [OutputType("PSObject[]", ParameterSetName="Identifier")]
+    [OutputType("PSObject[]", ParameterSetName="Name")]
     [OutputType("PSObject[]", ParameterSetName="Query")]
     [CmdletBinding(DefaultParameterSetName="Normal")]
     param
@@ -39,20 +44,30 @@ function Get-CWCompany
         [Parameter(ParameterSetName='Identifier', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string[]]$Identifier,
+        [Parameter(ParameterSetName='Name', Position=0, Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string[]]$Name,
         [Parameter(ParameterSetName='Query', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
         [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
         [Parameter(ParameterSetName='Identifier', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Name', Position=1, Mandatory=$false)]
         [Parameter(ParameterSetName='Query', Position=1, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string[]]$Property,
         [Parameter(ParameterSetName='Identifier', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Name', Position=1, Mandatory=$false)]
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [ValidateRange(1, 1000)]
         [uint32]$SizeLimit = 100,
+        [Parameter(ParameterSetName='Identifier')]
+        [Parameter(ParameterSetName='Name')]
+        [Parameter(ParameterSetName='Query')]
+        [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Identifier', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Name', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [PSObject]$Server
@@ -61,32 +76,37 @@ function Get-CWCompany
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        [CwApiCompanySvc] $CompanySvr = $null; 
+        [CwApiCompanySvc] $CompanySvr = $null;
+        [string]$OrderBy = [String]::Empty;
         
         # get the Company service
         if ($Server -ne $null)
         {
             $CompanySvc = [CwApiCompanySvc]::new($Server);
-        } 
-        else 
-        {
-            # TODO: determine whether or not to keep this as an option
-            $CompanySvc = [CwApiCompanySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         }
         
         [uint32] $companyCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
         
         # get the number of pages of ticket to request and total ticket count
-        if (![String]::IsNullOrWhiteSpace($Filter) -or ![String]::IsNullOrWhiteSpace($Identifier))
+        if (![String]::IsNullOrWhiteSpace($Filter) -or ![String]::IsNullOrWhiteSpace($Identifier) -or ![String]::IsNullOrWhiteSpace($Name))
         {
             if (![String]::IsNullOrWhiteSpace($Identifier))
             {
                 $Filter = "identifier='$Identifier'";
-                if ($Identifier -contains "*")
+                if ([RegEx]::IsMatch($Identifier, "\*"))
                 {
                     $Filter = "identifier like '$Identifier'";
 
+                }
+                Write-Verbose "Created a Filter String Based on the Identifier Value ($Identifier): $Filter";
+            }
+            elseif (![String]::IsNullOrWhiteSpace($Name))
+            {
+                $Filter = "name='$Name'";
+                if ($Name -contains "*")
+                {
+                    $Filter = "name like '$Name'";
                 }
                 Write-Verbose "Created a Filter String Based on the Identifier Value ($Identifier): $Filter";
             }
@@ -103,6 +123,12 @@ function Get-CWCompany
             $pageCount = [Math]::Ceiling([double]($companyCount / $MAX_ITEMS_PER_PAGE));
             Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Companies Per Pages): $pageCount";
         } # end if for filter/identifier check
+        
+        #specify the ordering
+        if ($Descending)
+        {
+            $OrderBy = " id desc";
+        }
         
         # determines if to select all fields or specific fields
         [string[]] $Properties = $null;
@@ -131,7 +157,7 @@ function Get-CWCompany
                 }
                 
                 Write-Debug "Requesting Company IDs that Meets this Filter: $Filter";
-                $queriedCompanies = $CompanySvc.ReadCompanies($Filter, $Properties, $pageNum, $itemsPerPage);
+                $queriedCompanies = $CompanySvc.ReadCompanies($Filter, $Properties, $OrderBy, $pageNum, $itemsPerPage);
                 [psobject[]] $Companies = $queriedCompanies;
                 
                 foreach ($Company in $Companies)

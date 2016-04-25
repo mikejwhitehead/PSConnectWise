@@ -7,6 +7,8 @@
     Query String 
 .PARAMETER SizeLimit
     Max number of items to return
+.PARAMETER Descending
+    Changes the sorting to descending order by IDs
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
@@ -19,7 +21,7 @@
 function Get-CWServicePriority
 {
     [CmdLetBinding()]
-    [OutputType("PSObject[]", ParameterSetName="Normal")]
+    [OutputType("PSObject", ParameterSetName="Normal")]
     [OutputType("PSObject[]", ParameterSetName="Query")]
     [CmdletBinding(DefaultParameterSetName="Normal")]
     param
@@ -33,6 +35,8 @@ function Get-CWServicePriority
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [ValidateRange(1, 1000)]
         [uint32]$SizeLimit = 100,
+        [Parameter(ParameterSetName='Query')]
+        [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
         [Parameter(ParameterSetName='Query', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -43,6 +47,7 @@ function Get-CWServicePriority
     {
         $MAX_ITEMS_PER_PAGE = 50;
         [CwApiServicePrioritySvc] $PrioritySvc = $null; 
+        [string]$OrderBy = [String]::Empty;
         
         # get the Company service
         if ($Server -ne $null)
@@ -74,6 +79,12 @@ function Get-CWServicePriority
             Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Priorities Per Pages): $pageCount";
         }
         
+        #specify the ordering
+        if ($Descending)
+        {
+            $OrderBy = " id desc";
+        }
+        
     }
     Process
     {
@@ -91,7 +102,7 @@ function Get-CWServicePriority
                 }    
                 
                 Write-Debug "Requesting Priority IDs that Meets this Filter: $Filter";
-                $queriedPriorities = $PrioritySvc.ReadPriorities($Filter, $pageNum, $itemsPerPage);
+                $queriedPriorities = $PrioritySvc.ReadPriorities($Filter, $OrderBy, $pageNum, $itemsPerPage);
                 [pscustomobject[]] $Priorities = $queriedPriorities;
                 
                 foreach ($Priority in $Priorities)

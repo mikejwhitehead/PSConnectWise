@@ -9,6 +9,8 @@
     Query String 
 .PARAMETER SizeLimit
     Max number of items to return
+.PARAMETER Descending
+    Changes the sorting to descending order by IDs
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
@@ -40,6 +42,9 @@ function Get-CWServiceBoard
         [Parameter(ParameterSetName='Query')]
         [ValidateRange(1, 1000)]
         [uint32]$SizeLimit = 100,
+        [Parameter(ParameterSetName='Name')]
+        [Parameter(ParameterSetName='Query')]
+        [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Name', Position=2, Mandatory=$true)]
         [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]
@@ -51,6 +56,7 @@ function Get-CWServiceBoard
     {
         $MAX_ITEMS_PER_PAGE = 50;
         [CwApiServiceBoardSvc] $BoardSvc = $null; 
+        [string]$OrderBy = [String]::Empty;
         
         # get the Company service
         if ($Server -ne $null)
@@ -72,7 +78,7 @@ function Get-CWServiceBoard
             if (![String]::IsNullOrWhiteSpace($Name))
             {
                 $Filter = "name='$Name'";
-                if ($Name -contains "*")
+                if ([RegEx]::IsMatch($Name, "\*"))
                 {
                     $Filter = "name like '$Name'";
 
@@ -91,6 +97,12 @@ function Get-CWServiceBoard
             $pageCount = [Math]::Ceiling([double]($boardCount / $MAX_ITEMS_PER_PAGE));
             
             Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Boards Per Pages): $pageCount";
+        }
+        
+        #specify the ordering
+        if ($Descending)
+        {
+            $OrderBy = " id desc";
         }
         
         # determines if to select all fields or specific fields
@@ -120,7 +132,7 @@ function Get-CWServiceBoard
                 }
                 
                 Write-Debug "Requesting Board IDs that Meets this Filter: $Filter";
-                $queriedBoards = $BoardSvc.ReadBoards($Filter, $pageNum, $itemsPerPage);
+                $queriedBoards = $BoardSvc.ReadBoards($Filter, $OrderBy, $pageNum, $itemsPerPage);
                 [pscustomobject[]] $Boards = $queriedBoards;
                 
                 foreach ($Board in $Boards)
