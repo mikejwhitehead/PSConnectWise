@@ -6,7 +6,8 @@ Import-Module "$WorkspaceRoot\PSConnectWise\PSConnectWise.psm1" -Force
 Describe 'CWServiceBoard' {
 		
 	. "$WorkspaceRoot\test\LoadTestSettings.ps1"
-	
+	[hashtable] $pstrSharedValues = @{};
+
 	# get the server connnection
 	$pstrServer = Get-CWConnectionInfo -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 	
@@ -19,7 +20,8 @@ Describe 'CWServiceBoard' {
 		It 'gets board and checks for the id field' {
 			$boardID = $pstrBoardID;
 			$board = Get-CWServiceBoard -ID $boardID -Server $pstrServer;
-			$board.id | Should Be $boardID;		
+			$pstrSharedValues.Add("board", $board);
+			$pstrSharedValues['board'].id | Should Be $boardID;		
 		}
 		
 		It 'gets board and pipes it through the Select-Object cmdlet for the id property' {
@@ -67,8 +69,9 @@ Describe 'CWServiceBoard' {
 		}
 		
 		It 'get single board by Name parameter' {
-			$boards = Get-CWServiceBoard -Name $pstrBoardName -Server $pstrServer;
-			$boards.name | Should Be $pstrBoardName;
+			$boardName = $pstrSharedValues['board'].name
+			$boards = Get-CWServiceBoard -Name $boardName -Server $pstrServer;
+			$boards.name | Should Be $boardName;
 		}
 	
 	}
