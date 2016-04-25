@@ -25,25 +25,33 @@ function Get-CWServiceTicket
     [CmdLetBinding()]
     [OutputType("PSObject", ParameterSetName="Normal")]
     [OutputType("PSObject[]", ParameterSetName="Query")]
+    [OutputType("PSObject[]", ParameterSetName="Summary")]
     [CmdletBinding(DefaultParameterSetName="Normal")]
     param
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [int[]]$ID,
+        [Parameter(ParameterSetName='Summary', Position=0, Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Summary,
         [Parameter(ParameterSetName='Query', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
         [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Summary', Mandatory=$false)]
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string[]]$Property,
+        [Parameter(ParameterSetName='Summary', Mandatory=$false)]
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [ValidateRange(1, 1000)]
         [int]$SizeLimit = 100,
+        [Parameter(ParameterSetName='Summary')]
         [Parameter(ParameterSetName='Query')]
         [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [Parameter(ParameterSetName='Summary', Mandatory=$true)]
         [Parameter(ParameterSetName='Query', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [PSCustomObject]$Server
@@ -69,8 +77,18 @@ function Get-CWServiceTicket
         [uint32] $pageCount   = 1;
         
         # get the number of pages of ticket to request and total ticket count
-        if (![String]::IsNullOrWhiteSpace($Filter))
+        if (![String]::IsNullOrWhiteSpace($Filter) -or ![String]::IsNullOrWhiteSpace($Summary))
         {
+            if (![String]::IsNullOrWhiteSpace($Summary))
+            {
+                $Filter = "summary='$Summary'";
+                if ([RegEx]::IsMatch($Summary, "\*"))
+                {
+                    $Filter = "summary like '$Summary'";
+                }
+                Write-Verbose "Created a Filter String Based on the Summary Value ($Summary): $Filter";
+            }
+            
             $ticketCount = $TicketSvc.GetTicketCount($Filter);
             Write-Debug "Total Count Ticket the Filter ($Filter): $ticketCount";
             

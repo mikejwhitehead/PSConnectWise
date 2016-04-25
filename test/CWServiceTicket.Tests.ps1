@@ -19,7 +19,8 @@ Describe 'CWServiceTicket' {
 		It 'gets ticket and checks for the id field' {
 			$ticketID = $pstrTicketID;
 			$ticket = Get-CWServiceTicket -ID $ticketID -Server $pstrServer;
-			$ticket.id | Should Be $ticketID;		
+			$pstrSharedValues.Add("ticket", $ticket);
+			$pstrSharedValues['ticket'].id | Should Be $ticketID;		
 		} 
 		
 		It 'gets ticket and pipes it through the Select-Object cmdlet for the id property' {
@@ -66,6 +67,28 @@ Describe 'CWServiceTicket' {
 			$maxTicketId = $ticketIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
 			$tickets[0].id | Should Be $maxTicketId;		
 		}
+		
+		It 'wildcard search using Summary parameter with SizeLimit parameter' {
+			$sizeLimit = 5;
+			$ticketSummary = $pstrSharedValues['ticket'].summary
+			$tickets = Get-CWServiceTicket -Summary "$ticketSummary*" -SizeLimit $sizeLimit -Server $pstrServer;
+			$count = $tickets | Measure-Object | Select -ExpandProperty Count;
+			$count -gt 0 -and $count -le $sizeLimit | Should Be $true ;
+		}
+		
+		It 'get tickets by Summary parameter' {
+			$ticketSummary = $pstrSharedValues['ticket'].summary
+			$tickets = Get-CWServiceTicket -Summary $ticketSummary -Server $pstrServer;
+			$tickets -ne $null | Should Be $true;
+		}
+		
+		It 'wildcard search using Filter parameter with Descending parameter' {
+			$sizeLimit = 5;
+			$minTicketId = [Math]::Max(0, $pstrSharedValues['ticket'].id - 100);
+			$tickets = Get-CWServiceTicket -Filter "id > $minTicketId" -SizeLimit $sizeLimit -Descending -Server $pstrServer;
+			$tickets[0].id -ge $tickets[$tickets.Count - 1].id | Should Be $true ;
+		}
+		
 		
 	} # end of Context 'Get-CWServiceTicket'
 	
