@@ -18,27 +18,18 @@ function Get-CWServiceBoardStatus
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$BoardID,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [String]$Domain = $script:SavedDomain,
-        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$CompanyName = $script:SavedCompanyName,
-        [Parameter(ParameterSetName='Normal', Position=3, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PublicKey = $script:SavedPublicKey,
-        [Parameter(ParameterSetName='Normal', Position=4, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PrivateKey = $script:SavedPrivateKey
+        [PSObject]$Server = $script:CWServerInfo
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        [CwApiServiceBoardStatusSvc] $BoardStatusSvc = $null; 
+        [CwApiServiceBoardStatusSvc] $BoardStatusSvc = $null
         
         # get the Company service
-        $BoardStatusSvc = [CwApiServiceBoardStatusSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        $BoardStatusSvc = [CwApiServiceBoardStatusSvc]::new($Server)
         
         [uint32] $statusCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

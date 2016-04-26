@@ -37,31 +37,26 @@ function Get-CWServiceTicket
         [string[]]$Property,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [int]$SizeLimit,
-        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
-        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [Parameter(ParameterSetName='Query', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [String]$Domain = $script:SavedDomain,
-        [Parameter(ParameterSetName='Normal', Position=3, Mandatory=$false)]
-        [Parameter(ParameterSetName='Query', Position=3, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$CompanyName = $script:SavedCompanyName,
-        [Parameter(ParameterSetName='Normal', Position=4, Mandatory=$false)]
-        [Parameter(ParameterSetName='Query', Position=4, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PublicKey = $script:SavedPublicKey,
-        [Parameter(ParameterSetName='Normal', Position=5, Mandatory=$false)]
-        [Parameter(ParameterSetName='Query', Position=5, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PrivateKey = $script:SavedPrivateKey
+        [PSCustomObject]$Server
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50 
-        [CwApiServiceTicketSvc] $TicketSvc = $null;
+        [CwApiServiceTicketSvc] $TicketSvc = $null; 
         
         # get the Ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        if ($Server -ne $null)
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
+        } 
+        else 
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
         
         [uint32] $ticketCount = 1  
         [uint32] $pageCount   = 1  
@@ -186,18 +181,9 @@ function New-CWServiceTicket
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [uint32]$StatusID,
-        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [String]$Domain = $script:SavedDomain,
-        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$CompanyName = $script:SavedCompanyName,
-        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PublicKey = $script:SavedPublicKey,
-        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PrivateKey = $script:SavedPrivateKey
+        [PSCustomObject]$Server
     )
     
     Begin
@@ -205,7 +191,14 @@ function New-CWServiceTicket
         [CwApiServiceTicketSvc] $TicketSvc = $null; 
         
         # get the Ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        if ($Server -ne $null)
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
+        } 
+        else 
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
     }
     Process
     {
@@ -288,22 +281,10 @@ function Update-CWServiceTicket
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [switch]$AddToResolution,
-        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
-        [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [Parameter(ParameterSetName='WithMessage', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [String]$Domain = $script:SavedDomain,
-        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
-        [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$CompanyName = $script:SavedCompanyName,
-        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
-        [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PublicKey = $script:SavedPublicKey,
-        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
-        [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PrivateKey = $script:SavedPrivateKey
+        [PSCustomObject]$Server
     )
     
     Begin
@@ -312,8 +293,16 @@ function Update-CWServiceTicket
         [CwApiServiceTicketNoteSvc] $NoteSvc = $null; 
         
         # get the Ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
-        $NoteSvc   = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        if ($Server -ne $null)
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
+            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Server);
+        } 
+        else 
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+            $NoteSvc   = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
         
         [ServiceTicketNoteTypes[]] $addToForNote = @();
         if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
@@ -385,18 +374,9 @@ function Remove-CWServiceTicket
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [int[]]$ID,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [String]$Domain = $script:SavedDomain,
-        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$CompanyName = $script:SavedCompanyName,
-        [Parameter(ParameterSetName='Normal', Position=3, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PublicKey = $script:SavedPublicKey,
-        [Parameter(ParameterSetName='Normal', Position=4, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PrivateKey = $script:SavedPrivateKey
+        [PSCustomObject]$Server
     )
     
     Begin
@@ -404,7 +384,14 @@ function Remove-CWServiceTicket
         [CwApiServiceTicketSvc] $TicketSvc = $null; 
         
         # get the Ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        if ($Server -ne $null)
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
+        } 
+        else 
+        {
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
         
     }
     Process

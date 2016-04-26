@@ -95,7 +95,7 @@ PrivateData = @{
         Tags = @("ConnectWise", "LabTech")
 
         # A URL to the license for this module.
-        # LicenseUri = ''
+        LicenseUri = 'https://github.com/sgtoj/PSConnectWise/blob/master/LICENSE.txt'
 
         # A URL to the main website for this project.
         ProjectUri = 'https://github.com/sgtoj/PSConnectWise'

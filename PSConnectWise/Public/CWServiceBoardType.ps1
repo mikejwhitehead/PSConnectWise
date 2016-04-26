@@ -18,27 +18,18 @@ function Get-CWServiceBoardType
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$BoardID,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [String]$Domain = $script:SavedDomain,
-        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$CompanyName = $script:SavedCompanyName,
-        [Parameter(ParameterSetName='Normal', Position=3, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PublicKey = $script:SavedPublicKey,
-        [Parameter(ParameterSetName='Normal', Position=4, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PrivateKey = $script:SavedPrivateKey
+        [PSObject]$Server = $script:CWServerInfo
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        [CwApiServiceBoardTypeSvc] $BoardTypeSvc = $null; 
+        [CwApiServiceBoardTypeSvc] $BoardTypeSvc = $null
         
         # get the Company service
-        $BoardTypeSvc = [CwApiServiceBoardTypeSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        $BoardTypeSvc = [CwApiServiceBoardTypeSvc]::new($Server)
         
         [uint32] $typeCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

@@ -31,31 +31,19 @@ function Get-CWServiceBoard
         [string]$Filter,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [int]$SizeLimit,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
-        [Parameter(ParameterSetName='Query', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [String]$Domain = $script:SavedDomain,
-        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
-        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$CompanyName = $script:SavedCompanyName,
-        [Parameter(ParameterSetName='Normal', Position=3, Mandatory=$false)]
-        [Parameter(ParameterSetName='Query', Position=3, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PublicKey = $script:SavedPublicKey,
-        [Parameter(ParameterSetName='Normal', Position=4, Mandatory=$false)]
-        [Parameter(ParameterSetName='Query', Position=4, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PrivateKey = $script:SavedPrivateKey
+        [PSObject]$Server = $script:CWServerInfo
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        [CwApiServiceBoardSvc] $BoardSvc = $null; 
+        [CwApiServiceBoardSvc] $BoardSvc = $null
         
         # get the Company service
-        $BoardSvc = [CwApiServiceBoardSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        $BoardSvc = [CwApiServiceBoardSvc]::new($Server)
         
         [uint32] $boardCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

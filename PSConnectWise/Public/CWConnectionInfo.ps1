@@ -49,16 +49,13 @@ function Get-CWConnectionInfo
     }
     Process
     {
-        [String]$script:SavedDomain = $connectionInfo.Domain
-        [String]$script:SavedCompanyName = $connectionInfo.CompanyName
-        [String]$script:SavedPublicKey = $connectionInfo.PublicKey
-        [String]$script:SavedPrivateKey = $connectionInfo.PrivateKey
+        [PSObject]$script:CWServerInfo = $connectionInfo
         $connectionInfo
     }
     End
     {
         # do nothing here
-    }
+    }    
 }
 
 Export-ModuleMember -Function 'Get-CWConnectionInfo';

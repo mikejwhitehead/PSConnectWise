@@ -31,22 +31,10 @@ function Get-CWServicePriority
         [string]$Filter,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [int]$SizeLimit,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
-        [Parameter(ParameterSetName='Query', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Query', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [String]$Domain = $script:SavedDomain,
-        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
-        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$CompanyName = $script:SavedCompanyName,
-        [Parameter(ParameterSetName='Normal', Position=3, Mandatory=$false)]
-        [Parameter(ParameterSetName='Query', Position=3, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PublicKey = $script:SavedPublicKey,
-        [Parameter(ParameterSetName='Normal', Position=4, Mandatory=$false)]
-        [Parameter(ParameterSetName='Query', Position=4, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PrivateKey = $script:SavedPrivateKey
+        [PSObject]$Server = $script:CWServerInfo
     )
     
     Begin
@@ -55,7 +43,7 @@ function Get-CWServicePriority
         [CwApiServicePrioritySvc] $PrioritySvc = $null; 
         
         # get the Company service
-        $PrioritySvc = [CwApiServicePrioritySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        $PrioritySvc = [CwApiServicePrioritySvc]::new($Server)
         
         [uint32] $priorityCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

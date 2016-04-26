@@ -27,32 +27,20 @@ function Get-CWCompanyContact
         [Parameter(ParameterSetName='Single', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$ID,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
-        [Parameter(ParameterSetName='Single', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Single', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [String]$Domain = $script:SavedDomain,
-        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
-        [Parameter(ParameterSetName='Single', Position=2, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$CompanyName = $script:SavedCompanyName,
-        [Parameter(ParameterSetName='Normal', Position=3, Mandatory=$false)]
-        [Parameter(ParameterSetName='Single', Position=3, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PublicKey = $script:SavedPublicKey,
-        [Parameter(ParameterSetName='Normal', Position=4, Mandatory=$false)]
-        [Parameter(ParameterSetName='Single', Position=4, Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PrivateKey = $script:SavedPrivateKey
+        [PSObject]$Server = $script:CWServerInfo
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
         
-        [CwApiCompanyContactSvc] $ContactSvc = $null; 
+        [CwApiCompanyContactSvc] $ContactSvc = $null
         
         # get the Company service
-        $ContactSvc = [CwApiCompanyContactSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        $ContactSvc = [CwApiCompanyContactSvc]::new($Server)
         
         [uint32] $contactCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
