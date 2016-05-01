@@ -18,7 +18,7 @@ function Get-CWServiceBoardStatus
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$BoardID,
-        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [PSObject]$Server = $script:CWServerInfo
     )

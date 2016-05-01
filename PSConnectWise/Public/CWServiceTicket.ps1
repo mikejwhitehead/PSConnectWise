@@ -37,10 +37,10 @@ function Get-CWServiceTicket
         [string[]]$Property,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [int]$SizeLimit,
-        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
-        [Parameter(ParameterSetName='Query', Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server
+        [PSCustomObject]$Server = $script:CWServerInfo
     )
     
     Begin
@@ -181,9 +181,9 @@ function New-CWServiceTicket
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [uint32]$StatusID,
-        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server
+        [PSCustomObject]$Server = $script:CWServerInfo
     )
     
     Begin
@@ -238,7 +238,7 @@ function New-CWServiceTicket
     $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Update-CWServiceTicket -ID 123 -StatusID 11 -Message "Changed the ticket status and added ticket note added to ticket via PowerShell." -Server $CWServer;
 #>
-function Update-CWServiceTicket  
+function Update-CWServiceTicket
 {
     [CmdLetBinding()]
     [OutputType("PSObject", ParameterSetName="Normal")]
@@ -281,10 +281,10 @@ function Update-CWServiceTicket
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [switch]$AddToResolution,
-        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
-        [Parameter(ParameterSetName='WithMessage', Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server
+        [PSCustomObject]$Server = $script:CWServerInfo
     )
     
     Begin
@@ -374,9 +374,9 @@ function Remove-CWServiceTicket
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [int[]]$ID,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server
+        [PSCustomObject]$Server = $script:CWServerInfo
     )
     
     Begin

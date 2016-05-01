@@ -48,9 +48,9 @@ function Get-CWCompany
         [string[]]$Property,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [uint32]$SizeLimit,
-        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='Identifier', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
+        [Parameter(ParameterSetName='Identifier', Position=2, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [PSObject]$Server = $script:CWServerInfo
     )
@@ -58,7 +58,6 @@ function Get-CWCompany
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        [CwApiCompanySvc] $CompanySvr = $null; 
         
         # get the Company service
         $CompanySvc = [CwApiCompanySvc]::new($Server)

@@ -31,8 +31,8 @@ function Get-CWServicePriority
         [string]$Filter,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [int]$SizeLimit,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='Query', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Position=1, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [PSObject]$Server = $script:CWServerInfo
     )

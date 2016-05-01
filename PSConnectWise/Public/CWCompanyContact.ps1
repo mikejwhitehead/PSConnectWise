@@ -27,8 +27,8 @@ function Get-CWCompanyContact
         [Parameter(ParameterSetName='Single', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$ID,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='Single', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Single', Position=1, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [PSObject]$Server = $script:CWServerInfo
     )
