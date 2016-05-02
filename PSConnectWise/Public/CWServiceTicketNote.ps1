@@ -28,10 +28,10 @@ function Get-CWServiceTicketNote
         [Parameter(ParameterSetName='Single', Position=1, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [int32]$NoteID,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='Single', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
+        [Parameter(ParameterSetName='Single', Position=2, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server
+        [PSCustomObject]$Server = $script:CWServerInfo
     )
     
     Begin
@@ -147,12 +147,12 @@ function Add-CWServiceTicketNote
         [switch]$AddToResolution,
         [Parameter(ParameterSetName='Normal', Position=2)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server
+        [PSCustomObject]$Server = $script:CWServerInfo
     )
     
     Begin
     {
-        [CwApiServiceTicketNoteSvc] $NoteSvc = $null; 
+        [CwApiServiceTicketNoteSvc] $NoteSvc = $null;
         
         # get the Note service
         if ($Server -ne $null)

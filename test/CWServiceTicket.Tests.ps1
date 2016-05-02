@@ -9,7 +9,7 @@ Describe 'CWServiceTicket' {
 	[hashtable] $pstrSharedValues = @{};
 	
 	# get the server connnection
-	$pstrServer = Get-CWConnectionInfo -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+	Get-CWConnectionInfo -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
  
 	Context 'Get-CWServiceTicket' {
 		
@@ -18,51 +18,51 @@ Describe 'CWServiceTicket' {
 		
 		It 'gets ticket and checks for the id field' {
 			$ticketID = $pstrTicketID;
-			$ticket = Get-CWServiceTicket -ID $ticketID -Server $pstrServer;
+			$ticket = Get-CWServiceTicket -ID $ticketID;
 			$ticket.id | Should Be $ticketID;		
 		} 
 		
 		It 'gets ticket and pipes it through the Select-Object cmdlet for the id property' {
 			$ticketID = $pstrTicketID;
-			$ticket = Get-CWServiceTicket -ID $ticketID -Server $pstrServer;
+			$ticket = Get-CWServiceTicket -ID $ticketID;
 			$ticket | Select-Object -ExpandProperty id | Should Be $ticketID;		
 		}
 		
 		It 'gets the id and subject properties of a ticket by using the -Property param' {
 			$ticketID = $pstrTicketID;
 			$fields = @("id", "summary");
-			$ticket = Get-CWServiceTicket -ID $ticketID -Property $fields -Server $pstrServer;
+			$ticket = Get-CWServiceTicket -ID $ticketID -Property $fields;
 			$ticket.PSObject.Properties | Measure-Object | Select -ExpandProperty Count | Should Be $fields.Count;		
 		}
 		
 		It 'gets tickets by passing array of ticket ids to the -ID param' {
 			$ticketIDs = $pstrTicketIDs;
-			$tickets = Get-CWServiceTicket -ID $ticketIDs -Server $pstrServer;
+			$tickets = Get-CWServiceTicket -ID $ticketIDs;
 			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $ticketIDs.Count;		
 		}
 		
 		It 'gets list of tickets that were piped to the cmdlet' {
 			$ticketIDs = $pstrTicketIDs;
-			$tickets = $ticketIDs | Get-CWServiceTicket -Server $pstrServer;
+			$tickets = $ticketIDs | Get-CWServiceTicket;
 			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $ticketIDs.Count;		
 		}
 		
 		It 'gets ticket based on the -Filter param' {
 			$filter = "id = $pstrTicketID";
-			$ticket = Get-CWServiceTicket -Filter $filter -Server $pstrServer;
+			$ticket = Get-CWServiceTicket -Filter $filter;
 			$ticket.id | Should Be $pstrTicketID;		
 		}
 		
 		It 'gets ticket based on the -Filter param and uses the SizeLimit param' {
 			$filter = "id IN ($([String]::Join(',', $pstrTicketIDs)))";
 			$sizeLimit =  2;
-			$tickets = Get-CWServiceTicket -Filter $filter -SizeLimit $sizeLimit -Server $pstrServer;
+			$tickets = Get-CWServiceTicket -Filter $filter -SizeLimit $sizeLimit;
 			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit;
 		}
 		
 		It 'gets tickets and sorts ticket id by descending piping cmdlet through Sort-Object cmdlet' {
 			$ticketIDs = $pstrTicketIDs;
-			$tickets = Get-CWServiceTicket -ID $ticketIDs -Server $pstrServer | Sort -Descending id;
+			$tickets = Get-CWServiceTicket -ID $ticketIDs | Sort -Descending id;
 			$maxTicketId = $ticketIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
 			$tickets[0].id | Should Be $maxTicketId;		
 		}
@@ -82,8 +82,7 @@ Describe 'CWServiceTicket' {
 		It "create a new service ticket and check for the ticket number" {
 			$ticket = New-CWServiceTicket -BoardID $pstrTicketBoard -CompanyID $pstrTicketCompany -ContactID $pstrNewTicketContact `
 						-Status $pstrTicketStatus -PriorityID $pstrTicketPriority `
-						-Subject $pstrTicketTitle -Description $pstrTicketBody `
-						-Server $pstrServer;
+						-Subject $pstrTicketTitle -Description $pstrTicketBody
 			$pstrSharedValues.Add("newTicketId", $ticket.id);
 			$pstrSharedValues["newTicketId"] -gt 0 | Should Be $true; 
 		} 
@@ -99,7 +98,7 @@ Describe 'CWServiceTicket' {
 		It "change the status of a ticket" {
 			$ticketID = $pstrTicketID;
 			$statusID = $pstrStatusID;
-			$ticket = Update-CWServiceTicket -ID $ticketID -StatusID $statusID -Server $pstrServer;
+			$ticket = Update-CWServiceTicket -ID $ticketID -StatusID $statusID;
 			$ticket.status.id -eq $statusID | Should Be $true; 
 		}
 		
@@ -108,14 +107,14 @@ Describe 'CWServiceTicket' {
 			$statusID = $pstrStatusID;
 			$boardID  = $pstrBoardID;
 			
-			$ticket = Update-CWServiceTicket -ID $ticketID -StatusID $statusID -BoardID $boardID -Server $pstrServer;
+			$ticket = Update-CWServiceTicket -ID $ticketID -StatusID $statusID -BoardID $boardID;
 			$ticket.status.id -eq $statusID -and $ticket.board.id -eq $boardID | Should Be $true; 
 		}
 		
 		It "add a ticket note to a ticket" {
 			$ticketID = $pstrTicketID;
 			$ticket = Update-CWServiceTicket -ID $ticketID `
-			            -Message "Testing new ticket note via update ticket command." -AddToDescription -Server $pstrServer;
+			            -Message "Testing new ticket note via update ticket command." -AddToDescription;
 			$ticket.id -eq $ticketID | Should Be $true; 
 		}
 		
@@ -124,7 +123,7 @@ Describe 'CWServiceTicket' {
 	Context "Remove-CWServiceTicket"  {
 		
 		It "deletes a ticket and check for a return value of true if successful" {
-			$wasDeleted = Remove-CWServiceTicket -ID $pstrSharedValues["newTicketId"] -Server $pstrServer;
+			$wasDeleted = Remove-CWServiceTicket -ID $pstrSharedValues["newTicketId"];
 			$wasDeleted | Should Be $true; 
 		}
 	

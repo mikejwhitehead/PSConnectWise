@@ -49,6 +49,7 @@ function Get-CWConnectionInfo
     }
     Process
     {
+        [PSObject]$script:CWServerInfo = $connectionInfo
         $connectionInfo
     }
     End

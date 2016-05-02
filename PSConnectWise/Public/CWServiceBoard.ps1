@@ -31,27 +31,19 @@ function Get-CWServiceBoard
         [string]$Filter,
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [int]$SizeLimit,
-        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
-        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$false)]
+        [Parameter(ParameterSetName='Query', Position=2, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$Server
+        [PSObject]$Server = $script:CWServerInfo
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        [CwApiServiceBoardSvc] $BoardSvc = $null; 
+        [CwApiServiceBoardSvc] $BoardSvc = $null
         
         # get the Company service
-        if ($Server -ne $null)
-        {
-            $BoardSvc = [CwApiServiceBoardSvc]::new($Server);
-        } 
-        else 
-        {
-            # TODO: determine whether or not to keep this as an option
-            $BoardSvc = [CwApiServiceBoardSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
-        }
+        $BoardSvc = [CwApiServiceBoardSvc]::new($Server)
         
         [uint32] $boardCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
