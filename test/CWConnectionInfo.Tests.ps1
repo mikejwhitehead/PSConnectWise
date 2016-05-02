@@ -11,7 +11,7 @@ Describe 'CWConnectionInfo' {
 	
 		It 'gets server connection information and checks it for the domain' {
 			$server = Get-CWConnectionInfo -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
-			$server.Domain | Should Be $pstrSvrDomain		
+			$server.Domain | Should Be $pstrSvrDomain
 		}
 		
 	}

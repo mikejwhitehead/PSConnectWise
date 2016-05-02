@@ -41,28 +41,19 @@ function Get-CWCompanyContact
         [uint32]$SizeLimit = 100,
         [Parameter(ParameterSetName='Normal')]
         [switch]$Descending,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='Single', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [Parameter(ParameterSetName='Single', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$Server
+        [PSObject]$Server = $script:CWServerInfo
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        [CwApiCompanyContactSvc] $ContactSvc = $null; 
         [string]$OrderBy = [String]::Empty;
-        
+
         # get the Company service
-        if ($Server -ne $null)
-        {
-            $ContactSvc = [CwApiCompanyContactSvc]::new($Server);
-        } 
-        else 
-        {
-            # TODO: determine whether or not to keep this as an option
-            $ContactSvc = [CwApiCompanyContactSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
-        }
+        $ContactSvc = [CwApiCompanyContactSvc]::new($Server);
         
         [uint32] $contactCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

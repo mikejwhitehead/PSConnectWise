@@ -23,27 +23,18 @@ function Get-CWServiceBoardSubtype
         [uint32]$BoardID,
         [Parameter(ParameterSetName='Normal')]
         [switch]$Descending,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$Server
+        [PSObject]$Server = $script:CWServerInfo
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        [CwApiServiceBoardSubtypeSvc] $BoardTypeSvc = $null; 
         [string]$OrderBy = [String]::Empty;
         
-        # get the Company service
-        if ($Server -ne $null)
-        {
-            $BoardTypeSvc = [CwApiServiceBoardSubtypeSvc]::new($Server);
-        } 
-        else 
-        {
-            # TODO: determine whether or not to keep this as an option
-            $BoardTypeSvc = [CwApiServiceBoardSubtypeSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
-        }
+        # get the BoardSubtype service
+        $BoardTypeSvc = [CwApiServiceBoardSubtypeSvc]::new($Server);
         
         [uint32] $typeCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

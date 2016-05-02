@@ -33,27 +33,19 @@ function Get-CWServiceTicketNote
         [int32]$NoteID,
         [Parameter(ParameterSetName='Normal')]
         [switch]$Descending,
-        [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$true)]
-        [Parameter(ParameterSetName='Single', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [Parameter(ParameterSetName='Single', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server
+        [PSCustomObject]$Server = $script:CWServerInfo
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        [CwApiServiceTicketNoteSvc] $NoteSvc = $null; 
         [string]$OrderBy = [String]::Empty;
         
         # get the Note service
-        if ($Server -ne $null)
-        {
-            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Server);
-        } 
-        else 
-        {
-            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
-        }
+        $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Server);
         
         [uint32] $noteCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
@@ -159,12 +151,12 @@ function Add-CWServiceTicketNote
         [switch]$AddToResolution,
         [Parameter(ParameterSetName='Normal', Position=2)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server
+        [PSCustomObject]$Server = $script:CWServerInfo
     )
     
     Begin
     {
-        [CwApiServiceTicketNoteSvc] $NoteSvc = $null; 
+        [CwApiServiceTicketNoteSvc] $NoteSvc = $null;
         
         # get the Note service
         if ($Server -ne $null)

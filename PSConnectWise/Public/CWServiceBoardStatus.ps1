@@ -23,27 +23,18 @@ function Get-CWServiceBoardStatus
         [uint32]$BoardID,
         [Parameter(ParameterSetName='Normal')]
         [switch]$Descending,
-        [Parameter(ParameterSetName='Normal', Position=2, Mandatory=$true)]
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$Server
+        [PSObject]$Server = $script:CWServerInfo
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
-        [CwApiServiceBoardStatusSvc] $BoardStatusSvc = $null; 
         [string]$OrderBy = [String]::Empty;
         
-        # get the Company service
-        if ($Server -ne $null)
-        {
-            $BoardStatusSvc = [CwApiServiceBoardStatusSvc]::new($Server);
-        } 
-        else 
-        {
-            # TODO: determine whether or not to keep this as an option
-            $BoardStatusSvc = [CwApiServiceBoardStatusSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
-        }
+        # get the BoardStatus service
+        $BoardStatusSvc = [CwApiServiceBoardStatusSvc]::new($Server);
         
         [uint32] $statusCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

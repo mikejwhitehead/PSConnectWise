@@ -16,13 +16,13 @@ Describe 'CWServiceBoardSubtype' {
 	
 		It 'gets board status and check that the results is an array' {
 			$boardID = $pstrBoardID;
-			$types = Get-CWServiceBoardSubtype -BoardID $boardID -Server $pstrServer;
+			$types = Get-CWServiceBoardSubtype -BoardID $boardID;
 			$types.GetType().BaseType.Name | Should Be "Array";		
 		}
 		
 		It 'gets board and pipes it through the Select-Object cmdlet for the id property of the first object' {
 			$boardID = $pstrBoardID;
-			$type = Get-CWServiceBoardSubtype -BoardID $boardID -Server $pstrServer | Select-Object boardId -First 1;
+			$type = Get-CWServiceBoardSubtype -BoardID $boardID | Select-Object boardId -First 1;
 			$type | Select-Object -ExpandProperty boardId | Should Be $boardID;		
 		}
 	
