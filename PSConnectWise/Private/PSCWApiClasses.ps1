@@ -59,12 +59,12 @@ class WebRestApiRequest
     {
         if ([String]::IsNullOrWhiteSpace($this.Body))
         {
-            Write-Debug "REST Request Details:  $($this | Select Url, Header, Verb | ConvertTo-Json -Depth 10 | Out-String)";
+            Write-Debug "REST Request Details:  $($this | Select-Object Url, Header, Verb | ConvertTo-Json -Depth 10 | Out-String)";
             $this.Response = Invoke-WebRequest -Uri $this.Url -Method $this.Verb -Headers $this.Header -ContentType $this.contentType -UseBasicParsing;   
         }
         else
         {
-            Write-Debug "REST Request Details:  $($this | Select Url, Header, Verb, Body | ConvertTo-Json -Depth 10 | Out-String)";
+            Write-Debug "REST Request Details:  $($this | Select-Object Url, Header, Verb, Body | ConvertTo-Json -Depth 10 | Out-String)";
             $this.Response = Invoke-WebRequest -Uri $this.Url -Method $this.Verb -Headers $this.Header -Body $this.Body -ContentType $this.contentType -UseBasicParsing;       
         }
     
@@ -428,12 +428,12 @@ class CWApiRestClient
                 else 
                 {
                     # do not create an operation obj if the property value is null or numeric value is 0
-                    if ($objDetail.Value -eq $null -or ($objDetail.Value.GetType().IsValueType -and $objDetail.Value -eq 0))
+                    if ($null -eq $objDetail.Value -or ($objDetail.Value.GetType().IsValueType -and $objDetail.Value -eq 0))
                     {
                         continue;
                     }
                     
-                    $patchOperation.path += $objDetail.Name.ToLower() ;
+                    $patchOperation.path += $objDetail.Name.ToLower();
                     $patchOperation.value = $objDetail.Value.ToString();
                     $postInfoCollection += $patchOperation;
                 }
@@ -717,7 +717,7 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         return $newTicket;
     }
     
-    [bool] DeleteTicket ([uint32] $ticketID)
+    [bool] DeleteTimeEntry ([uint32] $ticketID)
     {
         $relativePathUri = "/$ticketID";
         return $this.DeleteRequest($relativePathUri);
@@ -728,6 +728,44 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         return $this.GetCount($ticketConditions);
     }
 }
+
+class CwApiServiceTicketExtendedSvc : CwApiServiceTicketSvc
+{
+    CwApiServiceTicketExtendedSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
+    {
+    }
+    
+    CwApiServiceTicketExtendedSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    {
+    }
+
+    [psobject[]] ReadTicketTimeEntries ([uint32] $ticketId)
+    {
+        return $this.ReadTicketTimeEntries($ticketID)    
+    }
+
+    [psobject[]] ReadTicketTimeEntries ([uint32] $ticketId, $pageNum, $pageSize)
+    {
+        [hashtable] $queryParams = @{
+            page       = $pageNum;
+            pageSize   = $pageSize;
+        }
+
+        $relativePathUri = "/$ticketID/timeentries";
+        
+        return $this.ReadRequest($relativePathUri, $queryParams);
+    }
+    
+
+    [uint32] ReadTicketTimeEntryCount ([uint32] $ticketId)
+    {
+        $relativePathUri = "/$ticketID/timeentries/count";
+        
+        $timeEntryCount = $this.ReadRequest($relativePathUri, $null);
+
+        return $timeEntryCount[0].count; 
+    }
+} 
 
 class CwApiServiceBoardSvc : CWApiRestClientSvc
 {
@@ -1272,3 +1310,122 @@ class CwApiCompanyContactSvc : CWApiRestClientSvc
     }
     
 }
+
+class CwApiTimeEntrySvc : CWApiRestClientSvc
+{
+    
+    CwApiTimeEntrySvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/time/entries";
+    }
+    
+    [psobject] ReadTimeEntry ([uint32] $timeEntryId)
+    {
+        $relativePathUri = "/$timeEntryId";
+        return $this.ReadRequest($relativePathUri, $null);
+    }
+    
+    [psobject[]] ReadTimeEntries ([uint32] $ticketId)
+    {
+        return $this.ReadTimeEntries($ticketId, 1, 0)
+    }
+    
+    [psobject[]] ReadTimeEntries ([uint32] $ticketId, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        $TicketExtendedSvc = [CwApiServiceTicketExtendedSvc]::New($this.CWApiClient.CWConnectionInfo); 
+        [psobject[]] $ticketEntries = $TicketExtendedSvc.ReadTicketTimeEntries($ticketId, $pageNum, $pageSize);
+
+        [string] $ids = ""
+        for ($i = 0; $i -lt $ticketEntries.Count; $i++)
+        {
+            $ids += [string] $ticketEntries[$i].id;
+
+            if ($i -lt $ticketEntries.Count - 1)
+            {
+                $ids += ",";
+            }
+        }
+
+        [hashtable] $queryHashtable = @{
+            conditions = "id in ($ids)"
+        }
+
+        return $this.ReadRequest($null, $queryHashtable);
+    }
+    
+    [psobject[]] CreateTimeEntry ([uint32] $ticketId, [DateTime] $start, [DateTime] $end,  [string] $message, [ServiceTicketNoteTypes[]] $addTo, [uint32] $memberId, [string] $billOption)
+    {
+        $TicketSvc = [CwApiServiceTicketSvc]::New($this.CWApiClient.CWConnectionInfo); 
+        $ticket =  $TicketSvc.ReadTicket($ticketId);
+        [psobject[]] $postedEntries = @();
+        
+        
+        [hashtable[]] $entries = Split-TimeSpan -Start $start -End $end -UniversalTime;
+         
+        for ($i = 0; $i -lt $entries.Count; $i++)
+        {
+            $entry = $entries[$i];
+            
+            [hashtable] $timeEntryInfo = @{
+                ChargeToType           = $ticket.recordType;
+                ChargeToId             = $ticket.id;
+                TimeStart              = (Get-Date $entry.Start).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ');
+                TimeEnd                = (Get-Date $entry.End).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ');
+                Company                = [pscustomobject] @{ id = $ticket.company.id };
+                Member                 = @{ $true = [pscustomobject] @{ id = $memberId }; $false = $null }[ ![String]::IsNullOrEmpty($memberId) ];
+                BillableOption        = @{ $true = [string]$billOption; $false = 'DoNotBill' }[ [String]::IsNullOrEmpty($billOption) ];
+            }
+            
+            
+            
+            if ($i -eq $entries.Count - 1)
+            {
+                # only include the messaging if it is the last time entries to add to the ticket
+                $timeEntryInfo.Add("Notes", [string]$message);
+                $timeEntryInfo.Add("AddToDetailDescriptionFlag", [ServiceTicketNoteTypes]::Description -in $addTo);
+                $timeEntryInfo.Add("AddToInternalAnalysisFlag", [ServiceTicketNoteTypes]::Internal -in $addTo);
+                $timeEntryInfo.Add("AddToResolutionFlag", [ServiceTicketNoteTypes]::Resolution -in $addTo);
+                
+                # add internal note if there was more than one time entries for this space
+                $internalMessage = "#$($i + 1) of $($entries.Count) Time Entries: $($start.ToString('yyyy-MM-dd HH:mm:ss')) to $($end.ToString('yyyy-MM-dd HH:mm:ss'))";
+                $timeEntryInfo.Add("internalNotes", [string]$internalMessage);                
+            } 
+            else
+            {
+                # include internal notes this is one of multiple time entires
+                $internalMessage = "#$($i + 1) of $($entries.Count) Time Entries: $($start.ToString('yyyy-MM-dd HH:mm:ss')) to $($end.ToString('yyyy-MM-dd HH:mm:ss'))";
+                $timeEntryInfo.Add("Notes", [string]$internalMessage);
+                $timeEntryInfo.Add("AddToDetailDescriptionFlag", $true);
+                $timeEntryInfo.Add("internalNotes", [string]$internalMessage);
+                
+                # disable email notification on the these times entries
+                $timeEntryInfo.Add("emailResourceFlag", $false);
+                $timeEntryInfo.Add("emailContactFlag", $false);
+                $timeEntryInfo.Add("emailCcFlag", $false);
+            }
+                
+            $postedEntries += $this.CreateRequest($null, $timeEntryInfo); 
+        }
+        
+        return $postedEntries;
+    }
+
+    [bool] DeleteTimeEntry ([uint32] $timeEntryId)
+    {
+        $relativePathUri = "/$timeEntryId";
+        return $this.DeleteRequest($relativePathUri);
+    }
+    
+    [uint32] GetTimeEntryCount ([uint32] $ticketID)
+    {
+        $TicketExtendedSvc = [CwApiServiceTicketExtendedSvc]::New($this.CWApiClient.CWConnectionInfo); 
+        return $TicketExtendedSvc.ReadTicketTimeEntryCount($ticketId);
+    }
+    
+    [uint32] GetTimeEntryCount ([string] $conditions)
+    {
+        return $this.GetCount($conditions);
+    }
+    
+}
+

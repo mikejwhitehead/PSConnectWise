@@ -1,14 +1,14 @@
-#PSConnectWise  
+# PSConnectWise  
 
 Collection of PowerShell functions that interface with ConnectWise's REST API service. This project
 is meant to target the latest general releases of PowerShell (i.e. PS v5.0) and ConnectWise.
 
-###Functions
+### Functions
 Goal of the version of v1.0 was to create the minimum required PowerShell functions that is needed 
 to properly create, read, update, and delete a ConnectWise ticket. While doing so, develop a core 
 that will easly allow for future functions to be added. 
 
-######Service Module
+###### Service Module
 0. `Get-CWServiceTicket`
 0. `New-CWServiceTicket`
 0. `Update-CWServiceTicket`
@@ -21,12 +21,15 @@ that will easly allow for future functions to be added.
 0. `Get-CWServiceTicketNote`
 0. `Add-CWServiceTicketNote`
 
-######Company Module
+###### Company Module
 0. `Get-CWCompany`
 0. `Get-CWCompanyContact`
+
+###### TimeEntry Module
+0. `Get-CWTimeEntry`
+0. `Remove-CWTimeEntry`
         
-        
-##Requirements
+## Requirements
 
 - PowerShell 5.0
 - ConnectWise Server v2015.3 or Newer
@@ -35,7 +38,7 @@ that will easly allow for future functions to be added.
   - On permise CW server and CW API server are the same.
   - Cloud based CW server and CW API server are **not** the same.
 
-##Import Module to PS Session
+## Import Module to PS Session
 
 0. Download or Clone this Repository
 0. Open PowerShell
@@ -43,16 +46,16 @@ that will easly allow for future functions to be added.
    - `Import-Module "...\PSConnectWise\PSConnectWise\PSConnectWise.psm1" -Force;`
 0. Functions are Imported and Ready to Use
 
-##Examples
+## Examples
 
-####Get ConnectWise Ticket
+#### Get ConnectWise Ticket
 
-#####Execute
+##### Execute
 ```powershell
 $Server = Get-CWConnectionInfo -Domain 'TechInUrPocket.example.com' -CompanyName 'TechInUrPocket' -PublicKey '...' -PrivateKey '...';`
 Get-CWServiceTicket -ID 1234567 -Server $Server;
 ```
-#####Returns
+##### Returns
 ```powershell
 id                         : 1234567
 summary                    : My Computer is Broken
@@ -62,18 +65,17 @@ status                     : @{id=1; name=New; _info=}
 ... 
 ```
 
-##Contributing
+## Contributing
 
 See the [Contributing Documentation](./CONTRIBUTING.md)
 
-##Extra Information
+## Extra Information
 - [Test Directory](./test/) Stores the Unit Test Scripts for [Pester](https://github.com/pester/Pester).
   - See [Readme](https://github.com/sgtoj/ConnectWisePSModule/tree/master/pester)
 - [Documented Architecture](https://github.com/sgtoj/ConnectWisePSModule/blob/master/doc/ClassArchitectures.md) of the Dependent PS Classes
   - It is not required to read or understand it to use PowerShell function.
   - Its target is future contributors to this project.
   
-  
-##License
+## License
 
 [MIT](./LICENSE.txt)

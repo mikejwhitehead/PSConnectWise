@@ -1,0 +1,278 @@
+<#
+.SYNOPSIS
+    Gets time entries of a ConnectWise ticket. 
+.PARAMETER TicketID
+    ConnectWise ticket ID
+.PARAMETER ID
+    ConnectWise ticket note ID
+.PARAMETER Descending
+    Changes the sorting to descending order by IDs
+.PARAMETER Server
+    Variable to the object created via Get-CWConnectWiseInfo
+.EXAMPLE
+    Get-CWTimeEntry -ID 99;
+.EXAMPLE
+    Get-CWTimeEntry -TicketID 123 -Descending;
+#>
+function Get-CWTimeEntry
+{
+    [CmdLetBinding()]
+    [OutputType("PSObject[]", ParameterSetName="Normal")]
+    [OutputType("PSObject", ParameterSetName="Single")]
+    [CmdletBinding(DefaultParameterSetName="Normal")]
+    param
+    (
+        [Parameter(ParameterSetName='Single', Position=1, Mandatory=$true, ValueFromPipeline=$true)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$ID,
+        [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$TicketID,
+        [Parameter(ParameterSetName='Normal')]
+        [switch]$Descending,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [Parameter(ParameterSetName='Single', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]$Server = $script:CWServerInfo
+    )
+    
+    Begin
+    {
+        $MAX_ITEMS_PER_PAGE = 50;
+        [string]$OrderBy = [String]::Empty;
+        
+        # get the TimeEntry service
+        $TimeSvc = [CwApiTimeEntrySvc]::new($Server);
+        
+        [uint32] $entryCount = $MAX_ITEMS_PER_PAGE;
+        [uint32] $pageCount  = 1;
+        
+        # get the number of pages of time entries to request and total entry count
+        if ($null -ne $Ticket -and $TicketID -gt 0)
+        {
+            $entryCount = $TimeSvc.GetTimeEntryCount($TicketID);
+            Write-Debug "Total Count of Ticket Time Entries for Ticket ($TicketID): $entryCount";
+            
+            if ($null -ne $SizeLimit -and $SizeLimit -gt 0)
+            {
+                Write-Verbose "Total Ticket Entry Count Excess SizeLimit; Setting Entry Note Count to the SizeLimit: $SizeLimit"
+                $entryCount = [Math]::Min($entryCount, $SizeLimit);
+            }
+            $pageCount = [Math]::Ceiling([double]($entryCount / $MAX_ITEMS_PER_PAGE));
+            
+            Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Ticket Entry Per Pages): $pageCount";
+        }
+        
+        #specify the ordering
+        if ($Descending)
+        {
+            $OrderBy = " id desc";
+        }
+    }
+    Process
+    {
+        
+        for ($pageNum = 1; $pageNum -le $pageCount; $pageNum++)
+        {
+            if ($ID -eq 0)
+            {
+                
+                if ($null -ne $entryCount -and $entryCount -gt 0)
+                {
+                    # find how many Companies to retrieve
+                    $itemsRemainCount = $entryCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsPerPage = [Math]::Min($itemsRemainCount, $MAX_ITEMS_PER_PAGE);
+                }  
+                
+                Write-Debug "Requesting Note Entries for Ticket: $TicketID";
+                $queriedTimeEntries = $TimeSvc.ReadTimeEntries($TicketID, $pageNum, $itemsPerPage);
+                [psobject[]] $Entries = $queriedTimeEntries;
+            
+            } else {
+                
+                Write-Verbose "Requesting ConnectWise Time Entry for Ticket Number: $($Entry.id)";
+                $Entries = $TimeSvc.ReadTimeEntry($ID);
+          
+            } 
+            
+            foreach ($Entry in $Entries)
+            {
+                $Entry;
+            } 
+                
+        }
+    }
+    End
+    {
+        # do nothing here
+    }
+}
+
+<#
+.SYNOPSIS
+    Adds a new note to a ConnectWise ticket. 
+.PARAMETER TicketID
+    ID of the ConnectWise ticket to update
+.PARAMETER Start
+    Start time and date of the time entry
+.PARAMETER End
+    End time and date of the time entry
+.PARAMETER Message
+    New message to be added to Detailed Description, Internal Analysis, and/or Resolution section
+.PARAMETER AddToDescription
+    Instructs the value of `-Message` to the Detailed Description
+.PARAMETER AddToInternal
+    Instructs the value of `-Message` to the Internal Analysis
+.PARAMETER AddToResolution
+    Instructs the value of `-Message` to the Resolution
+.PARAMETER BillOption
+   Type of billing for the time entry
+.PARAMETER MemberID
+    ConnectWise memeber ID of the CW user the time entry should be applied against
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Add-CWServiceTicketNote -ID 123 -Message "Added ticket note added to ticket via PowerShell." -Server $CWServer;
+#>
+function Add-CWTimeEntry 
+{
+    [CmdLetBinding()]
+    [OutputType("PSObject[]", ParameterSetName="Normal")]
+    [CmdletBinding(DefaultParameterSetName="Normal")]
+    param
+    (
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$TicketID,
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [DateTime]$Start,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [DateTime]$End = (Get-Date),
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Message,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [switch]$AddToDescription,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [switch]$AddToInternal,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [switch]$AddToResolution,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateSet('Billable', 'DoNotBill', 'NoCharge', 'NoDefault')]
+        [ValidateNotNullOrEmpty()]
+        [string]$BillOption = "DoNotBill",
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$MemberID = 0,
+        [Parameter(ParameterSetName='Normal', Position=2)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]$Server = $script:CWServerInfo
+    )
+    
+    Begin
+    {
+        [CwApiTimeEntrySvc] $TimeSvc = $null;
+        
+        # get the Note service
+        if ($Server -ne $null)
+        {
+            $TimeSvc = [CwApiTimeEntrySvc]::new($Server);
+        } 
+        
+        [ServiceTicketNoteTypes[]] $addTo = @();
+        
+        if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
+        {
+            # defaults to detail description if no AddTo switch were passed
+            $AddToDescription = $true
+        }
+        
+        if ($AddToDescription -eq $true)
+        {
+            $addTo += [ServiceTicketNoteTypes]::Description;
+        }
+        if ($AddToInternal -eq $true)
+        {
+            $addTo += [ServiceTicketNoteTypes]::Internal;
+        }
+        if ($AddToResolution -eq $true)
+        {
+            $addTo += [ServiceTicketNoteTypes]::Resolution;
+        }   
+    }
+    Process
+    {
+        $newTimeEntries = $TimeSvc.CreateTimeEntry($TicketID, $Start, $End, $Message, $addTo, $MemberID, $BillOption);
+        return $newTimeEntries;
+    }
+    End
+    {
+        # do nothing here
+    }
+}
+
+<#
+.SYNOPSIS
+    Removes ConnectWise time entry information. 
+.PARAMETER ID
+    ConnectWise time entry ID
+.PARAMETER Server
+    Variable to the object created via Get-CWConnectWiseInfo
+.EXAMPLE
+    Remove-CWServiceTicket -ID 1;
+#>
+function Remove-CWTimeEntry 
+{
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact="Medium")]   
+    [OutputType("Boolean", ParameterSetName="Normal")]
+    param
+    (
+        [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
+        [ValidateNotNullOrEmpty()]
+        [int[]]$ID,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [switch]$Force,        
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]$Server = $script:CWServerInfo
+    )
+    
+    Begin
+    {
+        [CwApiTimeEntrySvc] $TimeEntrySvc = $null; 
+        
+        # get the Ticket service
+        if ($Server -ne $null)
+        {
+            $TimeEntrySvc = [CwApiTimeEntrySvc]::new($Server);
+        } 
+    }
+    Process
+    {
+        Write-Debug "Deleting ConnectWise Time Entries by Ticket ID"
+        
+        foreach ($entry in $ID)
+        {
+            if ($Force -or $PSCmdlet.ShouldProcess($entry))
+            {
+                return $TimeEntrySvc.DeleteTimeEntry($entry);
+            }
+            else
+            {
+                return $true;
+            }
+        }
+    }
+    End 
+    {
+        # do nothing here
+    }
+}
+
+Export-ModuleMember -Function 'Get-CWTimeEntry';
+Export-ModuleMember -Function 'Add-CWTimeEntry';
+Export-ModuleMember -Function 'Remove-CWTimeEntry';

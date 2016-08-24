@@ -162,10 +162,6 @@ function Add-CWServiceTicketNote
         if ($Server -ne $null)
         {
             $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Server);
-        } 
-        else 
-        {
-            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         }
         
         [ServiceTicketNoteTypes[]] $addTo = @();

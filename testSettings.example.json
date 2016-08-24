@@ -40,6 +40,11 @@
             "ticketContact": 777,
             "ticketStatus": 105,
             "ticketPriority": 8
+        }, 
+
+        // values to be used when testing time entries
+        "timeEntry": {
+            "memberid": 0
         }   
              
     }
