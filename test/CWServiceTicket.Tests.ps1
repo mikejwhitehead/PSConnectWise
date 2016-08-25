@@ -5,7 +5,7 @@ Import-Module "$WorkspaceRoot\PSConnectWise\PSConnectWise.psm1" -Force
 
 Describe 'CWServiceTicket' {
 	
-	. "$WorkspaceRoot\test\LoadTestSettings.ps1"
+	. $($WorkspaceRoot + '\test\LoadTestSettings.ps1');
 	[hashtable] $pstrSharedValues = @{};
 	
 	# get the server connnection
@@ -35,19 +35,19 @@ Describe 'CWServiceTicket' {
 			$ticketID = $pstrTicketID;
 			$fields = @("id", "summary");
 			$ticket = Get-CWServiceTicket -ID $ticketID -Property $fields;
-			$ticket.PSObject.Properties | Measure-Object | Select -ExpandProperty Count | Should Be $fields.Count;		
+			$ticket.PSObject.Properties | Measure-Object | Select-Object -ExpandProperty Count | Should Be $fields.Count;		
 		}
 		
 		It 'gets tickets by passing array of ticket ids to the -ID param' {
 			$ticketIDs = $pstrTicketIDs;
 			$tickets = Get-CWServiceTicket -ID $ticketIDs;
-			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $ticketIDs.Count;		
+			$tickets | Measure-Object | Select-Object -ExpandProperty Count | Should Be $ticketIDs.Count;		
 		}
 		
 		It 'gets list of tickets that were piped to the cmdlet' {
 			$ticketIDs = $pstrTicketIDs;
 			$tickets = $ticketIDs | Get-CWServiceTicket;
-			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $ticketIDs.Count;		
+			$tickets | Measure-Object | Select-Object -ExpandProperty Count | Should Be $ticketIDs.Count;		
 		}
 		
 		It 'gets ticket based on the -Filter param' {
@@ -60,13 +60,13 @@ Describe 'CWServiceTicket' {
 			$filter = "id IN ($([String]::Join(',', $pstrTicketIDs)))";
 			$sizeLimit =  2;
 			$tickets = Get-CWServiceTicket -Filter $filter -SizeLimit $sizeLimit;
-			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit;
+			$tickets | Measure-Object | Select-Object -ExpandProperty Count | Should Be $sizeLimit;
 		}
 		
 		It 'gets tickets and sorts ticket id by descending piping cmdlet through Sort-Object cmdlet' {
 			$ticketIDs = $pstrTicketIDs;
-			$tickets = Get-CWServiceTicket -ID $ticketIDs | Sort -Descending id;
-			$maxTicketId = $ticketIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
+			$tickets = Get-CWServiceTicket -ID $ticketIDs | Sort-Object -Descending id;
+			$maxTicketId = $ticketIDs | Measure-Object -Maximum | Select-Object -ExpandProperty Maximum
 			$tickets[0].id | Should Be $maxTicketId;		
 		}
 		
@@ -74,7 +74,7 @@ Describe 'CWServiceTicket' {
 			$sizeLimit = 5;
 			$ticketSummary = ($pstrSharedValues['ticket'].summary);
 			$tickets = Get-CWServiceTicket -Summary "$ticketSummary*" -SizeLimit $sizeLimit;
-			$count = $tickets | Measure-Object | Select -ExpandProperty Count;
+			$count = $tickets | Measure-Object | Select-Object -ExpandProperty Count;
 			$count -gt 0 -and $count -le $sizeLimit | Should Be $true;
 		}
 		
@@ -98,7 +98,7 @@ Describe 'CWServiceTicket' {
 		
 		$pstrTicketCompany  = $pstrProcNewTicket.ticketCompany
 		$pstrTicketBoard    = $pstrProcNewTicket.ticketBoard
-		$pstrTicketContact  = $pstrProcNewTicket.ticketContact
+		#$pstrTicketContact  = $pstrProcNewTicket.ticketContact
 		$pstrTicketStatus   = $pstrProcNewTicket.ticketStatus
 		$pstrTicketPriority = $pstrProcNewTicket.ticketPriority
 		$pstrTicketTitle    = $pstrProcNewTicket.ticketTitle

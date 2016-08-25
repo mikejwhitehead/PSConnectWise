@@ -120,7 +120,7 @@ function Get-CWCompanyContact
             if ($ID -eq 0)
             {
 
-                if ($contactCount -ne $null -and $contactCount -gt 0)
+                if ($null -ne $contactCount -and $contactCount -gt 0)
                 {
                     # find how many Companies to retrieve
                     $itemsRemainCount = $contactCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);

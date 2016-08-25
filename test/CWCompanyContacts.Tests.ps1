@@ -5,7 +5,7 @@ Import-Module "$WorkspaceRoot\PSConnectWise\PSConnectWise.psm1" -Force
 
 Describe 'CWCompanyContact' {
 	
-	. "$WorkspaceRoot\test\LoadTestSettings.ps1";
+	. $($WorkspaceRoot + '\test\LoadTestSettings.ps1');
 	[hashtable] $pstrSharedValues = @{};
 	
 	# get the server connnection
@@ -13,9 +13,9 @@ Describe 'CWCompanyContact' {
 	
 	Context 'Get-CWCompanyContact' {
 
-		$pstrCompanyIDs  = $pstrComp.companyIds;
+		#$pstrCompanyIDs  = $pstrComp.companyIds;
 		$pstrCompanyID   = $pstrComp.companyIds[0];
-		$pstrContactIDs  = $pstrComp.contactIds;
+		#$pstrContactIDs  = $pstrComp.contactIds;
 		$pstrContactID   = $pstrComp.contactIds[0];
 	
 		It 'gets a single contact' {
@@ -42,7 +42,7 @@ Describe 'CWCompanyContact' {
 			$firstName = $pstrSharedValues['contact'].firstname;
 			$companyID = $pstrSharedValues['contact'].company.id;
 			$contacts = Get-CWCompanyContact -CompanyID $companyID -FirstName $firstName -SizeLimit $sizeLimit;
-			$contact = $contacts | Select -First 1; 
+			$contact = $contacts | Select-Object -First 1; 
 			$contact.id -gt 0 |  Should Be $true;		
 		}
 
@@ -57,7 +57,7 @@ Describe 'CWCompanyContact' {
 			$lastName = $pstrSharedValues['contact'].lastname;
 			$companyID = $pstrSharedValues['contact'].company.id;
 			$contacts = Get-CWCompanyContact -CompanyID $companyID -LastName $lastName -SizeLimit $sizeLimit;
-			$contact = $contacts | Select -First 1; 
+			$contact = $contacts | Select-Object -First 1; 
 			$contact.id -gt 0 |  Should Be $true;		
 		}
 		
@@ -65,7 +65,7 @@ Describe 'CWCompanyContact' {
 			$sizeLimit = 5;
 			$companyID = $pstrSharedValues['contact'].company.id;
 			$contacts = Get-CWCompanyContact -CompanyID $companyID -FirstName "*" -SizeLimit $sizeLimit;
-			$contact = $contacts | Select -First 1; 
+			$contact = $contacts | Select-Object -First 1; 
 			$contact.id -gt 0 |  Should Be $true;		
 		}
 		
@@ -73,7 +73,7 @@ Describe 'CWCompanyContact' {
 			$sizeLimit = 5;
 			$companyID = $pstrSharedValues['contact'].company.id;
 			$contacts = Get-CWCompanyContact -CompanyID $companyID -LastName "*" -SizeLimit $sizeLimit;
-			$contact = $contacts | Select -First 1; 
+			$contact = $contacts | Select-Object -First 1; 
 			$contact.id -gt 0 |  Should Be $true;		
 		}
 		

@@ -5,7 +5,7 @@ Import-Module "$WorkspaceRoot\PSConnectWise\PSConnectWise.psm1" -Force
 
 Describe 'CWTimeEntry' {
 	
-	. "$WorkspaceRoot\test\LoadTestSettings.ps1"
+	. $($WorkspaceRoot + '\test\LoadTestSettings.ps1');
 	[hashtable] $pstrSharedValues = @{};
 	
 	# get the server connnection

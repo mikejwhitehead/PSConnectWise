@@ -98,7 +98,7 @@ function Get-CWServiceBoard
         
         # determines if to select all fields or specific fields
         [string[]] $Properties = $null;
-        if ($Property -ne $null)
+        if ($null -ne $Property)
         {
             if (!($Property.Length -eq 1 -and $Property[0].Trim() -ne "*"))
             {
@@ -115,7 +115,7 @@ function Get-CWServiceBoard
             if (![String]::IsNullOrWhiteSpace($Filter))
             {
                 
-                if ($boardCount -ne $null -and $boardCount -gt 0)
+                if ($null -ne $boardCount -and $boardCount -gt 0)
                 {
                     # find how many Companies to retrieve
                     $itemsRemainCount = $boardCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
@@ -129,7 +129,7 @@ function Get-CWServiceBoard
                 foreach ($Board in $Boards)
                 {
                     Write-Verbose "Requesting ConnectWise Board Number: $Board";
-                    if ($Properties -eq $null -or $Properties.Length -eq 0)
+                    if ($null -eq $Properties -or $Properties.Length -eq 0)
                     {
                         $Board;
                     }
@@ -145,7 +145,7 @@ function Get-CWServiceBoard
                 foreach ($Board in $ID)
                 {
                     Write-Verbose "Requesting ConnectWise Board Number: $Board";
-                    if ($Properties -eq $null -or $Properties.Length -eq 0)
+                    if ($null -eq $Properties -or $Properties.Length -eq 0)
                     {
                         $BoardSvc.ReadBoard($Board);
                     }

@@ -5,10 +5,10 @@ Import-Module "$WorkspaceRoot\PSConnectWise\PSConnectWise.psm1" -Force
 
 Describe 'CWServiceBoardSubtype' {
 
-	. "$WorkspaceRoot\test\LoadTestSettings.ps1"
+	. $($WorkspaceRoot + '\test\LoadTestSettings.ps1');
 	
 	# get the server connnection
-	$pstrServer = Get-CWConnectionInfo -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+	Get-CWConnectionInfo -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 	
 	Context 'Get-CWServiceBoardSubtype' {
 		

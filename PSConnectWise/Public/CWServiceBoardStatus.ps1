@@ -44,7 +44,7 @@ function Get-CWServiceBoardStatus
         {
             $statusCount = $BoardStatusSvc.GetStatusCount([uint32]$BoardID);
             
-            if ($SizeLimit -ne $null -and $SizeLimit -gt 0)
+            if ($null -ne $SizeLimit -and $SizeLimit -gt 0)
             {
                 Write-Verbose "Total Board Count Excess SizeLimit; Setting Board Count to the SizeLimit: $SizeLimit"
                 $statusCount = [Math]::Min($statusCount, $SizeLimit);
@@ -67,7 +67,7 @@ function Get-CWServiceBoardStatus
             if ($BoardID -gt 0)
             {
                 
-                if ($statusCount -ne $null -and $statusCount -gt 0)
+                if ($null -ne $statusCount -and $statusCount -gt 0)
                 {
                     # find how many Companies to retrieve
                     $itemsRemainCount = $statusCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
@@ -83,7 +83,7 @@ function Get-CWServiceBoardStatus
                     $Status
                 }
                 
-            }  elseif ($StatusID -ne $null) {
+            }  elseif ($null -ne $StatusID) {
                 
                 Write-Debug "Retrieving ConnectWise Status by Ticket ID"
                 foreach ($status in $StatusID)

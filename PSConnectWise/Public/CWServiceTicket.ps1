@@ -395,7 +395,7 @@ function Update-CWServiceTicket
 #>
 function Remove-CWServiceTicket 
 {
-    [CmdLetBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact="Medium")]  
     [OutputType("Boolean", ParameterSetName="Normal")]
     param
     (
@@ -427,7 +427,14 @@ function Remove-CWServiceTicket
         Write-Debug "Deleting ConnectWise Tickets by Ticket ID"
         foreach ($ticket in $ID)
         {
-            $TicketSvc.DeleteTicket($ticket);
+            if ($Force -or $PSCmdlet.ShouldProcess($entry))
+            {
+                $TicketSvc.DeleteTicket($ticket);
+            }
+            else 
+            {
+
+            }
         }
     }
     End 

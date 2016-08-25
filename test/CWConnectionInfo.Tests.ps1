@@ -5,7 +5,7 @@ Import-Module "$WorkspaceRoot\PSConnectWise\PSConnectWise.psm1" -Force
 
 Describe 'CWConnectionInfo' {
 
-	. "$WorkspaceRoot\test\LoadTestSettings.ps1"
+	. $($WorkspaceRoot + '\test\LoadTestSettings.ps1');
 	
 	Context 'Get-CWConnectionInfo' {
 	

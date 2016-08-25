@@ -5,7 +5,7 @@ Import-Module "$WorkspaceRoot\PSConnectWise\PSConnectWise.psm1" -Force
 
 Describe 'CWServiceBoard' {
 		
-	. "$WorkspaceRoot\test\LoadTestSettings.ps1"
+	. $($WorkspaceRoot + '\test\LoadTestSettings.ps1');
 	[hashtable] $pstrSharedValues = @{};
 
 	# get the server connnection
@@ -15,7 +15,7 @@ Describe 'CWServiceBoard' {
 		
 		$pstrBoardIDs  = $pstrGenSvc.boardIds;
 		$pstrBoardID   = $pstrGenSvc.boardIds[0];
-		$pstrBoardName = $pstrGenSvc.boardName;
+		#$pstrBoardName = $pstrGenSvc.boardName;
 	
 		It 'gets board and checks for the id field' {
 			$boardID = $pstrBoardID;
@@ -33,13 +33,13 @@ Describe 'CWServiceBoard' {
 		It 'gets boards by passing array of board ids to the -ID param' {
 			$boardIDs = $pstrBoardIDs;
 			$boards = Get-CWServiceBoard -ID $boardIDs;
-			$boards | Measure-Object | Select -ExpandProperty Count | Should Be $boardIDs.Count;		
+			$boards | Measure-Object | Select-Object -ExpandProperty Count | Should Be $boardIDs.Count;		
 		}
 		
 		It 'gets list of boards that were piped to the cmdlet' {
 			$boardIDs = $pstrBoardIDs;
 			$boards = $boardIDs | Get-CWServiceBoard;
-			$boards | Measure-Object | Select -ExpandProperty Count | Should Be $boardIDs.Count;		
+			$boards | Measure-Object | Select-Object -ExpandProperty Count | Should Be $boardIDs.Count;		
 		}
 		
 		It 'gets board based on the -Filter param' {
@@ -52,13 +52,13 @@ Describe 'CWServiceBoard' {
 			$filter = "id IN ($([String]::Join(",", $pstrBoardIDs)))";
 			$sizeLimit =  2;
 			$boards = Get-CWServiceBoard -Filter $filter -SizeLimit $sizeLimit;
-			$boards | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit;
+			$boards | Measure-Object | Select-Object -ExpandProperty Count | Should Be $sizeLimit;
 		}
 		
 		It 'gets boards and sorts board id by descending piping cmdlet through Sort-Object cmdlet' {
 			$boardIDs = $pstrBoardIDs;
-			$boards = Get-CWServiceBoard -ID $boardIDs | Sort -Descending id;
-			$maxBoardId = $boardIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
+			$boards = Get-CWServiceBoard -ID $boardIDs | Sort-Object -Descending id;
+			$maxBoardId = $boardIDs | Measure-Object -Maximum | Select-Object -ExpandProperty Maximum
 			$boards[0].id | Should Be $maxBoardId;		
 		}
 		

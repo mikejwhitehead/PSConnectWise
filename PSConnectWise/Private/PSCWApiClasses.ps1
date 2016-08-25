@@ -101,7 +101,7 @@ class WebRestApiRequest
         
         foreach ($p in $queryParams.GetEnumerator())
         {
-            if ($p.Value -eq $null)
+            if ($null -eq $p.Value)
             {
                 continue;    
             }
@@ -405,7 +405,7 @@ class CWApiRestClient
         
             if ($objDetail.GetType().Name.ToString() -eq "PSNoteProperty")
             {
-                if ($parentObject -eq $null)
+                if ($null -eq $parentObject)
                     {
                     $patchOperation = [PSCustomObject] @{
                         op    = [string]"replace";
@@ -533,7 +533,7 @@ class CWApiRestClientSvc
         $request.RelativePathUri = $relativePathUri;
         $request.Verb = "GET"; 
         
-        if ($queryHashtable -ne $null)
+        if ($null -ne $queryHashtable)
         {
             if ($queryHashtable.Contains('pageSize') -and $queryHashtable['pageSize'] -eq 0)
             {
@@ -635,7 +635,7 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
     {
         [hashtable] $queryHashtable = @{}
         
-        if ($fields -ne $null)
+        if ($null -ne $fields)
         {
             $queryHashtable["fields"] = ([string] [String]::Join(",", $fields)).TrimEnd(",");
         }
@@ -674,7 +674,7 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
             orderBy    = $orderBy;
         }
         
-        if ($fields -ne $null)
+        if ($null -ne $fields)
         {
             $queryParams.Add("fields", ([string] [String]::Join(",", $fields)).TrimEnd(","));
         }
@@ -717,7 +717,7 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         return $newTicket;
     }
     
-    [bool] DeleteTimeEntry ([uint32] $ticketID)
+    [bool] DeleteTicket ([uint32] $ticketID)
     {
         $relativePathUri = "/$ticketID";
         return $this.DeleteRequest($relativePathUri);
@@ -1144,7 +1144,7 @@ class CwApiCompanySvc : CWApiRestClientSvc
     {
         [hashtable] $queryHashtable = @{}
         
-        if ($fields -ne $null)
+        if ($null -ne $fields)
         {
             $queryHashtable["fields"] = ([string] [String]::Join(",", $fields)).TrimEnd(",");
         }
@@ -1185,7 +1185,7 @@ class CwApiCompanySvc : CWApiRestClientSvc
             orderBy    = $orderBy;
         }
         
-        if ($fields -ne $null)
+        if ($null -ne $fields)
         {
             $queryHashtable.Add("fields", ([string] [String]::Join(",", $fields)).TrimEnd(","));
         }
@@ -1224,7 +1224,7 @@ class CwApiCompanyContactSvc : CWApiRestClientSvc
             fields = $null;
         }
         
-        if ($fields -ne $null)
+        if ($null -ne $fields)
         {
             $queryHashtable.fields = ([string] [String]::Join(",", $fields)).TrimEnd(",");
         }
@@ -1290,7 +1290,7 @@ class CwApiCompanyContactSvc : CWApiRestClientSvc
             orderBy    = $orderBy;
         }
         
-        if ($fields -ne $null)
+        if ($null -ne $fields)
         {
             $queryHashtable.fields = ([string] [String]::Join(",", $fields)).TrimEnd(",");
         }

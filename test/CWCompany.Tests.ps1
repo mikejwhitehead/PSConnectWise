@@ -5,7 +5,7 @@ Import-Module "$WorkspaceRoot\PSConnectWise\PSConnectWise.psm1" -Force
 
 Describe 'CWCompany' {
 		
-	. "$WorkspaceRoot\test\LoadTestSettings.ps1";
+	. $($WorkspaceRoot + '\test\LoadTestSettings.ps1');
 	[hashtable] $pstrSharedValues = @{};
 	
 	# get the server connnection
@@ -35,19 +35,19 @@ Describe 'CWCompany' {
 			$companyID = $pstrCompanyID;
 			$fields = @("id", "identifier", "name");
 			$company = Get-CWCompany -ID $companyID -Property $fields;
-			$company.PSObject.Properties | Measure-Object | Select -ExpandProperty Count | Should Be $fields.Count;		
+			$company.PSObject.Properties | Measure-Object | Select-Object -ExpandProperty Count | Should Be $fields.Count;		
 		}
 		
 		It 'gets companies by passing array of company ids to the -ID param' {
 			$companyIDs = $pstrCompanyIDs;
 			$tickets = Get-CWCompany -ID $companyIDs;
-			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $companyIDs.Count;		
+			$tickets | Measure-Object | Select-Object -ExpandProperty Count | Should Be $companyIDs.Count;		
 		}
 		
 		It 'gets list of companies that were piped to the cmdlet' {
 			$companyIDs = $pstrCompanyIDs;
 			$tickets = $companyIDs | Get-CWCompany
-			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $companyIDs.Count;		
+			$tickets | Measure-Object | Select-Object -ExpandProperty Count | Should Be $companyIDs.Count;		
 		}
 		
 		It 'gets company based on the -Filter param' {
@@ -60,20 +60,20 @@ Describe 'CWCompany' {
 			$filter = "id IN ($([String]::Join(',', $pstrCompanyIDs)))";
 			$sizeLimit =  2;
 			$tickets = Get-CWCompany -Filter $filter -SizeLimit $sizeLimit;
-			$tickets | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit;
+			$tickets | Measure-Object | Select-Object -ExpandProperty Count | Should Be $sizeLimit;
 		}
 		
 		It 'gets companies and sorts company id by descending piping cmdlet through Sort-Object cmdlet' {
 			$companyIDs = $pstrCompanyIDs;
-			$companies = Get-CWCompany -ID $companyIDs | Sort -Descending id;
-			$maxCompanyId = $companyIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum;
+			$companies = Get-CWCompany -ID $companyIDs | Sort-Object -Descending id;
+			$maxCompanyId = $companyIDs | Measure-Object -Maximum | Select-Object -ExpandProperty Maximum;
 			$companies[0].id | Should Be $maxCompanyId;		
 		}
 		
 		It 'wildcard search using Identifier parameter with SizeLimit parameter' {
 			$sizeLimit = 5;
 			$companies = Get-CWCompany -Identifier "*" -SizeLimit $sizeLimit;
-			$companies | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit ;
+			$companies | Measure-Object | Select-Object -ExpandProperty Count | Should Be $sizeLimit ;
 		}
 		
 		It 'get single company by Identifier parameter' {
@@ -85,7 +85,7 @@ Describe 'CWCompany' {
 		It 'wildcard search using Name parameter with SizeLimit parameter' {
 			$sizeLimit = 5;
 			$companies = Get-CWCompany -Name "*" -SizeLimit $sizeLimit;
-			$companies | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit ;
+			$companies | Measure-Object | Select-Object -ExpandProperty Count | Should Be $sizeLimit ;
 		}
 		
 		It 'get single company by Name parameter' {

@@ -44,7 +44,7 @@ function Get-CWServiceBoardSubtype
         {
             $typeCount = $BoardTypeSvc.GetTypeCount([uint32]$BoardID);
             
-            if ($SizeLimit -ne $null -and $SizeLimit -gt 0)
+            if ($null -ne $SizeLimit -and $SizeLimit -gt 0)
             {
                 Write-Verbose "Total Board Count Excess SizeLimit; Setting Board Count to the SizeLimit: $SizeLimit"
                 $typeCount = [Math]::Min($typeCount, $SizeLimit);
@@ -67,7 +67,7 @@ function Get-CWServiceBoardSubtype
             if ($BoardID -gt 0)
             {
                 
-                if ($typeCount -ne $null -and $typeCount -gt 0)
+                if ($null -ne $typeCount -and $typeCount -gt 0)
                 {
                     # find how many Companies to retrieve
                     $itemsRemainCount = $typeCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
@@ -83,7 +83,7 @@ function Get-CWServiceBoardSubtype
                     $Type
                 }
                 
-            } elseIf ($TypeID -ne $null) {
+            } elseIf ($null -ne $TypeID) {
                 
                 Write-Debug "Retrieving Connec tWise Board Type by Ticket ID"
                 foreach ($type in $TypeID)

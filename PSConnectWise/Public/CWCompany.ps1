@@ -128,7 +128,7 @@ function Get-CWCompany
         
         # determines if to select all fields or specific fields
         [string[]] $Properties = $null;
-        if ($Property -ne $null)
+        if ($null -ne $Property)
         {
             if (!($Property.Length -eq 1 -and $Property[0].Trim() -ne "*"))
             {
@@ -145,7 +145,7 @@ function Get-CWCompany
             if (![String]::IsNullOrWhiteSpace($Filter) -or ![String]::IsNullOrWhiteSpace($Identifier))
             {
                 
-                if ($companyCount -ne $null -and $companyCount -gt 0)
+                if ($null -ne $companyCount -and $companyCount -gt 0)
                 {
                     # find how many Companies to retrieve
                     $itemsRemainCount = $companyCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
@@ -169,7 +169,7 @@ function Get-CWCompany
                 foreach ($CompanyID in $ID)
                 {
                     Write-Verbose "Requesting ConnectWise Company Number: $CompanyID";
-                    if ($Properties -eq $null -or $Properties.Length -eq 0)
+                    if ($null -eq $Properties -or $Properties.Length -eq 0)
                     {
                         $CompanySvc.ReadCompany([uint32] $CompanyID);
                     }

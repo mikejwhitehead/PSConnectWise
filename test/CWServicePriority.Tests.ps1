@@ -5,7 +5,7 @@ Import-Module "$WorkspaceRoot\PSConnectWise\PSConnectWise.psm1" -Force
 
 Describe -Tag 'ReqPriorityPermission' 'CWServicePriority' {
 	
-	. "$WorkspaceRoot\test\LoadTestSettings.ps1"
+	. $($WorkspaceRoot + '\test\LoadTestSettings.ps1');
 	
 	# get the server connnection
 	Get-CWConnectionInfo -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
@@ -30,13 +30,13 @@ Describe -Tag 'ReqPriorityPermission' 'CWServicePriority' {
 		It 'gets priorities by passing array of priority ids to the -ID param' {
 			$priorityIDs = $pstrPriorityIDs;
 			$priorities = Get-CWServicePriority -ID $priorityIDs;
-			$priorities | Measure-Object | Select -ExpandProperty Count | Should Be $priorityIDs.Count;		
+			$priorities | Measure-Object | Select-Object -ExpandProperty Count | Should Be $priorityIDs.Count;		
 		}
 		
 		It 'gets list of priorities that were piped to the cmdlet' {
 			$priorityIDs = $pstrPriorityIDs;
 			$priorities = $priorityIDs | Get-CWServicePriority;
-			$priorities | Measure-Object | Select -ExpandProperty Count | Should Be $priorityIDs.Count;		
+			$priorities | Measure-Object | Select-Object -ExpandProperty Count | Should Be $priorityIDs.Count;		
 		}
 		
 		It 'gets priority based on the -Filter param' {
@@ -49,13 +49,13 @@ Describe -Tag 'ReqPriorityPermission' 'CWServicePriority' {
 			$filter = "id IN ($([String]::Join(",", $pstrPriorityIDs)))";
 			$sizeLimit =  2;
 			$priorities = Get-CWServicePriority -Filter $filter -SizeLimit $sizeLimit;
-			$priorities | Measure-Object | Select -ExpandProperty Count | Should Be $sizeLimit;
+			$priorities | Measure-Object | Select-Object -ExpandProperty Count | Should Be $sizeLimit;
 		}
 		
 		It 'gets priorities and sorts priority id by descending piping cmdlet through Sort-Object cmdlet' {
 			$priorityIDs = $pstrPriorityIDs;
-			$priorities = Get-CWServicePriority -ID $priorityIDs | Sort -Descending id;
-			$maxpriorityID = $priorityIDs | Measure-Object -Maximum | Select -ExpandProperty Maximum
+			$priorities = Get-CWServicePriority -ID $priorityIDs | Sort-Object -Descending id;
+			$maxpriorityID = $priorityIDs | Measure-Object -Maximum | Select-Object -ExpandProperty Maximum
 			$priorities[0].id | Should Be $maxpriorityID;		
 		}
 	

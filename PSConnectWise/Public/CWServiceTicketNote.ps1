@@ -56,7 +56,7 @@ function Get-CWServiceTicketNote
             $noteCount = $NoteSvc.GetNoteCount($TicketID);
             Write-Debug "Total Count of Ticket Note Entries for Ticket ($TicketID): $noteCount";
             
-            if ($SizeLimit -ne $null -and $SizeLimit -gt 0)
+            if ($null -ne $SizeLimit -and $SizeLimit -gt 0)
             {
                 Write-Verbose "Total Ticket Notes Count Excess SizeLimit; Setting Ticket Note Count to the SizeLimit: $SizeLimit"
                 $noteCount = [Math]::Min($noteCount, $SizeLimit);
@@ -80,7 +80,7 @@ function Get-CWServiceTicketNote
             if ($NoteID -eq 0)
             {
                 
-                if ($noteCount -ne $null -and $noteCount -gt 0)
+                if ($null -ne $noteCount -and $noteCount -gt 0)
                 {
                     # find how many Companies to retrieve
                     $itemsRemainCount = $noteCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);

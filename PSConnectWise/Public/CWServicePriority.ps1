@@ -85,7 +85,7 @@ function Get-CWServicePriority
             if (![String]::IsNullOrWhiteSpace($Filter))
             {
                 
-                if ($priorityCount -ne $null -and $priorityCount -gt 0)
+                if ($null -ne $priorityCount -and $priorityCount -gt 0)
                 {
                     # find how many Companies to retrieve
                     $itemsRemainCount = $priorityCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
@@ -99,7 +99,7 @@ function Get-CWServicePriority
                 foreach ($Priority in $Priorities)
                 {
                     Write-Verbose "Requesting ConnectWise Priority Number: $Priority";
-                    if ($Properties -eq $null -or $Properties.Length -eq 0)
+                    if ($null -eq $Properties -or $Properties.Length -eq 0)
                     {
                         $Priority;
                     }
@@ -115,7 +115,7 @@ function Get-CWServicePriority
                 foreach ($Priority in $ID)
                 {
                     Write-Verbose "Requesting ConnectWise Priority Number: $Priority";
-                    if ($Properties -eq $null -or $Properties.Length -eq 0)
+                    if ($null -eq $Properties -or $Properties.Length -eq 0)
                     {
                         $PrioritySvc.ReadPriority($Priority);
                     }
