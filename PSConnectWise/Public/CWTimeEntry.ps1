@@ -8,7 +8,7 @@
 .PARAMETER Descending
     Changes the sorting to descending order by IDs
 .PARAMETER Server
-    Variable to the object created via Get-CWConnectWiseInfo
+    Variable to the object created via Get-CWConnectWiseInfo.
 .EXAMPLE
     Get-CWTimeEntry -ID 99;
 .EXAMPLE
@@ -131,7 +131,7 @@ function Get-CWTimeEntry
     ConnectWise memeber ID of the CW user the time entry should be applied against
 .EXAMPLE
     $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
-    Add-CWServiceTicketNote -ID 123 -Message "Added ticket note added to ticket via PowerShell." -Server $CWServer;
+    Add-CWTimeEntry -ID 123 -Message "Added ticket note added to ticket via PowerShell." -Server $CWServer;
 #>
 function Add-CWTimeEntry 
 {
@@ -220,10 +220,12 @@ function Add-CWTimeEntry
     Removes ConnectWise time entry information. 
 .PARAMETER ID
     ConnectWise time entry ID
+.PARAMETER Force
+    Removes time entry without confirmation prompt
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
-    Remove-CWServiceTicket -ID 1;
+    Remove-CWTimeEntry -ID 1;
 #>
 function Remove-CWTimeEntry 
 {
