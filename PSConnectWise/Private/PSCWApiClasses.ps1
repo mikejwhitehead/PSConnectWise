@@ -1335,6 +1335,11 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
         $TicketExtendedSvc = [CwApiServiceTicketExtendedSvc]::New($this.CWApiClient.CWConnectionInfo); 
         [psobject[]] $ticketEntries = $TicketExtendedSvc.ReadTicketTimeEntries($ticketId, $pageNum, $pageSize);
 
+        if ($ticketEntries.Cound -eq 0)
+        {
+            return $null; 
+        }
+
         [string] $ids = ""
         for ($i = 0; $i -lt $ticketEntries.Count; $i++)
         {
