@@ -488,8 +488,18 @@ class CWApiRestClient
         {
             if ($_.Exception.Response.StatusCode.value__ -in @(400, 401, 404))
             {
-                Write-Warning $_.ErrorDetails.Message;
-                
+                if ($null -ne $_.ErrorDetails.Message)
+                { 
+                    Write-Warning $_.ErrorDetails.Message;
+                }
+                elseif ($null -ne $_.Exception.Message)
+                {
+                    Write-Warning $_.Exception.Message;
+                }
+                else 
+                {
+                    Write-Warning $_;
+                }
             } else {
                 
                 throw $_;
