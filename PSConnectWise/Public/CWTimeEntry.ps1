@@ -291,6 +291,8 @@ function Add-CWTimeEntry
     Removes time entry without confirmation prompt
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
+.NOTES
+    ConnectWise API-Only Members do not have access to delete time entries. Therefore, this function will not work for API only members. 
 .EXAMPLE
     Remove-CWTimeEntry -ID 1;
 #>

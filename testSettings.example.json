@@ -24,6 +24,11 @@
         "company": {
             "companyIds": [1, 2],
             "contactIds": [1, 2, 3, 4, 5]
+        },
+
+        // variables to be used when making calls to ConnectWise's System module
+        "system": {
+            "memberIds": [1, 2, 3]
         }
         
     },

@@ -1470,3 +1470,90 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
     
 }
 
+class CwApiSystemMemberSvc : CWApiRestClientSvc
+{
+    CwApiSystemMemberSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/system/members";
+    }
+    
+    [psobject] ReadMember ([uint32] $memberId)
+    {
+        $relativePathUri = "/$memberId";
+        return $this.ReadRequest($relativePathUri, $null);
+    }
+
+    [psobject] ReadMember ([uint32] $memberId, [string[]] $fields)
+    {
+        [hashtable] $queryHashtable = @{}
+        
+        if ($null -ne $fields)
+        {
+            $queryHashtable["fields"] = ([string] [String]::Join(",", $fields)).TrimEnd(",");
+        }
+        
+        $relativePathUri = "/$memberId";
+        return $this.ReadRequest($relativePathUri, $queryHashtable);
+    }
+
+    [psobject] ReadMember ([string] $email)
+    {
+        return $this.ReadMember($email, $null);
+    }
+
+    [psobject] ReadMember ([string] $email, [string[]] $fields)
+    {
+        $filter = "email='$email'";
+        $member = @( $this.ReadMembers($filter, $fields) );
+
+        if ($null -eq $member -or $member.Count -eq 0)
+        {
+            return $null
+        }
+
+        return $member[0];
+    }
+
+    [psobject[]] ReadMembers ([string] $memberConditions)
+    {        
+        return $this.ReadMembers($memberConditions, $null);
+    }
+    
+    [psobject[]] ReadMembers ([string] $memberConditions, [string[]] $fields)
+    {        
+        return $this.ReadMembers($memberConditions, $fields, 1);
+    }
+    
+    [psobject[]] ReadMembers ([string] $memberConditions, [string[]] $fields, [uint32] $pageNum)
+    {         
+        return $this.ReadMembers($memberConditions, $fields, $pageNum, 0);
+    }
+    
+    [psobject[]] ReadMembers ([string] $memberConditions, [string[]] $fields, [uint32] $pageNum, [uint32] $pageSize)
+    {         
+        return $this.ReadMembers($memberConditions, $fields, $null, $pageNum, $pageSize);
+    }
+    
+    [psobject[]] ReadMembers ([string] $memberConditions, [string[]] $fields, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        [hashtable] $queryHashtable = @{
+            conditions = $memberConditions;
+            page       = $pageNum;
+            pageSize   = $pageSize;
+            orderBy    = $orderBy;
+        }
+
+        if ($null -ne $fields -and $fields.Count -gt 0)
+        {
+            $queryHashtable.fields = ([string] [String]::Join(",", $fields)).TrimEnd(",");
+        }
+        
+        return $this.ReadRequest($null, $queryHashtable);
+    }
+    
+    [uint32] GetMemberCount([string] $memberConditions)
+    {
+        return $this.GetCount($memberConditions);
+    }
+    
+}

@@ -8,6 +8,8 @@ $pstrGenSvc        = $testSettings.general.service;
 $pstrProcNewTicket = $testSettings.actions.newTicket;
 $pstrComp          = $testSettings.general.company;
 $pstrProcTimeEntry = $testSettings.actions.newTimeEntry;
+$pstrGenSys        = $testSettings.general.system;
+
 
 # defining server variables
 $pstrSvrDomain  = $pstrSvr.domain;
