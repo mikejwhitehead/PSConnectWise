@@ -332,7 +332,7 @@ function Update-CWServiceTicket
             $NoteSvc   = [CwApiServiceTicketNoteSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
         }
         
-        [ServiceTicketNoteTypes[]] $addToForNote = @();
+        [CWServiceTicketNoteTypes[]] $addToForNote = @();
         if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
         {
             # defaults to detail description if no AddTo switch were passed
@@ -341,15 +341,15 @@ function Update-CWServiceTicket
         
         if ($AddToDescription -eq $true)
         {
-            $addToForNote += [ServiceTicketNoteTypes]::Description;
+            $addToForNote += [CWServiceTicketNoteTypes]::Description;
         }
         if ($AddToInternal -eq $true)
         {
-            $addToForNote += [ServiceTicketNoteTypes]::Internal;
+            $addToForNote += [CWServiceTicketNoteTypes]::Internal;
         }
         if ($AddToResolution -eq $true)
         {
-            $addToForNote += [ServiceTicketNoteTypes]::Resolution;
+            $addToForNote += [CWServiceTicketNoteTypes]::Resolution;
         }  
     }
     Process

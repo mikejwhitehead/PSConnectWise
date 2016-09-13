@@ -27,6 +27,21 @@ Describe 'CWTimeEntry' {
 			$pstrSharedValues.timeEntries[0].id -gt 0 | Should Be $true;
 		} 
 
+		It 'create a new time entry on a ticket by passing a hashtable' {
+			$data = @{
+                TicketID     = $pstrTicketID;
+                Start        = (Get-Date).AddMinutes(-1);
+                End          = (Get-Date);
+                Message      = "Testing Time Entries";
+                AddTo        = @("Internal");
+                MemberID     = $pstrMemberID;
+			}
+
+			$entry = Add-CWTimeEntry -HashTimeEntry $data;
+			$pstrSharedValues.timeEntries += @($entry);
+			$pstrSharedValues.timeEntries[0].id -gt 0 | Should Be $true;
+		} 
+
 		It 'create a new multi-day time entry on a ticket' {
 			$start = (Get-Date).AddHours(-25)
 			$end   = Get-Date

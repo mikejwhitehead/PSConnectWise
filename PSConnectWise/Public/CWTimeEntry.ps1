@@ -203,40 +203,74 @@ function Add-CWTimeEntry
             $TimeSvc = [CwApiTimeEntrySvc]::new($Server);
         } 
         
-        [CWServiceTicketNoteTypes[]] $addTo = @();
-        
-        if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
-        {
-            # defaults to detail description if no AddTo switch were passed
-            $AddToDescription = $true
-        }
-        
-        if ($AddToDescription -eq $true)
-        {
-            $addTo += [CWServiceTicketNoteTypes]::Description;
-        }
-        if ($AddToInternal -eq $true)
-        {
-            $addTo += [CWServiceTicketNoteTypes]::Internal;
-        }
-        if ($AddToResolution -eq $true)
-        {
-            $addTo += [CWServiceTicketNoteTypes]::Resolution;
-        }   
+         
     }
     Process
     {
-        [hashtable] $data = @{
-            TicketID     = $TicketID;
-            Start        = $Start;
-            End          = $End;
-            Message      = $Message;
-            AddTo        = $AddTo;
-            InternalNote = $InternalNote;
-            CompanyID    = $CompanyID;
-            MemberID     = $MemberID;
-            ChargeToType = $ChargeToType;
-            BillOption   = $BillOption;
+        [CWServiceTicketNoteTypes[]] $addTo = @();
+        
+        if ($null -ne $HashTimeEntry)
+        {
+            $data = $HashTimeEntry;
+
+            $data.BillOption   = @{ $true = $HashTimeEntry.BillOption; $false = "DoNotBill"}[ !$([String]::IsNullOrEmpty($HashTimeEntry.BillOption)) ]
+            $data.ChargeToType = @{ $true = $HashTimeEntry.ChargeToType; $false = "ServiceTicket"}[ !$([String]::IsNullOrEmpty($HashTimeEntry.ChargeToType)) ]
+            
+            $data.AddTo        = @();
+
+            if ("Description" -in $HashTimeEntry.AddTo)
+            {
+                $data.AddTo += [CWServiceTicketNoteTypes]::Description;
+            }
+            if ("Internal" -in $HashTimeEntry.AddTo)
+            {
+                $data.AddTo += [CWServiceTicketNoteTypes]::Internal;
+            }
+            if ("Resolution" -in $HashTimeEntry.AddTo)
+            {
+                $data.AddTo += [CWServiceTicketNoteTypes]::Resolution;
+            }
+
+            if ($data.AddTo.Count -eq 0)
+            {
+                # defaults to detail description if no AddTo switch were passed
+                $data.AddTo += [CWServiceTicketNoteTypes]::Internal;
+            }
+        }
+        else 
+        {
+
+            if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
+            {
+                # defaults to detail description if no AddTo switch were passed
+                $AddToDescription = $true
+            }
+            
+            if ($AddToDescription -eq $true)
+            {
+                $addTo += [CWServiceTicketNoteTypes]::Description;
+            }
+            if ($AddToInternal -eq $true)
+            {
+                $addTo += [CWServiceTicketNoteTypes]::Internal;
+            }
+            if ($AddToResolution -eq $true)
+            {
+                $addTo += [CWServiceTicketNoteTypes]::Resolution;
+            }  
+
+            [hashtable] $data = @{
+                TicketID     = $TicketID;
+                Start        = $Start;
+                End          = $End;
+                Message      = $Message;
+                AddTo        = $AddTo;
+                InternalNote = $InternalNote;
+                CompanyID    = $CompanyID;
+                MemberID     = $MemberID;
+                ChargeToType = $ChargeToType;
+                BillOption   = $BillOption;
+            }
         }
 
         $newTimeEntries = $TimeSvc.CreateTimeEntry($data);

@@ -164,7 +164,7 @@ function Add-CWServiceTicketNote
             $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Server);
         }
         
-        [ServiceTicketNoteTypes[]] $addTo = @();
+        [CWServiceTicketNoteTypes[]] $addTo = @();
         
         if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
         {
@@ -174,15 +174,15 @@ function Add-CWServiceTicketNote
         
         if ($AddToDescription -eq $true)
         {
-            $addTo += [ServiceTicketNoteTypes]::Description;
+            $addTo += [CWServiceTicketNoteTypes]::Description;
         }
         if ($AddToInternal -eq $true)
         {
-            $addTo += [ServiceTicketNoteTypes]::Internal;
+            $addTo += [CWServiceTicketNoteTypes]::Internal;
         }
         if ($AddToResolution -eq $true)
         {
-            $addTo += [ServiceTicketNoteTypes]::Resolution;
+            $addTo += [CWServiceTicketNoteTypes]::Resolution;
         }   
     }
     Process
