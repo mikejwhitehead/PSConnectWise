@@ -1,4 +1,4 @@
-enum ServiceTicketNoteTypes 
+enum CWServiceTicketNoteTypes 
 {
     Description
     Internal
@@ -1111,13 +1111,13 @@ class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
         return $this.ReadRequest($relativePathUri, $queryHashtable);
     }
     
-    [pscustomobject] CreateNote ([uint32] $ticketId, [string] $message, [ServiceTicketNoteTypes[]] $addTo)
+    [pscustomobject] CreateNote ([uint32] $ticketId, [string] $message, [CWServiceTicketNoteTypes[]] $addTo)
     {
         $newTicketNote = [PSCustomObject] @{
             Text                  = [string]$message
-            DetailDescriptionFlag = [ServiceTicketNoteTypes]::Description -in $addTo
-            InternalAnalysisFlag  = [ServiceTicketNoteTypes]::Internal -in $addTo
-            ResolutionFlag        = [ServiceTicketNoteTypes]::Resolution -in $addTo
+            DetailDescriptionFlag = [CWServiceTicketNoteTypes]::Description -in $addTo
+            InternalAnalysisFlag  = [CWServiceTicketNoteTypes]::Internal -in $addTo
+            ResolutionFlag        = [CWServiceTicketNoteTypes]::Resolution -in $addTo
         }
         
         $relativePathUri = "/$ticketId/notes";
@@ -1368,7 +1368,7 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
         return $this.ReadRequest($null, $queryHashtable);
     }
     
-    [psobject[]] CreateTimeEntry ([uint32] $ticketId, [DateTime] $start, [DateTime] $end,  [string] $message, [ServiceTicketNoteTypes[]] $addTo, [uint32] $memberId, [string] $billOption)
+    [psobject[]] CreateTimeEntry ([uint32] $ticketId, [DateTime] $start, [DateTime] $end,  [string] $message, [CWServiceTicketNoteTypes[]] $addTo, [uint32] $memberId, [string] $billOption)
     {
         $data = @{
             TicketID   = $ticketId;
@@ -1423,9 +1423,9 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
             {
                 # only include the messaging if it is the last time entries to add to the ticket
                 $timeEntryInfo.Add("Notes", [string]$message);
-                $timeEntryInfo.Add("AddToDetailDescriptionFlag", [ServiceTicketNoteTypes]::Description -in $addTo);
-                $timeEntryInfo.Add("AddToInternalAnalysisFlag", [ServiceTicketNoteTypes]::Internal -in $addTo);
-                $timeEntryInfo.Add("AddToResolutionFlag", [ServiceTicketNoteTypes]::Resolution -in $addTo);
+                $timeEntryInfo.Add("AddToDetailDescriptionFlag", [CWServiceTicketNoteTypes]::Description -in $addTo);
+                $timeEntryInfo.Add("AddToInternalAnalysisFlag", [CWServiceTicketNoteTypes]::Internal -in $addTo);
+                $timeEntryInfo.Add("AddToResolutionFlag", [CWServiceTicketNoteTypes]::Resolution -in $addTo);
                 
                 # add internal note if there was more than one time entries for this space
                 $internalMessage = "#$($i + 1) of $($entries.Count) Time Entries: $($start.ToString('yyyy-MM-dd HH:mm:ss')) to $($end.ToString('yyyy-MM-dd HH:mm:ss'))";

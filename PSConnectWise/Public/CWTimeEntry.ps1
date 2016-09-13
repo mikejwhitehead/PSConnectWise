@@ -184,7 +184,11 @@ function Add-CWTimeEntry
         [Parameter(ParameterSetName='Normal', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$MemberID = 0,
-        [Parameter(ParameterSetName='Normal', Position=2)]
+        [Parameter(ParameterSetName='Hash', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [hashtable]$HashTimeEntry,
+        [Parameter(ParameterSetName='Normal')]
+        [Parameter(ParameterSetName='Hash')]
         [ValidateNotNullOrEmpty()]
         [PSCustomObject]$Server = $script:CWServerInfo
     )
@@ -199,7 +203,7 @@ function Add-CWTimeEntry
             $TimeSvc = [CwApiTimeEntrySvc]::new($Server);
         } 
         
-        [ServiceTicketNoteTypes[]] $addTo = @();
+        [CWServiceTicketNoteTypes[]] $addTo = @();
         
         if ($AddToDescription -eq $false -and $AddToInternal -eq $false -and $AddToResolution -eq $false)
         {
@@ -209,15 +213,15 @@ function Add-CWTimeEntry
         
         if ($AddToDescription -eq $true)
         {
-            $addTo += [ServiceTicketNoteTypes]::Description;
+            $addTo += [CWServiceTicketNoteTypes]::Description;
         }
         if ($AddToInternal -eq $true)
         {
-            $addTo += [ServiceTicketNoteTypes]::Internal;
+            $addTo += [CWServiceTicketNoteTypes]::Internal;
         }
         if ($AddToResolution -eq $true)
         {
-            $addTo += [ServiceTicketNoteTypes]::Resolution;
+            $addTo += [CWServiceTicketNoteTypes]::Resolution;
         }   
     }
     Process
