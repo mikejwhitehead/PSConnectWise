@@ -97,7 +97,7 @@ Describe 'CWCompany' {
 		It 'wildcard search using Name parameter with Descending parameter' {
 			$sizeLimit = 5;
 			$companies = Get-CWCompany -Name "*" -SizeLimit $sizeLimit -Descending;
-			$companies[0].id -gt $companies[$companies.Count - 1].id | Should Be $true ;
+			$companies[0].id -gt $companies[$companies.Count - 1].id | Should Be $true;
 		}
         
     }
