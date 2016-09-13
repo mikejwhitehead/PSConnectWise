@@ -29,6 +29,9 @@ that will easly allow for future functions to be added.
 0. `Get-CWTimeEntry`
 0. `Add-CWTimeEntry`
 0. `Remove-CWTimeEntry`
+
+###### System Module
+0. `Get-CWSystemMember`
         
 ## Requirements
 
