@@ -118,15 +118,21 @@ function Get-CWTimeEntry
 .PARAMETER End
     End time and date of the time entry
 .PARAMETER Message
-    New message to be added to Detailed Description, Internal Analysis, and/or Resolution section
+    New message to be added to Detailed Description, Internal Analysis, and/or Resolution section.
 .PARAMETER AddToDescription
     Instructs the value of `-Message` to the Detailed Description
 .PARAMETER AddToInternal
     Instructs the value of `-Message` to the Internal Analysis
 .PARAMETER AddToResolution
     Instructs the value of `-Message` to the Resolution
+.PARAMETER InternalNote
+    Note to be added to the hidden Internal Note field 
+.PARAMETER ChargeToType
+    Change to type of the time entry
 .PARAMETER BillOption
    Type of billing for the time entry
+.PARAMETER CompanyID
+    Company to charge the time entry against
 .PARAMETER MemberID
     ConnectWise memeber ID of the CW user the time entry should be applied against
 .EXAMPLE
@@ -162,9 +168,19 @@ function Add-CWTimeEntry
         [ValidateNotNullOrEmpty()]
         [switch]$AddToResolution,
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$InternalNote,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateSet('ServiceTicket', 'ProjectTicket', 'ChargeCode', 'Activity')]
+        [ValidateNotNullOrEmpty()]
+        [string]$ChargeToType = "ServiceTicket",
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateSet('Billable', 'DoNotBill', 'NoCharge', 'NoDefault')]
         [ValidateNotNullOrEmpty()]
         [string]$BillOption = "DoNotBill",
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$CompanyID = 0,
         [Parameter(ParameterSetName='Normal', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$MemberID = 0,
@@ -206,7 +222,20 @@ function Add-CWTimeEntry
     }
     Process
     {
-        $newTimeEntries = $TimeSvc.CreateTimeEntry($TicketID, $Start, $End, $Message, $addTo, $MemberID, $BillOption);
+        [hashtable] $data = @{
+            TicketID     = $TicketID;
+            Start        = $Start;
+            End          = $End;
+            Message      = $Message;
+            AddTo        = $AddTo;
+            InternalNote = $InternalNote;
+            CompanyID    = $CompanyID;
+            MemberID     = $MemberID;
+            ChargeToType = $ChargeToType;
+            BillOption   = $BillOption;
+        }
+
+        $newTimeEntries = $TimeSvc.CreateTimeEntry($data);
         return $newTimeEntries;
     }
     End

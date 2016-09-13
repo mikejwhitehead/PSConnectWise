@@ -488,8 +488,18 @@ class CWApiRestClient
         {
             if ($_.Exception.Response.StatusCode.value__ -in @(400, 401, 404))
             {
-                Write-Warning $_.ErrorDetails.Message;
-                
+                if ($null -ne $_.ErrorDetails.Message)
+                { 
+                    Write-Warning $_.ErrorDetails.Message;
+                }
+                elseif ($null -ne $_.Exception.Message)
+                {
+                    Write-Warning $_.Exception.Message;
+                }
+                else 
+                {
+                    Write-Warning $_;
+                }
             } else {
                 
                 throw $_;
@@ -1335,7 +1345,7 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
         $TicketExtendedSvc = [CwApiServiceTicketExtendedSvc]::New($this.CWApiClient.CWConnectionInfo); 
         [psobject[]] $ticketEntries = $TicketExtendedSvc.ReadTicketTimeEntries($ticketId, $pageNum, $pageSize);
 
-        if ($ticketEntries.Cound -eq 0)
+        if ($ticketEntries.Count -eq 0)
         {
             return $null; 
         }
@@ -1360,6 +1370,33 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
     
     [psobject[]] CreateTimeEntry ([uint32] $ticketId, [DateTime] $start, [DateTime] $end,  [string] $message, [ServiceTicketNoteTypes[]] $addTo, [uint32] $memberId, [string] $billOption)
     {
+        $data = @{
+            TicketID   = $ticketId;
+            Start      = $start;
+            End        = $end;
+            Message    = $message;
+            AddTo      = $addTo;
+            MemberID   = $memberId;
+            BillOption = $billOption;
+        }
+
+        return $this.CreateTimeEntry($data);
+    }
+
+    [psobject[]] CreateTimeEntry ([hashtable] $timeEntryData)
+    {
+        $ticketId     = $timeEntryData.TicketID;
+        $start        = $timeEntryData.Start;
+        $end          = $timeEntryData.End;
+        $message      = $timeEntryData.Message;
+        $addTo        = $timeEntryData.AddTo;
+        $internalNote = $timeEntryData.InternalNote;
+        $companyID    = $timeEntryData.CompanyID;
+        $memberId     = $timeEntryData.MemberID;
+        $chargeToType = $timeEntryData.ChargeToType;
+        $billOption   = $timeEntryData.BillOption;
+        
+
         $TicketSvc = [CwApiServiceTicketSvc]::New($this.CWApiClient.CWConnectionInfo); 
         $ticket =  $TicketSvc.ReadTicket($ticketId);
         [psobject[]] $postedEntries = @();
@@ -1378,10 +1415,9 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
                 TimeEnd                = (Get-Date $entry.End).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ');
                 Company                = [pscustomobject] @{ id = $ticket.company.id };
                 Member                 = @{ $true = [pscustomobject] @{ id = $memberId }; $false = $null }[ ![String]::IsNullOrEmpty($memberId) ];
-                BillableOption        = @{ $true = [string]$billOption; $false = 'DoNotBill' }[ [String]::IsNullOrEmpty($billOption) ];
+                ChangeToType           = @{ $true = ''; $false = 'ServiceTicket' }[ $true ] 
+                BillableOption         = @{ $true = [string]$billOption; $false = 'DoNotBill' }[ [String]::IsNullOrEmpty($billOption) ];
             }
-            
-            
             
             if ($i -eq $entries.Count - 1)
             {
