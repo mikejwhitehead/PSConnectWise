@@ -1496,14 +1496,14 @@ class CwApiSystemMemberSvc : CWApiRestClientSvc
         return $this.ReadRequest($relativePathUri, $queryHashtable);
     }
 
-    [psobject] ReadMember ([string] $email)
+    [psobject] ReadMember ([string] $username)
     {
-        return $this.ReadMember($email, $null);
+        return $this.ReadMember($username, $null);
     }
 
-    [psobject] ReadMember ([string] $email, [string[]] $fields)
+    [psobject] ReadMember ([string] $username, [string[]] $fields)
     {
-        $filter = "email='$email'";
+        $filter = "identifier='$username'";
         $member = @( $this.ReadMembers($filter, $fields) );
 
         if ($null -eq $member -or $member.Count -eq 0)

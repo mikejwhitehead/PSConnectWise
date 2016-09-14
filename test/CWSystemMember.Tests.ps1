@@ -61,19 +61,24 @@ Describe 'CWSystemMember' {
 			$members[0].id | Should Be $maxMemberId;		
 		}
 		
-		It 'wildcard search using Name parameter with SizeLimit parameter' {
+		It 'get member using username parameter via Filter and SizeLimit parameter' {
 			$sizeLimit = 5;
-			$members = Get-CWSystemMember -FirstName $pstrSharedValues.member.FirstName -LastName $pstrSharedValues.member.LastName -SizeLimit $sizeLimit;
+			$members = Get-CWSystemMember -Filter "identifier='$($pstrSharedValues.member.identifier;)'" -SizeLimit $sizeLimit;
 			$null -ne $members | Should Be $true;
 		}
 		
-		It 'get single member by Name parameter' {
+		It 'get single member by First and Last parameters' {
 			$memberFName = $pstrSharedValues.member.FirstName;
 			$memberLName = $pstrSharedValues.member.LastName;
 			$members = Get-CWSystemMember -FirstName $memberFName -LastName $memberLName;
 			$null -ne $members | Should Be $true;
 		}
-	
+		
+		It 'get single member by Username parameter' {
+			$username = $pstrSharedValues.member.identifier;
+			$members = Get-CWSystemMember -Username $username;
+			$null -ne $members | Should Be $true;
+		}
 	}
 
 } 

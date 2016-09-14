@@ -33,22 +33,22 @@ function Get-CWSystemMember
     [OutputType("PSObject", ParameterSetName="Normal")]
     [OutputType("PSObject[]", ParameterSetName="Name")]
     [OutputType("PSObject[]", ParameterSetName="Query")]
-    [OutputType("PSObject[]", ParameterSetName="Email")]
+    [OutputType("PSObject", ParameterSetName="Username")]
     [CmdletBinding(DefaultParameterSetName="Normal")]
     param
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [int[]]$ID,
+        [Parameter(ParameterSetName='Username', Position=0, Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Username,
         [Parameter(ParameterSetName='Name', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$FirstName,
         [Parameter(ParameterSetName='Name', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$LastName,
-        [Parameter(ParameterSetName='Email', Position=0, Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$Email,
         [Parameter(ParameterSetName='Query', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Filter,
@@ -173,16 +173,16 @@ function Get-CWSystemMember
                 
             } else {
                 
-                if (![String]::IsNullOrEmpty($Email))
+                if (![String]::IsNullOrEmpty($Username))
                 {
-                    Write-Debug "Retrieving ConnectWise Members by Member Email";
+                    Write-Debug "Retrieving ConnectWise Members by Member Username";
                     if ($null -eq $Properties -or $Properties.Length -eq 0)
                     {
-                        $MemberSvc.ReadMember($Email);
+                        $MemberSvc.ReadMember($Username);
                     }
                     else 
                     {
-                        $MemberSvc.ReadMember($Email, $Properties);
+                        $MemberSvc.ReadMember($Username, $Properties);
                     }
                 }
                 else
