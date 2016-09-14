@@ -1428,15 +1428,18 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
                 $timeEntryInfo.Add("AddToResolutionFlag", [CWServiceTicketNoteTypes]::Resolution -in $addTo);
                 
                 # add internal note if there was more than one time entries for this space
-                $internalMessage = "[Note: #$($i + 1) of $($entries.Count) Time Entries: $($start.ToString('yyyy-MM-dd HH:mm:ss')) to $($end.ToString('yyyy-MM-dd HH:mm:ss'))]";
+                $internalMessage = "$internalNote `r`n`r`n[Note: #$($i + 1) of $($entries.Count) Time Entries: $($start.ToString('yyyy-MM-dd HH:mm:ss')) to $($end.ToString('yyyy-MM-dd HH:mm:ss'))] ";
                 $timeEntryInfo.Add("internalNotes", [string]$internalMessage);                
             } 
             else
             {
+                $timeEntryInfo.Add("Notes", [string]$message);
+                $timeEntryInfo.Add("AddToDetailDescriptionFlag", [CWServiceTicketNoteTypes]::Description -in $addTo);
+                $timeEntryInfo.Add("AddToInternalAnalysisFlag", [CWServiceTicketNoteTypes]::Internal -in $addTo);
+                $timeEntryInfo.Add("AddToResolutionFlag", [CWServiceTicketNoteTypes]::Resolution -in $addTo);
+
                 # include internal notes this is one of multiple time entires
-                $internalMessage = "[Note: #$($i + 1) of $($entries.Count) Time Entries: $($start.ToString('yyyy-MM-dd HH:mm:ss')) to $($end.ToString('yyyy-MM-dd HH:mm:ss'))]";
-                $timeEntryInfo.Add("Notes", [string]$internalMessage);
-                $timeEntryInfo.Add("AddToDetailDescriptionFlag", $true);
+                $internalMessage = "$internalNote `r`n`r`n[Note: #$($i + 1) of $($entries.Count) Time Entries: $($start.ToString('yyyy-MM-dd HH:mm:ss')) to $($end.ToString('yyyy-MM-dd HH:mm:ss'))]";
                 $timeEntryInfo.Add("internalNotes", [string]$internalMessage);
                 
                 # disable email notification on the these times entries
