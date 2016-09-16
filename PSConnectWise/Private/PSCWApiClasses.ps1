@@ -419,9 +419,11 @@ class CWApiRestClient
                     $patchOperation.path += "/";
                 }
                 
-                if ($objDetail.Value.GetType().Name.ToString() -in @("PSCustomObject", "PSObject"))
+                if ($null -ne $objDetail.Value -and $objDetail.Value.GetType().Name.ToString() -in @("PSCustomObject", "PSObject"))
                 {
-                    $patchOperation.path += $objDetail.Name.ToLower();
+                    $name = $objDetail.Name.SubString(0,1).ToLower();
+                    $name += $objDetail.Name.Substring(1, $objDetail.Name.Length - 1);
+                    $patchOperation.path += $name;
                     $value = [CWApiRestClient]::BuildPatchOperations([psobject[]] $objDetail.Value, $patchOperation);
                     $postInfoCollection += $value;    
                 }
@@ -433,7 +435,9 @@ class CWApiRestClient
                         continue;
                     }
                     
-                    $patchOperation.path += $objDetail.Name.ToLower();
+                    $name = $objDetail.Name.SubString(0,1).ToLower();
+                    $name += $objDetail.Name.Substring(1, $objDetail.Name.Length - 1);
+                    $patchOperation.path += $name;
                     $patchOperation.value = $objDetail.Value.ToString();
                     $postInfoCollection += $patchOperation;
                 }
@@ -692,16 +696,15 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         return $this.ReadRequest($null, $queryParams);
     }
     
-    [pscustomobject] 
-    UpdateTicket ([uint32] $ticketId, [uint32] $boardId, [uint32] $contactId, [uint32] $statusId, [uint32] $priorityID)
+    [pscustomobject] UpdateTicket ([uint32] $ticketId, [uint32] $boardId, [uint32] $contactId, [uint32] $statusId, [uint32] $priorityID)
     {
         [pscustomobject] $UpdatedTicket= $null;
         
         $newTicketInfo = [PSCustomObject] @{
-            Board    = [PSCustomObject] @{ ID = [uint32]$boardId;    }
-            Contact  = [PSCustomObject] @{ ID = [uint32]$contactId;  }
-            Priority = [PSCustomObject] @{ ID = [uint32]$priorityId; }
-            Status   = [PSCustomObject] @{ ID = [uint32]$statusId;   }
+            Board    = [PSCustomObject] @{ Id = [uint32]$boardId;    }
+            Contact  = [PSCustomObject] @{ Id = [uint32]$contactId;  }
+            Priority = [PSCustomObject] @{ Id = [uint32]$priorityId; }
+            Status   = [PSCustomObject] @{ Id = [uint32]$statusId;   }
         }
 
         $relativePathUri = "/$ticketID";
@@ -713,14 +716,14 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
     [pscustomobject] CreateTicket ([uint32] $boardId, [uint32] $companyId, [uint32] $contactId, [string] $subject, [string] $body, [string] $analysis, [uint32] $statusId, [uint32] $priorityID)
     {
         $newTicketInfo = [PSCustomObject] @{
-            Board                   = [PSCustomObject] @{ ID = [uint32]$boardId;    }
-            Company                 = [PSCustomObject] @{ ID = [uint32]$companyId;  }
-            Contact                 = [PSCustomObject] @{ ID = [uint32]$contactId;  }
+            Board                   = [PSCustomObject] @{ Id = [uint32]$boardId;    }
+            Company                 = [PSCustomObject] @{ Id = [uint32]$companyId;  }
+            Contact                 = [PSCustomObject] @{ Id = [uint32]$contactId;  }
             Summary                 = [string]$subject
             InitialDescription      = [string]$body
             InitialInternalAnalysis = [string]$analysis
-            Priority                = [PSCustomObject] @{ ID = [uint32]$priorityId; }
-            Status                  = [PSCustomObject] @{ ID = [uint32]$statusId;   }
+            Priority                = [PSCustomObject] @{ Id = [uint32]$priorityId; }
+            Status                  = [PSCustomObject] @{ Id = [uint32]$statusId;   }
         }
         
         $newTicket = $this.CreateRequest($newTicketInfo); 
@@ -1452,6 +1455,32 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
         }
         
         return $postedEntries;
+    }
+
+    [pscustomobject] UpdateTimeEntry ([uint32] $timeEntryId, $start, $end, [string] $message, [string] $internalNote)
+    {  
+        if ($null -ne $start) 
+        {
+            $start = (Get-Date $start).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+        }
+
+        if ($null -ne $end) 
+        {
+            $end = (Get-Date $end).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ');
+        }
+
+        $data = [hashtable] @{
+            TimeStart     = @{ $true = $start; $false = $null }[ $null -ne $start ];
+            TimeEnd       = @{ $true = $end; $false = $null }[ $null -ne $end ];
+            Notes         = [string]$message;
+            InternalNotes = [string]$internalNote;
+        }
+
+        $timeEntryUpdateInfo = [PSCustomObject] $data;
+        $relativePathUri = "/$timeEntryId";
+        $UpdateTimeEntry = $this.UpdateRequest($relativePathUri, $timeEntryUpdateInfo)
+        
+        return $UpdateTimeEntry;
     }
 
     [bool] DeleteTimeEntry ([uint32] $timeEntryId)

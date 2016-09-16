@@ -51,7 +51,7 @@ Describe 'CWTimeEntry' {
 			$entries.Count -gt 0 | Should Be $true; 
 		} 
 		
-	} # end of Context "New-CWServiceTicket" 
+	} # end of Context "New-CWTimeEntry" 
  
 	Context 'Get-CWTimeEntry' {
 		
@@ -85,8 +85,33 @@ Describe 'CWTimeEntry' {
 		}
 		
 		
-	} # end of Context 'Get-CWServiceTicket'
+	} # end of Context 'Get-CWTimeEntry'
 	
+		Context "Update-CWTimeEntry"  {
+		
+		$pstrTicketID     = $pstrGenSvc.ticketIds[0];
+		$pstrTimeEntryID  = $pstrSharedValues.timeEntries[0].id;
+		$pstrTimeEntryIDs = @($pstrSharedValues.timeEntries | Select-Object -ExpandProperty id);
+	
+		It "change the internal note of a ticket" {
+			$ticketID = $pstrTicketID;
+			$msg = "test";
+			$ticket = Update-CWTimeEntry -ID $pstrTimeEntryID -InternalNote $msg;
+			$ticket.internalnotes.Trim() -eq $msg.Trim() | Should Be $true; 
+		}
+		
+		It "change the status of a ticket and set the board ID" {
+			$start = (Get-Date).AddMinutes(-1);
+			$end = (Get-Date)			
+			$ticket = Update-CWTimeEntry -ID $pstrTimeEntryID -Start $start -End $end;
+			$isStartValid = (Get-Date $ticket.timeStart).ToUniversalTime().ToString("yyyy-MM-ddThh:mm:ssZ") -eq (Get-Date $start).ToUniversalTime().ToString("yyyy-MM-ddThh:mm:ssZ") 
+			$isEndValid = (Get-Date $ticket.timeEnd).ToUniversalTime().ToString("yyyy-MM-ddThh:mm:ssZ") -eq (Get-Date $end).ToUniversalTime().ToString("yyyy-MM-ddThh:mm:ssZ") 
+			$isStartValid -and $isEndValid | Should Be $true; 
+		}
+		
+		
+	} # end of Context "Update-CWTimeEntry" 
+
 	Context "Remove-CWTimeEntry"  {
 
 		$pstrTicketID     = $pstrGenSvc.ticketIds[0];
@@ -101,4 +126,4 @@ Describe 'CWTimeEntry' {
 	}
 	
 		
-} # end of Describe 'CWServiceTicket'
+} # end of Describe 'CWTimeEntry'

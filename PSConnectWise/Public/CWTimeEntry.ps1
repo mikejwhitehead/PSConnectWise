@@ -284,6 +284,75 @@ function Add-CWTimeEntry
 
 <#
 .SYNOPSIS
+    Updates a ConnectWise TimeEntry. 
+.PARAMETER ID
+    ID of the ConnectWise TimeEntry to update
+.PARAMETER Start
+    Start time and date of the time entry
+.PARAMETER End
+    End time and date of the time entry
+.PARAMETER Message
+    New message to be added to Detailed Description, Internal Analysis, and/or Resolution section
+.PARAMETER InternalNote
+    Note to be added to the hidden Internal Note field 
+.EXAMPLE
+    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    Update-CWTimeEntry -ID 123 -Message "Changed the TimeEntry status using PowerShell" -Server $CWServer;
+#>
+function Update-CWTimeEntry
+{
+    [CmdLetBinding()]
+    [OutputType("PSObject", ParameterSetName="Normal")]
+    param
+    (
+        [Parameter(ParameterSetName='Normal', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$ID,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [datetime]$Start,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [datetime]$End,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Message,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$InternalNote,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]$Server = $script:CWServerInfo
+    )
+    
+    Begin
+    {
+        [CwApiTimeEntrySvc] $TimeEntrySvc = $null; 
+        
+        # get the TimeEntry service
+        if ($Server -ne $null)
+        {
+            $TimeEntrySvc = [CwApiTimeEntrySvc]::new($Server);
+        } 
+        else 
+        {
+            $TimeEntrySvc = [CwApiTimeEntrySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+        }
+        
+    }
+    Process
+    {
+        return $TimeEntrySvc.UpdateTimeEntry($ID, $Start, $End, $Message, $InternalNote);
+    }
+    End
+    {
+        # do nothing here
+    }
+    
+}
+
+<#
+.SYNOPSIS
     Removes ConnectWise time entry information. 
 .PARAMETER ID
     ConnectWise time entry ID
@@ -346,4 +415,5 @@ function Remove-CWTimeEntry
 
 Export-ModuleMember -Function 'Get-CWTimeEntry';
 Export-ModuleMember -Function 'Add-CWTimeEntry';
+Export-ModuleMember -Function 'Update-CWTimeEntry';
 Export-ModuleMember -Function 'Remove-CWTimeEntry';
