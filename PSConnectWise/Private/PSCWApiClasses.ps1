@@ -695,12 +695,18 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         
         return $this.ReadRequest($null, $queryParams);
     }
-    
+
     [pscustomobject] UpdateTicket ([uint32] $ticketId, [uint32] $boardId, [uint32] $contactId, [uint32] $statusId, [uint32] $priorityID)
+    {
+        return $this.UpdateTicket($ticketId, $boardId, $contactId, $statusId, $priorityID, $null);
+    }
+    
+    [pscustomobject] UpdateTicket ([uint32] $ticketId, [uint32] $boardId, [uint32] $contactId, [uint32] $statusId, [uint32] $priorityID, $summary)
     {
         [pscustomobject] $UpdatedTicket= $null;
         
         $newTicketInfo = [PSCustomObject] @{
+            Summary  = $summary;
             Board    = [PSCustomObject] @{ Id = [uint32]$boardId;    }
             Contact  = [PSCustomObject] @{ Id = [uint32]$contactId;  }
             Priority = [PSCustomObject] @{ Id = [uint32]$priorityId; }

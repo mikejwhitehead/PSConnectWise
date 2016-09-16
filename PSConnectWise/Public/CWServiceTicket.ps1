@@ -366,9 +366,9 @@ function Update-CWServiceTicket
         }
         
         #update the ticket
-        if ($BoardID -gt 0 -or $ContactID -gt 0 -or $StatusID -gt 0 -or $PriorityID -gt 0)
+        if ($BoardID -gt 0 -or $ContactID -gt 0 -or $StatusID -gt 0 -or $PriorityID -gt 0 -or ![String]::IsNullOrEmpty($Subject))
         {
-            return $TicketSvc.UpdateTicket($ID, $BoardID, $ContactID, $StatusID, $PriorityID);
+            return $TicketSvc.UpdateTicket($ID, $BoardID, $ContactID, $StatusID, $PriorityID, $Subject);
         }
         else
         {
