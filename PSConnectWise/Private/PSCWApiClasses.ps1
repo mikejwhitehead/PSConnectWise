@@ -704,6 +704,11 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
     [pscustomobject] UpdateTicket ([uint32] $ticketId, [uint32] $boardId, [uint32] $contactId, [uint32] $statusId, [uint32] $priorityID, $summary)
     {
         [pscustomobject] $UpdatedTicket= $null;
+
+        if ([String]::IsNullOrEmpty($summary))
+        {
+            $summary = $null
+        }
         
         $newTicketInfo = [PSCustomObject] @{
             Summary  = $summary;
