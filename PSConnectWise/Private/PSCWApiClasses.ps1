@@ -494,15 +494,15 @@ class CWApiRestClient
             {
                 if ($null -ne $_.ErrorDetails.Message)
                 { 
-                    Write-Warning $_.ErrorDetails.Message;
+                    Write-Error $_.ErrorDetails.Message;
                 }
                 elseif ($null -ne $_.Exception.Message)
                 {
-                    Write-Warning $_.Exception.Message;
+                    Write-Error $_.Exception.Message;
                 }
                 else 
                 {
-                    Write-Warning $_;
+                    Write-Error $_;
                 }
             } else {
                 
