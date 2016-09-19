@@ -1399,16 +1399,16 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
 
     [psobject[]] CreateTimeEntry ([hashtable] $timeEntryData)
     {
-        $ticketId     = $timeEntryData.TicketID;
-        $start        = $timeEntryData.Start;
-        $end          = $timeEntryData.End;
-        $message      = $timeEntryData.Message;
-        $addTo        = $timeEntryData.AddTo;
-        $internalNote = $timeEntryData.InternalNote;
-        $companyID    = $timeEntryData.CompanyID;
-        $memberId     = $timeEntryData.MemberID;
-        $chargeToType = $timeEntryData.ChargeToType;
-        $billOption   = $timeEntryData.BillOption;
+        $ticketId      = $timeEntryData.TicketID;
+        $start         = $timeEntryData.Start;
+        $end           = $timeEntryData.End;
+        $message       = $timeEntryData.Message;
+        $addTo         = $timeEntryData.AddTo;
+        $internalNotes = $timeEntryData.InternalNotes;
+        $companyID     = $timeEntryData.CompanyID;
+        $memberId      = $timeEntryData.MemberID;
+        $chargeToType  = $timeEntryData.ChargeToType;
+        $billOption    = $timeEntryData.BillOption;
         
 
         $TicketSvc = [CwApiServiceTicketSvc]::New($this.CWApiClient.CWConnectionInfo); 
@@ -1442,7 +1442,7 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
                 $timeEntryInfo.Add("AddToResolutionFlag", [CWServiceTicketNoteTypes]::Resolution -in $addTo);
                 
                 # add internal note if there was more than one time entries for this space
-                $internalMessage = "$internalNote `r`n`r`n[Note: #$($i + 1) of $($entries.Count) Time Entries: $($start.ToString('yyyy-MM-dd HH:mm:ss')) to $($end.ToString('yyyy-MM-dd HH:mm:ss'))] ";
+                $internalMessage = "$internalNotes `r`n`r`n[Note: #$($i + 1) of $($entries.Count) Time Entries: $($start.ToString('yyyy-MM-dd HH:mm:ss')) to $($end.ToString('yyyy-MM-dd HH:mm:ss'))] ";
                 $timeEntryInfo.Add("internalNotes", [string]$internalMessage);                
             } 
             else
@@ -1453,7 +1453,7 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
                 $timeEntryInfo.Add("AddToResolutionFlag", [CWServiceTicketNoteTypes]::Resolution -in $addTo);
 
                 # include internal notes this is one of multiple time entires
-                $internalMessage = "$internalNote `r`n`r`n[Note: #$($i + 1) of $($entries.Count) Time Entries: $($start.ToString('yyyy-MM-dd HH:mm:ss')) to $($end.ToString('yyyy-MM-dd HH:mm:ss'))]";
+                $internalMessage = "$internalNotes `r`n`r`n[Note: #$($i + 1) of $($entries.Count) Time Entries: $($start.ToString('yyyy-MM-dd HH:mm:ss')) to $($end.ToString('yyyy-MM-dd HH:mm:ss'))]";
                 $timeEntryInfo.Add("internalNotes", [string]$internalMessage);
                 
                 # disable email notification on the these times entries
