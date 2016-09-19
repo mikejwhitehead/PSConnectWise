@@ -260,16 +260,16 @@ function Add-CWTimeEntry
             }  
 
             [hashtable] $data = @{
-                TicketID     = $TicketID;
-                Start        = $Start;
-                End          = $End;
-                Message      = $Message;
-                AddTo        = $AddTo;
-                InternalNote = $InternalNote;
-                CompanyID    = $CompanyID;
-                MemberID     = $MemberID;
-                ChargeToType = $ChargeToType;
-                BillOption   = $BillOption;
+                TicketID      = $TicketID;
+                Start         = $Start;
+                End           = $End;
+                Message       = $Message;
+                AddTo         = $AddTo;
+                InternalNotes = $InternalNote;
+                CompanyID     = $CompanyID;
+                MemberID      = $MemberID;
+                ChargeToType  = $ChargeToType;
+                BillOption    = $BillOption;
             }
         }
 
