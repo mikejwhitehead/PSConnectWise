@@ -504,10 +504,10 @@ class CWApiRestClient
                 {
                     throw $_;
                 }
-            } else {
-                
+            } 
+            else 
+            {
                 throw $_;
-                
             }
         }
         
