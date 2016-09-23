@@ -502,7 +502,7 @@ class CWApiRestClient
                 }
                 else 
                 {
-                    Write-Error $_;
+                    throw $_;
                 }
             } else {
                 
