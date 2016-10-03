@@ -55,7 +55,7 @@ function Get-CWTimeEntry
         [uint32] $pageCount  = 1;
         
         # get the number of pages of time entries to request and total entry count
-        if ($null -ne $Ticket -and $TicketID -gt 0)
+        if ($null -ne $TicketID -and $TicketID -gt 0)
         {
             $entryCount = $TimeSvc.GetTimeEntryCount($TicketID);
             Write-Debug "Total Count of Ticket Time Entries for Ticket ($TicketID): $entryCount";
