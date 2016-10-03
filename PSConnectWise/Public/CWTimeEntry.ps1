@@ -81,7 +81,7 @@ function Get-CWTimeEntry
         for ($pageNum = 1; $pageNum -le $pageCount; $pageNum++)
         {
             
-            if ($ID -eq 0 -and $Detailed -ne $true)
+            if ($ID -eq 0 -and $Detailed -eq $true)
             {
                 
                 if ($null -ne $entryCount -and $entryCount -gt 0)
@@ -95,7 +95,7 @@ function Get-CWTimeEntry
                 $queriedTimeEntries = $TimeSvc.ReadTimeEntries($TicketID, $pageNum, $itemsPerPage);
                 [psobject[]] $Entries = $queriedTimeEntries;
             
-            } elseif ($ID -eq 0 -and $Detailed) {
+            } elseif ($ID -eq 0 -and $Detailed -ne $true) {
 
                 Write-Debug "Requesting Basic Note Entries for Ticket: $TicketID";
                 $queriedTimeEntries = $TimeSvc.ReadBasicTimeEntries($TicketID, $pageNum, $itemsPerPage);
