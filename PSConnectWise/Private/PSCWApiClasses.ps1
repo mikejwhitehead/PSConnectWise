@@ -1376,7 +1376,9 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
         }
 
         [hashtable] $queryHashtable = @{
-            conditions = "id in ($ids)"
+            conditions = "id in ($ids)";
+            page       = $pageNum;
+            pageSize   = $pageSize;
         }
 
         return $this.ReadRequest($null, $queryHashtable);
