@@ -83,6 +83,16 @@ Describe 'CWTimeEntry' {
 			$maxTimeEntryId = $entries | Select-Object -ExpandProperty id| Measure-Object -Maximum | Select-Object -ExpandProperty Maximum
 			$entries[0].id | Should Be $maxTimeEntryId;
 		}
+
+		It 'gets detailed entry by time entry id' {
+			$entry = Get-CWTimeEntry -TicketID $pstrTicketID -Detailed | Select -First 1;
+			$entry.chargeToType | Should Not Be $null;
+		}
+
+		It 'gets normal (basic) entry by time entry id' {
+			$entry = Get-CWTimeEntry -TicketID $pstrTicketID | Select -First 1;
+			$entry.chargeToType | Should Be $null;
+		}
 		
 		
 	} # end of Context 'Get-CWTimeEntry'
