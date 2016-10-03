@@ -1503,7 +1503,7 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
         if ($null -ne $memberId -and $memberId -gt 0)
         {
             $data.Add('member', [hashtable] @{  Id = $memberId; } );
-        }s
+        }
 
         $timeEntryUpdateInfo = [PSCustomObject] $data;
         $relativePathUri = "/$timeEntryId";
