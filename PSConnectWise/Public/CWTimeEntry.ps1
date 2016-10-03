@@ -5,6 +5,8 @@
     ConnectWise ticket ID
 .PARAMETER ID
     ConnectWise ticket note ID
+.PARAMETER Basic
+    Retrieves the very basic information
 .PARAMETER Descending
     Changes the sorting to descending order by IDs
 .PARAMETER Server
@@ -28,6 +30,11 @@ function Get-CWTimeEntry
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [uint32]$TicketID,
+        [Parameter(ParameterSetName='Normal')]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$SizeLimit = 0,
+        [Parameter(ParameterSetName='Normal')]
+        [switch]$Basic,
         [Parameter(ParameterSetName='Normal')]
         [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
@@ -71,10 +78,10 @@ function Get-CWTimeEntry
     }
     Process
     {
-        
         for ($pageNum = 1; $pageNum -le $pageCount; $pageNum++)
         {
-            if ($ID -eq 0)
+            
+            if ($ID -eq 0 -and $Basic -ne $true)
             {
                 
                 if ($null -ne $entryCount -and $entryCount -gt 0)
@@ -88,6 +95,12 @@ function Get-CWTimeEntry
                 $queriedTimeEntries = $TimeSvc.ReadTimeEntries($TicketID, $pageNum, $itemsPerPage);
                 [psobject[]] $Entries = $queriedTimeEntries;
             
+            } elseif ($ID -eq 0 -and $Basic) {
+
+                Write-Debug "Requesting Basic Note Entries for Ticket: $TicketID";
+                $queriedTimeEntries = $TimeSvc.ReadBasicTimeEntries($TicketID, $pageNum, $itemsPerPage);
+                [psobject[]] $Entries = $queriedTimeEntries;
+
             } else {
                 
                 Write-Verbose "Requesting ConnectWise Time Entry for Ticket Number: $($Entry.id)";

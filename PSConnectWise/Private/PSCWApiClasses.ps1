@@ -1384,6 +1384,19 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
         return $this.ReadRequest($null, $queryHashtable);
     }
     
+    [psobject[]] ReadBasicTimeEntries ([uint32] $ticketId, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        $TicketExtendedSvc = [CwApiServiceTicketExtendedSvc]::New($this.CWApiClient.CWConnectionInfo); 
+        [psobject[]] $ticketEntries = $TicketExtendedSvc.ReadTicketTimeEntries($ticketId, $pageNum, $pageSize);
+
+        if ($ticketEntries.Count -eq 0)
+        {
+            return $null; 
+        }
+        
+        return $ticketEntries;
+    }
+
     [psobject[]] CreateTimeEntry ([uint32] $ticketId, [DateTime] $start, [DateTime] $end,  [string] $message, [CWServiceTicketNoteTypes[]] $addTo, [uint32] $memberId, [string] $billOption)
     {
         $data = @{
