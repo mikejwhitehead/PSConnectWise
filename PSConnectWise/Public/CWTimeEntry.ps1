@@ -335,6 +335,9 @@ function Update-CWTimeEntry
         [string]$InternalNote,
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
+        [uint32]$Member,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
         [PSCustomObject]$Server = $script:CWServerInfo
     )
     
@@ -355,7 +358,7 @@ function Update-CWTimeEntry
     }
     Process
     {
-        return $TimeEntrySvc.UpdateTimeEntry($ID, $Start, $End, $Message, $InternalNote);
+        return $TimeEntrySvc.UpdateTimeEntry($ID, $Start, $End, $Message, $InternalNote, $Member);
     }
     End
     {

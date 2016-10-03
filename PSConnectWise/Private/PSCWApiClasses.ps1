@@ -1483,7 +1483,7 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
         return $postedEntries;
     }
 
-    [pscustomobject] UpdateTimeEntry ([uint32] $timeEntryId, $start, $end, [string] $message, [string] $internalNote)
+    [pscustomobject] UpdateTimeEntry ([uint32] $timeEntryId, $start, $end, [string] $message, [string] $internalNote, [uint32] $memberId)
     {  
         if ($null -ne $start) 
         {
@@ -1500,6 +1500,11 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
             TimeEnd       = @{ $true = $end; $false = $null }[ $null -ne $end ];
             Notes         = [string]$message;
             InternalNotes = [string]$internalNote;
+        }
+
+        if ($null -ne $memberId -and $memberId -gt 0)
+        {
+            $data.Add('member', [hashtable] @{  Id = $memberId; } );
         }
 
         $timeEntryUpdateInfo = [PSCustomObject] $data;
