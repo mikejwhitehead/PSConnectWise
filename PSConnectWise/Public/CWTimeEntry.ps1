@@ -5,8 +5,8 @@
     ConnectWise ticket ID
 .PARAMETER ID
     ConnectWise ticket note ID
-.PARAMETER Basic
-    Retrieves the very basic information
+.PARAMETER Detailed
+    Retrieves detailed time entry data
 .PARAMETER Descending
     Changes the sorting to descending order by IDs
 .PARAMETER Server
@@ -34,7 +34,7 @@ function Get-CWTimeEntry
         [ValidateNotNullOrEmpty()]
         [uint32]$SizeLimit = 0,
         [Parameter(ParameterSetName='Normal')]
-        [switch]$Basic,
+        [switch]$Detailed,
         [Parameter(ParameterSetName='Normal')]
         [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
@@ -81,7 +81,7 @@ function Get-CWTimeEntry
         for ($pageNum = 1; $pageNum -le $pageCount; $pageNum++)
         {
             
-            if ($ID -eq 0 -and $Basic -ne $true)
+            if ($ID -eq 0 -and $Detailed -ne $true)
             {
                 
                 if ($null -ne $entryCount -and $entryCount -gt 0)
@@ -91,11 +91,11 @@ function Get-CWTimeEntry
                     $itemsPerPage = [Math]::Min($itemsRemainCount, $MAX_ITEMS_PER_PAGE);
                 }  
                 
-                Write-Debug "Requesting Note Entries for Ticket: $TicketID";
+                Write-Debug "Requesting Full Note Entries for Ticket: $TicketID";
                 $queriedTimeEntries = $TimeSvc.ReadTimeEntries($TicketID, $pageNum, $itemsPerPage);
                 [psobject[]] $Entries = $queriedTimeEntries;
             
-            } elseif ($ID -eq 0 -and $Basic) {
+            } elseif ($ID -eq 0 -and $Detailed) {
 
                 Write-Debug "Requesting Basic Note Entries for Ticket: $TicketID";
                 $queriedTimeEntries = $TimeSvc.ReadBasicTimeEntries($TicketID, $pageNum, $itemsPerPage);
