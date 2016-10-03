@@ -1377,8 +1377,6 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
 
         [hashtable] $queryHashtable = @{
             conditions = "id in ($ids)";
-            page       = $pageNum;
-            pageSize   = $pageSize;
         }
 
         return $this.ReadRequest($null, $queryHashtable);
@@ -1505,7 +1503,7 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
         if ($null -ne $memberId -and $memberId -gt 0)
         {
             $data.Add('member', [hashtable] @{  Id = $memberId; } );
-        }
+        }s
 
         $timeEntryUpdateInfo = [PSCustomObject] $data;
         $relativePathUri = "/$timeEntryId";
