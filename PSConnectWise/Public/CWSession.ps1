@@ -58,4 +58,48 @@ function Set-CWSession
     }    
 }
 
+<#
+.SYNOPSIS
+    Returns whether not a connection to the CW server can be made with the session information.
+.PARAMETER Server
+    Variable to the object created via Set-CWSession
+.EXAMPLE
+    Test-CWSession;
+#>
+function Test-CWSession
+{
+    [CmdLetBinding()]
+    [OutputType("boolean", ParameterSetName="Normal")]
+    param
+    (
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [PSObject]$Session = $script:CWSession
+    )
+    
+    Begin
+    {
+        # get the service
+        $cwApiSvc = $null;
+        if ($Session -ne $null)
+        {
+            $cwApiSvc = [CWApiRestClientSvc]::new($Session);
+        } 
+        else 
+        {
+            Write-Error "No open ConnectWise session. See Set-CWSession for more information.";
+        }
+
+    }
+    Process
+    {
+        return $cwApiSvc.TestConnection();
+    }
+    End
+    {
+        # do nothing here
+    }    
+}
+
 Export-ModuleMember -Function 'Set-CWSession';
+Export-ModuleMember -Function 'Test-CWSession';

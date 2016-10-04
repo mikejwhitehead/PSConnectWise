@@ -521,6 +521,32 @@ class CWApiRestClientSvc
     {
         return $this.CWApiClient.Get($url);
     }
+
+    [pscustomobject[]] ServerInfo ()
+    {
+        $request = [CWApiRequestInfo]::New();
+        $request.RelativePathUri = "/system/info";
+        $request.Verb = "GET"; 
+
+        $info = $null;
+        
+        try 
+        {
+            $info = $this.CWApiClient.Get($request);
+        }
+        catch 
+        {
+            # lazy error handling / do nothing
+        }
+        
+        return $info;
+    }
+
+    [boolean] TestConnection ()
+    {
+        $info = $this.ServerInfo();
+        return $null -ne $info -and $null -ne $info.version;
+    }
     
     [psobject[]] ReadRequest ([string] $relativePathUri)
     {
