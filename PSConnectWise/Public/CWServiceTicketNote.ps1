@@ -10,10 +10,10 @@
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWCompanyContact -ID 1 -Server $CWServer;
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWServiceTicketNote -TicketID 123 -Server $CWServer;
 #>
 function Get-CWServiceTicketNote
@@ -36,7 +36,7 @@ function Get-CWServiceTicketNote
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [Parameter(ParameterSetName='Single', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server = $script:CWServerInfo
+        [PSCustomObject]$Session = $script:CWSession
     )
     
     Begin
@@ -45,7 +45,7 @@ function Get-CWServiceTicketNote
         [string]$OrderBy = [String]::Empty;
         
         # get the Note service
-        $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Server);
+        $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Session);
         
         [uint32] $noteCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
@@ -126,7 +126,7 @@ function Get-CWServiceTicketNote
 .PARAMETER AddToResolution
     Instructs the value of `-Message` to the Resolution
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Add-CWServiceTicketNote -ID 123 -Message "Added ticket note added to ticket via PowerShell." -Server $CWServer;
 #>
 function Add-CWServiceTicketNote 
@@ -151,17 +151,22 @@ function Add-CWServiceTicketNote
         [switch]$AddToResolution,
         [Parameter(ParameterSetName='Normal', Position=2)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server = $script:CWServerInfo
+        [PSCustomObject]$Session = $script:CWSession
     )
     
     Begin
     {
         [CwApiServiceTicketNoteSvc] $NoteSvc = $null;
         
-        # get the Note service
-        if ($Server -ne $null)
+        # get the service
+        $NoteSvc = $null;
+        if ($Session -ne $null)
         {
-            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Server);
+            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Session);
+        } 
+        else 
+        {
+            Write-Error "No open ConnectWise session. See Set-CWSession for more information.";
         }
         
         [CWServiceTicketNoteTypes[]] $addTo = @();

@@ -10,10 +10,10 @@
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWCompanyContact -ID 1 -Server $CWServer;
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWCompanyContact -CompanyID 1 -Server $CWServer;
 #>
 function Get-CWCompanyContact
@@ -44,7 +44,7 @@ function Get-CWCompanyContact
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [Parameter(ParameterSetName='Single', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$Server = $script:CWServerInfo
+        [PSObject]$Session = $script:CWSession
     )
     
     Begin
@@ -52,8 +52,16 @@ function Get-CWCompanyContact
         $MAX_ITEMS_PER_PAGE = 50;
         [string]$OrderBy = [String]::Empty;
 
-        # get the Company service
-        $ContactSvc = [CwApiCompanyContactSvc]::new($Server);
+        # get the service
+        $ContactSvc = $null;
+        if ($Session -ne $null)
+        {
+            $ContactSvc = [CwApiCompanyContactSvc]::new($Session);
+        } 
+        else 
+        {
+            Write-Error "No open ConnectWise session. See Set-CWSession for more information.";
+        }
         
         [uint32] $contactCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

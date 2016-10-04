@@ -18,13 +18,13 @@
 .NOTES
     ConnectWise API-Only Members do not have access to the CW System module. Therefore, this function will not work for API only members. 
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWSystemMember -ID 1 -Server $CWServer;
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWSystemMember -Email "John.Doe@example.com" -Server $CWServer;
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWSystemMember -Query "ID in (1, 2, 3, 4, 5)" -Server $CWServer;
 #>
 function Get-CWSystemMember
@@ -70,7 +70,7 @@ function Get-CWSystemMember
         [Parameter(ParameterSetName='Name', Mandatory=$false)]
         [Parameter(ParameterSetName='Email', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$Server = $script:CWServerInfo
+        [PSObject]$Session = $script:CWSession
     )
     
     Begin
@@ -78,9 +78,17 @@ function Get-CWSystemMember
         $MAX_ITEMS_PER_PAGE = 50;
         [string]$OrderBy = [String]::Empty;
         
-        # get the Member- service
-        $MemberSvc = [CwApiSystemMemberSvc]::new($Server);
-        
+        # get the service
+        $MemberSvc = $null;
+        if ($Session -ne $null)
+        {
+            $MemberSvc = [CwApiSystemMemberSvc]::new($Session);
+        } 
+        else 
+        {
+            Write-Error "No open ConnectWise session. See Set-CWSession for more information.";
+        }
+
         [uint32] $memberCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
         

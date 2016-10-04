@@ -18,13 +18,13 @@
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWCompany -ID 1 -Server $CWServer;
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWCompany -Identifier "LabTechSoftware" -Server $CWServer;
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWCompany -Query "ID in (1, 2, 3, 4, 5)" -Server $CWServer;
 #>
 function Get-CWCompany
@@ -70,7 +70,7 @@ function Get-CWCompany
         [Parameter(ParameterSetName='Name', Mandatory=$false)]
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$Server = $script:CWServerInfo
+        [PSObject]$Session = $script:CWSession
     )
     
     Begin
@@ -78,8 +78,16 @@ function Get-CWCompany
         $MAX_ITEMS_PER_PAGE = 50;
         [string]$OrderBy = [String]::Empty;
         
-        # get the Company service
-        $CompanySvc = [CwApiCompanySvc]::new($Server);
+        # get the service
+        $CompanySvc = $null;
+        if ($Session -ne $null)
+        {
+            $CompanySvc = [CwApiCompanySvc]::new($Session);
+        } 
+        else 
+        {
+            Write-Error "No open ConnectWise session. See Set-CWSession for more information.";
+        }
         
         [uint32] $companyCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

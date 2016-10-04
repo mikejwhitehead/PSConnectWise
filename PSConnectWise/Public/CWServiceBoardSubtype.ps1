@@ -8,7 +8,7 @@
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWServiceBoardType -BoardID 1 -Server $CWServer;
 #>
 function Get-CWServiceBoardSubtype
@@ -25,16 +25,24 @@ function Get-CWServiceBoardSubtype
         [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$Server = $script:CWServerInfo
+        [PSObject]$Session = $script:CWSession
     )
     
     Begin
     {
         $MAX_ITEMS_PER_PAGE = 50;
         [string]$OrderBy = [String]::Empty;
-        
-        # get the BoardSubtype service
-        $BoardTypeSvc = [CwApiServiceBoardSubtypeSvc]::new($Server);
+
+        # get the service
+        $BoardTypeSvc = $null;
+        if ($Session -ne $null)
+        {
+            $BoardTypeSvc = [CwApiServiceBoardSubtypeSvc]::new($Session);
+        } 
+        else 
+        {
+            Write-Error "No open ConnectWise session. See Set-CWSession for more information.";
+        }
         
         [uint32] $typeCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

@@ -14,10 +14,10 @@
 .PARAMETER Descending
     Changes the sorting to descending order by IDs
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWServiceTicket -ID 1 -Server $CWServer;
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer =  -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWServiceTicket -Query "ID in (123, 456, 789, 321, 654, 987)" -Server $CWServer;
 #>
 function Get-CWServiceTicket 
@@ -54,7 +54,7 @@ function Get-CWServiceTicket
         [Parameter(ParameterSetName='Summary', Mandatory=$false)]
         [Parameter(ParameterSetName='Query', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server = $script:CWServerInfo
+        [PSCustomObject]$Session = $script:CWSession
     )
     
     Begin
@@ -63,7 +63,7 @@ function Get-CWServiceTicket
         [string]$OrderBy = [String]::Empty;
         
         # get the Ticket service
-        $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
+        $TicketSvc = [CwApiServiceTicketSvc]::new($Session);
         
         [uint32] $ticketCount = 1; 
         [uint32] $pageCount   = 1;
@@ -176,7 +176,7 @@ function Get-CWServiceTicket
 .PARAMETER StatusID
     ID of the ConnectWise board status
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     New-CWServiceTicket -BoardID 1 -CompanyID 7 -ContactID 10 -Subject "My First Ticket" Description "This is my first ticket created via PowerShell." -Server $CWServer;
 #>
 function New-CWServiceTicket 
@@ -211,7 +211,7 @@ function New-CWServiceTicket
         [uint32]$StatusID,
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server = $script:CWServerInfo
+        [PSCustomObject]$Session = $script:CWSession
     )
     
     Begin
@@ -219,9 +219,9 @@ function New-CWServiceTicket
         [CwApiServiceTicketSvc] $TicketSvc = $null; 
         
         # get the Ticket service
-        if ($Server -ne $null)
+        if ($Session -ne $null)
         {
-            $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Session);
         } 
         else 
         {
@@ -263,7 +263,7 @@ function New-CWServiceTicket
 .PARAMETER StatusID
     New ConnectWise status id for the ticket 
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Update-CWServiceTicket -ID 123 -StatusID 11 -Message "Changed the ticket status and added ticket note added to ticket via PowerShell." -Server $CWServer;
 #>
 function Update-CWServiceTicket
@@ -312,7 +312,7 @@ function Update-CWServiceTicket
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [Parameter(ParameterSetName='WithMessage', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server = $script:CWServerInfo
+        [PSCustomObject]$Session = $script:CWSession
     )
     
     Begin
@@ -321,10 +321,10 @@ function Update-CWServiceTicket
         [CwApiServiceTicketNoteSvc] $NoteSvc = $null; 
         
         # get the Ticket service
-        if ($Server -ne $null)
+        if ($Session -ne $null)
         {
-            $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
-            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Server);
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Session);
+            $NoteSvc = [CwApiServiceTicketNoteSvc]::new($Session);
         } 
         else 
         {
@@ -390,7 +390,7 @@ function Update-CWServiceTicket
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Remove-CWServiceTicket -ID 1 -Server $CWServer;
 #>
 function Remove-CWServiceTicket 
@@ -404,21 +404,22 @@ function Remove-CWServiceTicket
         [int[]]$ID,
         [Parameter(ParameterSetName='Normal', Position=1, Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server = $script:CWServerInfo
+        [PSCustomObject]$Session = $script:CWSession
     )
     
     Begin
     {
         [CwApiServiceTicketSvc] $TicketSvc = $null; 
         
-        # get the Ticket service
-        if ($Server -ne $null)
+        # get the service
+        $TicketSvc = $null;
+        if ($Session -ne $null)
         {
-            $TicketSvc = [CwApiServiceTicketSvc]::new($Server);
+            $TicketSvc = [CwApiServiceTicketSvc]::new($Session);
         } 
         else 
         {
-            $TicketSvc = [CwApiServiceTicketSvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+            Write-Error "No open ConnectWise session. See Set-CWSession for more information.";
         }
         
     }

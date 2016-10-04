@@ -40,7 +40,7 @@ function Get-CWTimeEntry
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [Parameter(ParameterSetName='Single', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server = $script:CWServerInfo
+        [PSCustomObject]$Session = $script:CWSession
     )
     
     Begin
@@ -49,7 +49,7 @@ function Get-CWTimeEntry
         [string]$OrderBy = [String]::Empty;
         
         # get the TimeEntry service
-        $TimeSvc = [CwApiTimeEntrySvc]::new($Server);
+        $TimeSvc = [CwApiTimeEntrySvc]::new($Session);
         
         [uint32] $entryCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
@@ -149,7 +149,7 @@ function Get-CWTimeEntry
 .PARAMETER MemberID
     ConnectWise memeber ID of the CW user the time entry should be applied against
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Add-CWTimeEntry -ID 123 -Message "Added ticket note added to ticket via PowerShell." -Server $CWServer;
 #>
 function Add-CWTimeEntry 
@@ -203,7 +203,7 @@ function Add-CWTimeEntry
         [Parameter(ParameterSetName='Normal')]
         [Parameter(ParameterSetName='Hash')]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server = $script:CWServerInfo
+        [PSCustomObject]$Session = $script:CWSession
     )
     
     Begin
@@ -211,12 +211,10 @@ function Add-CWTimeEntry
         [CwApiTimeEntrySvc] $TimeSvc = $null;
         
         # get the Note service
-        if ($Server -ne $null)
+        if ($Session -ne $null)
         {
-            $TimeSvc = [CwApiTimeEntrySvc]::new($Server);
+            $TimeSvc = [CwApiTimeEntrySvc]::new($Session);
         } 
-        
-         
     }
     Process
     {
@@ -309,7 +307,7 @@ function Add-CWTimeEntry
 .PARAMETER InternalNote
     Note to be added to the hidden Internal Note field 
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Update-CWTimeEntry -ID 123 -Message "Changed the TimeEntry status using PowerShell" -Server $CWServer;
 #>
 function Update-CWTimeEntry
@@ -338,23 +336,21 @@ function Update-CWTimeEntry
         [uint32]$Member,
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server = $script:CWServerInfo
+        [PSCustomObject]$Session = $Script:CWSession
     )
     
     Begin
     {
-        [CwApiTimeEntrySvc] $TimeEntrySvc = $null; 
-        
-        # get the TimeEntry service
-        if ($Server -ne $null)
+        # get the service
+        $TimeEntrySvc = $null;
+        if ($Session -ne $null)
         {
-            $TimeEntrySvc = [CwApiTimeEntrySvc]::new($Server);
+            $TimeEntrySvc = [CwApiTimeEntrySvc]::new($Session);
         } 
         else 
         {
-            $TimeEntrySvc = [CwApiTimeEntrySvc]::new($Domain, $CompanyName, $PublicKey, $PrivateKey);
+            Write-Error "No open ConnectWise session. See Set-CWSession for more information.";
         }
-        
     }
     Process
     {
@@ -394,7 +390,7 @@ function Remove-CWTimeEntry
         [switch]$Force,        
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSCustomObject]$Server = $script:CWServerInfo
+        [PSCustomObject]$Session = $script:CWSession
     )
     
     Begin
@@ -402,10 +398,14 @@ function Remove-CWTimeEntry
         [CwApiTimeEntrySvc] $TimeEntrySvc = $null; 
         
         # get the Ticket service
-        if ($Server -ne $null)
+        if ($Session -ne $null)
         {
-            $TimeEntrySvc = [CwApiTimeEntrySvc]::new($Server);
-        } 
+            $TimeEntrySvc = [CwApiTimeEntrySvc]::new($Session);
+        }
+        else
+        {
+            Write-Error "No open ConnectWise session";
+        }
     }
     Process
     {

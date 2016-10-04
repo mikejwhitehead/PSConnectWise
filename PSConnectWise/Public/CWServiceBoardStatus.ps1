@@ -8,7 +8,7 @@
 .PARAMETER Server
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $Session = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
     Get-CWServiceBoardStatus -BoardID 1 -Server $CWServer;
 #>
 function Get-CWServiceBoardStatus
@@ -25,7 +25,7 @@ function Get-CWServiceBoardStatus
         [switch]$Descending,
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$Server = $script:CWServerInfo
+        [PSObject]$Session = $script:CWSession
     )
     
     Begin
@@ -33,8 +33,16 @@ function Get-CWServiceBoardStatus
         $MAX_ITEMS_PER_PAGE = 50;
         [string]$OrderBy = [String]::Empty;
         
-        # get the BoardStatus service
-        $BoardStatusSvc = [CwApiServiceBoardStatusSvc]::new($Server);
+        # get the service
+        $BoardStatusSvc = $null;
+        if ($Session -ne $null)
+        {
+            $BoardStatusSvc = [CwApiServiceBoardStatusSvc]::new($Session);
+        } 
+        else 
+        {
+            Write-Error "No open ConnectWise session. See Set-CWSession for more information.";
+        }
         
         [uint32] $statusCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;

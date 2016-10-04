@@ -9,7 +9,7 @@ Describe 'CWCompany' {
 	[hashtable] $pstrSharedValues = @{};
 	
 	# get the server connnection
-	Get-CWConnectionInfo -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+	Set-CWSession -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
 	
 	Context 'Get-CWCompany' {
         

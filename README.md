@@ -57,8 +57,8 @@ that will easly allow for future functions to be added.
 
 ##### Execute
 ```powershell
-$Server = Get-CWConnectionInfo -Domain 'TechInUrPocket.example.com' -CompanyName 'TechInUrPocket' -PublicKey '...' -PrivateKey '...';`
-Get-CWServiceTicket -ID 1234567 -Server $Server;
+$CWSession = Set-CWSession -Domain 'TechInUrPocket.example.com' -CompanyName 'TechInUrPocket' -PublicKey '...' -PrivateKey '...';`
+Get-CWServiceTicket -ID 1234567 -Session $CWSession;
 ```
 ##### Returns
 ```powershell

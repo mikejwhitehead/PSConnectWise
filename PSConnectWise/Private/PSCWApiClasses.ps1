@@ -146,7 +146,7 @@ class CWApiRequestInfo
     
 }
 
-class CWApiRestConnectionInfo 
+class CWApiRestSession 
 {
     [string] $Domain;
     [string] $CompanyName;
@@ -158,7 +158,7 @@ class CWApiRestConnectionInfo
     [string] $ApiVersion = "3.0";
     [bool] $OverrideSSL = $false;
     
-    CWApiRestConnectionInfo ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey)
+    CWApiRestSession ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey)
     {
         $this.Domain      = $domain;
         $this.CompanyName = $companyName;
@@ -174,7 +174,7 @@ class CWApiRestConnectionInfo
         $this._buildHttpHeader();
     }   
      
-    CWApiRestConnectionInfo ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey, [bool] $overrideSSL)
+    CWApiRestSession ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey, [bool] $overrideSSL)
     {
         $this.Domain      = $domain;
         $this.CompanyName = $companyName;
@@ -232,20 +232,13 @@ class CWApiRestClient
 {
     # public properties
     [string] $RelativeBaseEndpointUri = "";
-    [CWApiRestConnectionInfo] $CWConnectionInfo;
+    [CWApiRestSession] $CWConnectionInfo;
     
     #
     # Constructors
-    #
-    
-    CWApiRestClient ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey)
+    CWApiRestClient ([CWApiRestSession] $session)
     {
-        $this.CWConnectionInfo = [CWApiRestConnectionInfo]::New($domain, $companyName, $publicKey, $privateKey, $true)
-    }
-    
-    CWApiRestClient ([CWApiRestConnectionInfo] $connectionInfo)
-    {
-        $this.CWConnectionInfo = $connectionInfo
+        $this.CWConnectionInfo = $session
     }
     
     #
@@ -519,14 +512,9 @@ class CWApiRestClientSvc
 {
     hidden [CWApiRestClient] $CWApiClient; 
     
-    CWApiRestClientSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey)
+    CWApiRestClientSvc ([CWApiRestSession] $session)
     {
-        $this.CWApiClient = [CWApiRestClient]::New($domain, $companyName, $publicKey, $privateKey);
-    }
-    
-    CWApiRestClientSvc ([CWApiRestConnectionInfo] $connectionInfo)
-    {
-        $this.CWApiClient = [CWApiRestClient]::New($connectionInfo)
+        $this.CWApiClient = [CWApiRestClient]::New($session)
     }
     
     [pscustomobject[]] QuickRead ([string] $url)
@@ -630,12 +618,8 @@ class CWApiRestClientSvc
 
 class CwApiServiceTicketSvc : CWApiRestClientSvc
 {
-    CwApiServiceTicketSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
-    {
-        $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
-    }
     
-    CwApiServiceTicketSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    CwApiServiceTicketSvc ([CWApiRestSession] $session) : base($session)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
@@ -754,12 +738,8 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
 }
 
 class CwApiServiceTicketExtendedSvc : CwApiServiceTicketSvc
-{
-    CwApiServiceTicketExtendedSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
-    {
-    }
-    
-    CwApiServiceTicketExtendedSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+{    
+    CwApiServiceTicketExtendedSvc ([CWApiRestSession] $session) : base($session)
     {
     }
 
@@ -793,12 +773,7 @@ class CwApiServiceTicketExtendedSvc : CwApiServiceTicketSvc
 
 class CwApiServiceBoardSvc : CWApiRestClientSvc
 {
-    CwApiServiceBoardSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
-    {
-        $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";;
-    }
-    
-    CwApiServiceBoardSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    CwApiServiceBoardSvc ([CWApiRestSession] $session) : base($session)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
     }
@@ -845,12 +820,7 @@ class CwApiServiceBoardSvc : CWApiRestClientSvc
 
 class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
 {
-    CwApiServiceBoardStatusSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
-    {
-        $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
-    }
-    
-    CwApiServiceBoardStatusSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    CwApiServiceBoardStatusSvc ([CWApiRestSession] $session) : base($session)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
     }
@@ -907,13 +877,8 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
 }
 
 class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
-{
-    CwApiServiceBoardTypeSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
-    {
-        $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
-    }
-    
-    CwApiServiceBoardTypeSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+{    
+    CwApiServiceBoardTypeSvc ([CWApiRestSession] $session) : base($session)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
     }
@@ -971,12 +936,7 @@ class CwApiServiceBoardTypeSvc : CWApiRestClientSvc
 
 class CwApiServiceBoardSubtypeSvc : CWApiRestClientSvc
 {
-    CwApiServiceBoardSubtypeSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
-    {
-        $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
-    }
-    
-    CwApiServiceBoardSubtypeSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    CwApiServiceBoardSubtypeSvc ([CWApiRestSession] $session) : base($session)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
     }
@@ -1034,13 +994,7 @@ class CwApiServiceBoardSubtypeSvc : CWApiRestClientSvc
 
 class CwApiServicePrioritySvc : CWApiRestClientSvc
 {
-
-    CwApiServicePrioritySvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
-    {
-        $this.CWApiClient.RelativeBaseEndpointUri = "/service/priorities";
-    }
-    
-    CwApiServicePrioritySvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    CwApiServicePrioritySvc ([CWApiRestSession] $session) : base($session)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/priorities";
     }
@@ -1087,12 +1041,7 @@ class CwApiServicePrioritySvc : CWApiRestClientSvc
 
 class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
 {
-    CwApiServiceTicketNoteSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
-    {
-        $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
-    }
-    
-    CwApiServiceTicketNoteSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    CwApiServiceTicketNoteSvc ([CWApiRestSession] $session) : base($session)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/tickets";
     }
@@ -1148,13 +1097,7 @@ class CwApiServiceTicketNoteSvc : CWApiRestClientSvc
 
 class CwApiCompanySvc : CWApiRestClientSvc
 {
-
-    CwApiCompanySvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
-    {
-        $this.CWApiClient.RelativeBaseEndpointUri = "/company/companies";
-    }
-    
-    CwApiCompanySvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    CwApiCompanySvc ([CWApiRestSession] $session) : base($session)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/company/companies";
     }
@@ -1226,13 +1169,7 @@ class CwApiCompanySvc : CWApiRestClientSvc
 
 class CwApiCompanyContactSvc : CWApiRestClientSvc
 {
-    
-    CwApiCompanyContactSvc ([string] $domain, [string] $companyName, [string] $publicKey, [string] $privateKey) : base($domain, $companyName, $publicKey, $privateKey)
-    {
-        $this.CWApiClient.RelativeBaseEndpointUri = "/company/contacts";
-    }
-    
-    CwApiCompanyContactSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    CwApiCompanyContactSvc ([CWApiRestSession] $session) : base($session)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/company/contacts";
     }
@@ -1337,8 +1274,7 @@ class CwApiCompanyContactSvc : CWApiRestClientSvc
 
 class CwApiTimeEntrySvc : CWApiRestClientSvc
 {
-    
-    CwApiTimeEntrySvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    CwApiTimeEntrySvc ([CWApiRestSession] $session) : base($session)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/time/entries";
     }
@@ -1533,7 +1469,7 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
 
 class CwApiSystemMemberSvc : CWApiRestClientSvc
 {
-    CwApiSystemMemberSvc ([CWApiRestConnectionInfo] $connectionInfo) : base($connectionInfo)
+    CwApiSystemMemberSvc ([CWApiRestSession] $session) : base($session)
     {
         $this.CWApiClient.RelativeBaseEndpointUri = "/system/members";
     }

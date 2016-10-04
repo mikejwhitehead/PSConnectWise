@@ -10,12 +10,12 @@
 .PARAMETER PrivateKey
     ConnectWise API private key
 .EXAMPLE
-    $CWServer = Get-CWConnectionInfo -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
+    $CWSession = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
 #>
-function Get-CWConnectionInfo
+function Set-CWSession
 {
     [CmdLetBinding()]
-    [OutputType("CWApiRestConnectionInfo", ParameterSetName="Normal")]
+    [OutputType("CWApiRestSession", ParameterSetName="Normal")]
     param
     (
         [Parameter(ParameterSetName='Normal', Position=0, Mandatory=$true)]
@@ -36,21 +36,21 @@ function Get-CWConnectionInfo
     
     Begin
     {
-        [CWApiRestConnectionInfo] $connectionInfo = $null;
+        [CWApiRestSession] $cwSession = $null;
         
         if ($Override)
         {
-            $connectionInfo = [CWApiRestConnectionInfo]::New($Domain, $CompanyName, $PublicKey, $PrivateKey);
+            $cwSession = [CWApiRestSession]::New($Domain, $CompanyName, $PublicKey, $PrivateKey);
         }
         else 
         {
-            $connectionInfo = [CWApiRestConnectionInfo]::New($Domain, $CompanyName, $PublicKey, $PrivateKey, $true);
+            $cwSession = [CWApiRestSession]::New($Domain, $CompanyName, $PublicKey, $PrivateKey, $true);
         }
     }
     Process
     {
-        [PSObject]$script:CWServerInfo = $connectionInfo
-        $connectionInfo
+        [PSObject]$Script:CWSession = $cwSession
+        $cwSession;
     }
     End
     {
@@ -58,4 +58,4 @@ function Get-CWConnectionInfo
     }    
 }
 
-Export-ModuleMember -Function 'Get-CWConnectionInfo';
+Export-ModuleMember -Function 'Set-CWSession';

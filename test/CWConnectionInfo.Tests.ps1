@@ -7,11 +7,11 @@ Describe 'CWConnectionInfo' {
 
 	. $($WorkspaceRoot + '\test\LoadTestSettings.ps1');
 	
-	Context 'Get-CWConnectionInfo' {
+	Context 'Set-CWSession' {
 	
 		It 'gets server connection information and checks it for the domain' {
-			$server = Get-CWConnectionInfo -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
-			$server.Domain | Should Be $pstrSvrDomain
+			$session = Set-CWSession -Domain $pstrSvrDomain -CompanyName $pstrSvrCompany -PublicKey $pstrSvrPublic -PrivateKey $pstrSvrPrivate;
+			$session.Domain | Should Be $pstrSvrDomain
 		}
 		
 	}
