@@ -45,7 +45,7 @@ function Get-CWTimeEntry
     
     Begin
     {
-        $MAX_ITEMS_PER_PAGE = 50;
+        $MAX_ITEMS_PER_PAGE = 25;
         [string]$OrderBy = [String]::Empty;
         
         # get the TimeEntry service
