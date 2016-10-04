@@ -83,22 +83,14 @@ function Get-CWTimeEntry
             
             if ($ID -eq 0 -and $Detailed -eq $true)
             {
-                
-                if ($null -ne $entryCount -and $entryCount -gt 0)
-                {
-                    # find how many Companies to retrieve
-                    $itemsRemainCount = $entryCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
-                    $itemsPerPage = [Math]::Min($itemsRemainCount, $MAX_ITEMS_PER_PAGE);
-                }  
-                
                 Write-Debug "Requesting Full Note Entries for Ticket: $TicketID";
-                $queriedTimeEntries = $TimeSvc.ReadTimeEntries($TicketID, $pageNum, $itemsPerPage);
+                $queriedTimeEntries = $TimeSvc.ReadTimeEntries($TicketID, $pageNum, $MAX_ITEMS_PER_PAGE);
                 [psobject[]] $Entries = $queriedTimeEntries;
             
             } elseif ($ID -eq 0 -and $Detailed -ne $true) {
 
                 Write-Debug "Requesting Basic Note Entries for Ticket: $TicketID";
-                $queriedTimeEntries = $TimeSvc.ReadBasicTimeEntries($TicketID, $pageNum, $itemsPerPage);
+                $queriedTimeEntries = $TimeSvc.ReadBasicTimeEntries($TicketID, $pageNum, $MAX_ITEMS_PER_PAGE);
                 [psobject[]] $Entries = $queriedTimeEntries;
 
             } else {
@@ -107,12 +99,12 @@ function Get-CWTimeEntry
                 $Entries = $TimeSvc.ReadTimeEntry($ID);
           
             } 
-            
-            foreach ($Entry in $Entries)
-            {
-                $Entry;
-            } 
                 
+        }
+
+        foreach ($Entry in $Entries)
+        {
+            $Entry;
         }
     }
     End
