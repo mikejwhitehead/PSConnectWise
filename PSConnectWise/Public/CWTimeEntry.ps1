@@ -99,13 +99,15 @@ function Get-CWTimeEntry
                 $Entries = $TimeSvc.ReadTimeEntry($ID);
           
             } 
+
+            foreach ($Entry in $Entries)
+            {
+                $Entry;
+            }
                 
         }
 
-        foreach ($Entry in $Entries)
-        {
-            $Entry;
-        }
+        
     }
     End
     {
