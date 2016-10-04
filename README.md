@@ -33,6 +33,8 @@ that will easly allow for future functions to be added.
 
 ###### System Module
 0. `Get-CWSystemMember`
+0. `Set-CWSession`
+0. `Test-CWSession`
         
 ## Requirements
 
@@ -58,7 +60,7 @@ that will easly allow for future functions to be added.
 ##### Execute
 ```powershell
 $CWSession = Set-CWSession -Domain 'TechInUrPocket.example.com' -CompanyName 'TechInUrPocket' -PublicKey '...' -PrivateKey '...';`
-Get-CWServiceTicket -ID 1234567 -Session $CWSession;
+Get-CWServiceTicket -ID 1234567 -Session $CWSession;  # Session parameter and value not required
 ```
 ##### Returns
 ```powershell
