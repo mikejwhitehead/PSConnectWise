@@ -77,6 +77,9 @@ status                     : @{id=1; name=New; _info=}
 See the [Contributing Documentation](./CONTRIBUTING.md)
 
 ## Extra Information
+- This module (v1.0) is still under development. 
+  - This means breaking changes can be introduced by future updates.
+  - Once the v1.0 module has be [published](https://github.com/sgtoj/PSConnectWise/milestone/1) to the [PowerShell Gallery](https://www.powershellgallery.com/), versions and breaking changes will follow [semantic versioning](http://semver.org/) convention. 
 - [Test Directory](./test/) Stores the Unit Test Scripts for [Pester](https://github.com/pester/Pester).
   - See [Readme](https://github.com/sgtoj/ConnectWisePSModule/tree/master/pester)
 - [Documented Architecture](https://github.com/sgtoj/ConnectWisePSModule/blob/master/doc/ClassArchitectures.md) of the Dependent PS Classes
