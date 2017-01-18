@@ -38,7 +38,7 @@ function Set-CWSession
     {
         [CWApiRestSession] $cwSession = $null;
         
-        if ($Override)
+        if (!$OverrideSSL)
         {
             $cwSession = [CWApiRestSession]::New($Domain, $CompanyName, $PublicKey, $PrivateKey);
         }
