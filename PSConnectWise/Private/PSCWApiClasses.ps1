@@ -1404,7 +1404,7 @@ class CwApiTimeEntrySvc : CWApiRestClientSvc
                 TimeEnd                = (Get-Date $entry.End).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ');
                 Company                = [pscustomobject] @{ id = $ticket.company.id };
                 Member                 = @{ $true = [pscustomobject] @{ id = $memberId }; $false = $null }[ ![String]::IsNullOrEmpty($memberId) ];
-                BillableOption         = @{ $true = [string]$billOption; $false = 'DoNotBill' }[ [String]::IsNullOrEmpty($billOption) ];
+                BillableOption         = @{ $true = [string]$billOption; $false = 'DoNotBill' }[ ![String]::IsNullOrEmpty($billOption) ];
             }
 
             if ($i -eq $entries.Count - 1)
