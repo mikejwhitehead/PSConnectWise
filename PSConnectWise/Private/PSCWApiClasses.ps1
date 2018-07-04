@@ -734,7 +734,7 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
         return $UpdatedTicket;
     }
 
-    [pscustomobject] CreateTicket ([uint32] $boardId, [uint32] $companyId, [uint32] $contactId, [string] $subject, [string] $body, [string] $analysis, [uint32] $statusId, [uint32] $priorityID)
+    [pscustomobject] CreateTicket ([uint32] $boardId, [uint32] $companyId, [uint32] $contactId, [string] $subject, [string] $body, [string] $analysis, [uint32] $statusId, [string]$severity, [string]$impact, [uint32] $sourceId, [uint32] $priorityID, [uint32]$typeId, [uint32]$subTypeId, [uint32]$itemId)
     {
         $newTicketInfo = [PSCustomObject] @{
             Board                   = [PSCustomObject] @{ Id = [uint32]$boardId;    }
@@ -744,7 +744,13 @@ class CwApiServiceTicketSvc : CWApiRestClientSvc
             InitialDescription      = [string]$body
             InitialInternalAnalysis = [string]$analysis
             Priority                = [PSCustomObject] @{ Id = [uint32]$priorityId; }
+            Severity                = [string]$severity
+            Impact                  = [string]$impact
             Status                  = [PSCustomObject] @{ Id = [uint32]$statusId;   }
+            Source                  = [PSCustomObject] @{ Id = [uint32]$sourceId;   }
+            Type                    = [PSCustomObject] @{ Id = [uint32]$typeId;   }
+            SubType                 = [PSCustomObject] @{ Id = [uint32]$subTypeId;   }
+            Item                    = [PSCustomObject] @{ Id = [uint32]$itemId;   }
         }
 
         $newTicket = $this.CreateRequest($newTicketInfo);
@@ -1061,6 +1067,53 @@ class CwApiServicePrioritySvc : CWApiRestClientSvc
     [uint32] GetPriorityCount([string] $priorityConditions)
     {
         return $this.GetCount($priorityConditions);
+    }
+
+}
+
+class CwApiServiceSourceSvc : CWApiRestClientSvc
+{
+    CwApiServiceSourceSvc ([CWApiRestSession] $session) : base($session)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/sources";
+    }
+
+    [psobject] ReadSource([uint32] $sourceId)
+    {
+        $relativePathUri = "/$sourceId";
+        return $this.ReadRequest($relativePathUri, $null);
+    }
+
+    [psobject[]] ReadSources ([string] $sourceConditions)
+    {
+        return $this.ReadSources($sourceConditions, 1);
+    }
+
+    [psobject[]] ReadSources ([string] $sourceConditions, [uint32] $pageNum)
+    {
+        return $this.ReadSources($sourceConditions, $pageNum, 0);
+    }
+
+    [psobject[]] ReadSources ([string] $sourceConditions, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        return $this.ReadSources($sourceConditions, $null, $pageNum, $pageSize);
+    }
+
+    [psobject[]] ReadSources ([string] $sourceConditions, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        [hashtable] $queryHashtable = @{
+            conditions = $sourceConditions;
+            page       = $pageNum;
+            pageSize   = $pageSize;
+            orderBy    = $orderBy;
+        }
+
+        return $this.ReadRequest($null, $queryHashtable);
+    }
+
+    [uint32] GetSourceCount([string] $sourceConditions)
+    {
+        return $this.GetCount($sourceConditions);
     }
 
 }
@@ -1576,6 +1629,76 @@ class CwApiSystemMemberSvc : CWApiRestClientSvc
     [uint32] GetMemberCount([string] $memberConditions)
     {
         return $this.GetCount($memberConditions);
+    }
+
+}
+
+class CwApiSystemLocationSvc : CWApiRestClientSvc
+{
+    CwApiSystemLocationSvc ([CWApiRestSession] $session) : base($session)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/system/locations";
+    }
+
+    [psobject] ReadLocation ([uint32] $locationId)
+    {
+        $relativePathUri = "/$locationId";
+        return $this.ReadRequest($relativePathUri, $null);
+    }
+
+    [psobject] ReadLocation ([uint32] $locationId, [string[]] $fields)
+    {
+        [hashtable] $queryHashtable = @{}
+
+        if ($null -ne $fields)
+        {
+            $queryHashtable["fields"] = ([string] [String]::Join(",", $fields)).TrimEnd(",");
+        }
+
+        $relativePathUri = "/$locationId";
+        return $this.ReadRequest($relativePathUri, $queryHashtable);
+    }
+
+    [psobject[]] ReadLocations ([string] $locationConditions)
+    {
+        return $this.ReadLocations($locationConditions, $null);
+    }
+
+    [psobject[]] ReadLocations ([string] $locationConditions, [string[]] $fields)
+    {
+        return $this.ReadLocations($locationConditions, $fields, 1);
+    }
+
+    [psobject[]] ReadLocations ([string] $locationConditions, [string[]] $fields, [uint32] $pageNum)
+    {
+        return $this.ReadLocations($locationConditions, $fields, $pageNum, 0);
+    }
+
+    [psobject[]] ReadLocations ([string] $locationConditions, [string[]] $fields, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        return $this.ReadLocations($locationConditions, $fields, $null, $pageNum, $pageSize);
+    }
+
+    [psobject[]] ReadLocations ([string] $locationConditions, [string[]] $fields, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        [hashtable] $queryHashtable = @{
+            conditions = $locationConditions;
+            page       = $pageNum;
+            pageSize   = $pageSize;
+            orderBy    = $orderBy;
+        }
+
+        if ($null -ne $fields -and $fields.Count -gt 0)
+        {
+            $queryHashtable.fields = ([string] [String]::Join(",", $fields)).TrimEnd(",");
+        }
+
+        return $this.ReadRequest($null, $queryHashtable);
+    }
+
+    [uint32] GetLocationCount([string] $locationConditions)
+    {
+        return $this.GetCount($locationConditions);
     }
 
 }
