@@ -211,6 +211,24 @@ function New-CWServiceTicket
         [uint32]$StatusID,
         [Parameter(ParameterSetName='Normal', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
+        [uint32]$SourceID,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$TypeID,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$SubTypeID,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$ItemID,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Severity,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Impact,
+        [Parameter(ParameterSetName='Normal', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
         [PSCustomObject]$Session = $script:CWSession
     )
     
@@ -230,7 +248,7 @@ function New-CWServiceTicket
     }
     Process
     {
-        $newTicket = $TicketSvc.CreateTicket($BoardID, $CompanyID, $ContactID, $Subject, $Description, $Internal, $StatusID, $PriorityID);
+        $newTicket = $TicketSvc.CreateTicket($BoardID, $CompanyID, $ContactID, $Subject, $Description, $Internal, $StatusID, $Severity, $Impact, $SourceID, $PriorityID, $TypeID, $SubTypeID, $ItemID);
         return $newTicket;
     }
     End
