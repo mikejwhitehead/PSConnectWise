@@ -109,3 +109,4 @@ function Get-CWServiceBoardSubtype
     }
 }
 
+Export-ModuleMember -Function 'Get-CWServiceBoardSubtype';
