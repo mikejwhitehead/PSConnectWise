@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Gets ConnectWise board's type and subtype information. 
+    Gets ConnectWise board's item and subitem information. 
 .PARAMETER BoardID
     ConnectWise board ID
 .PARAMETER Descending
@@ -9,9 +9,9 @@
     Variable to the object created via Get-CWConnectWiseInfo
 .EXAMPLE
     $CWServer = Set-CWSession -Domain "cw.example.com" -CompanyName "ExampleInc" -PublicKey "VbN85MnY" -PrivateKey "ZfT05RgN";
-    Get-CWServiceBoardType -BoardID 1 -Server $CWServer;
+    Get-CWServiceBoardItem -BoardID 1 -Server $CWServer;
 #>
-function Get-CWServiceBoardSubtype
+function Get-CWServiceBoardItem
 {
     [CmdLetBinding()]
     [OutputType("PSObject[]", ParameterSetName="Normal")]
@@ -30,36 +30,36 @@ function Get-CWServiceBoardSubtype
     
     Begin
     {
-        $MAX_ITEMS_PER_PAGE = 200;
+        $MAX_ITEMS_PER_PAGE = 50;
         [string]$OrderBy = [String]::Empty;
-
+        
         # get the service
-        $BoardTypeSvc = $null;
+        $BoardItemSvc = $null;
         if ($Session -ne $null)
         {
-            $BoardTypeSvc = [CwApiServiceBoardSubtypeSvc]::new($Session);
+            $BoardItemSvc = [CwApiServiceBoardItemSvc]::new($Session);
         } 
         else 
         {
             Write-Error "No open ConnectWise session. See Set-CWSession for more information.";
         }
         
-        [uint32] $typeCount = $MAX_ITEMS_PER_PAGE;
+        [uint32] $itemCount = $MAX_ITEMS_PER_PAGE;
         [uint32] $pageCount  = 1;
         
         # get the number of pages of board status to request and total ticket count
         if ($BoardID -gt 0)
         {
-            $typeCount = $BoardTypeSvc.GetSubTypeCount([uint32]$BoardID);
+            $itemCount = $BoardItemSvc.GetItemCount([uint32]$BoardID);
             
             if ($null -ne $SizeLimit -and $SizeLimit -gt 0)
             {
                 Write-Verbose "Total Board Count Excess SizeLimit; Setting Board Count to the SizeLimit: $SizeLimit"
-                $typeCount = [Math]::Min($typeCount, $SizeLimit);
+                $itemCount = [Math]::Min($itemCount, $SizeLimit);
             }
-            $pageCount = [Math]::Ceiling([double]($typeCount / $MAX_ITEMS_PER_PAGE));
+            $pageCount = [Math]::Ceiling([double]($itemCount / $MAX_ITEMS_PER_PAGE));
             
-            Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Types Per Pages): $pageCount";
+            Write-Debug "Total Number of Pages ($MAX_ITEMS_PER_PAGE Items Per Pages): $pageCount";
         }
         
         #specify the ordering
@@ -75,29 +75,29 @@ function Get-CWServiceBoardSubtype
             if ($BoardID -gt 0)
             {
                 
-                if ($null -ne $typeCount -and $typeCount -gt 0)
+                if ($null -ne $itemCount -and $itemCount -gt 0)
                 {
                     # find how many Companies to retrieve
-                    $itemsRemainCount = $typeCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
+                    $itemsRemainCount = $itemCount - (($pageNum - 1) * $MAX_ITEMS_PER_PAGE);
                     $itemsPerPage = [Math]::Min($itemsRemainCount, $MAX_ITEMS_PER_PAGE);
                 }                
                 
-                Write-Debug "Requesting Type IDs for BoardID: $BoardID";
-                $queriedTypes = $BoardTypeSvc.ReadSubTypes($boardId, [string[]] @("*"), $OrderBy, $pageNum, $itemsPerPage);
-                [pscustomobject[]] $Types = $queriedTypes;
+                Write-Debug "Requesting Item IDs for BoardID: $BoardID";
+                $queriedItems = $BoardItemSvc.ReadItems($boardId, [string[]] @("*"), $OrderBy, $pageNum, $itemsPerPage);
+                [pscustomobject[]] $Items = $queriedItems;
                 
-                foreach ($Type in $Types)
+                foreach ($Item in $Items)
                 {
-                    $Type
+                    $Item
                 }
                 
-            } elseIf ($null -ne $TypeID) {
+            } elseIf ($null -ne $ItemID) {
                 
-                Write-Debug "Retrieving Connec tWise Board Type by Ticket ID"
-                foreach ($type in $TypeID)
+                Write-Debug "Retrieving Connec tWise Board Item by Ticket ID"
+                foreach ($item in $ItemID)
                 {
-                    Write-Verbose "Requesting ConnectWise Board Type Number: $type";
-                    $BoardTypeSvc.ReadSubType($boardId, $type);
+                    Write-Verbose "Requesting ConnectWise Board Item Number: $item";
+                    $BoardItemSvc.ReadItem($boardId, $item);
                 }
                 
             }
@@ -109,3 +109,4 @@ function Get-CWServiceBoardSubtype
     }
 }
 
+Export-ModuleMember -Function 'Get-CWServiceBoardItem';

@@ -850,6 +850,7 @@ class CwApiServiceBoardSvc : CWApiRestClientSvc
 
 }
 
+
 class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
 {
     CwApiServiceBoardStatusSvc ([CWApiRestSession] $session) : base($session)
@@ -905,6 +906,64 @@ class CwApiServiceBoardStatusSvc : CWApiRestClientSvc
     {
         $relativePathUri = "/$boardId/statuses/count";
         return $this.GetCount($statusConditions, $relativePathUri);
+    }
+}
+
+class CwApiServiceBoardItemSvc : CWApiRestClientSvc
+{
+    CwApiServiceBoardItemSvc ([CWApiRestSession] $session) : base($session)
+    {
+        $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
+    }
+
+    [psobject] ReadItem([uint32] $boardId, $itemId)
+    {
+        $relativePathUri = "/$boardId/items/$itemId";
+        return $this.ReadRequest($relativePathUri);
+    }
+
+    [psobject[]] ReadItems ([uint32] $boardId)
+    {
+        return $this.ReadItems([uint32] $boardId, "*");
+    }
+
+    [psobject[]] ReadItems ([uint32] $boardId, [string] $fields)
+    {
+        return $this.ReadItems($boardId, $fields, 1);
+    }
+
+    [psobject[]] ReadItems ([uint32] $boardId, [string] $fields, [uint32] $pageNum)
+    {
+        return $this.ReadItems($boardId, $fields, $pageNum, 0);
+    }
+
+    [psobject[]] ReadItems ([uint32] $boardId, [string] $fields, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        return $this.ReadItems($boardId, $fields, $null, $pageNum, $pageSize);
+    }
+
+    [psobject[]] ReadItems ([uint32] $boardId, [string] $fields, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
+    {
+        [hashtable] $queryHashtable = @{
+            fields     = $fields;
+            page       = $pageNum;
+            pageSize   = $pageSize;
+            orderBy    = $orderBy;
+        }
+
+        $relativePathUri = "/$boardId/items";
+        return $this.ReadRequest($relativePathUri, $queryHashtable);
+    }
+
+    [uint32] GetItemCount ([uint32] $boardId)
+    {
+        return $this.GetItemCount($boardId, $null);
+    }
+
+    [uint32] GetItemCount ([uint32] $boardId, [string] $itemConditions)
+    {
+        $relativePathUri = "/$boardId/items/count";
+        return $this.GetCount($itemConditions, $relativePathUri);
     }
 }
 
@@ -973,33 +1032,33 @@ class CwApiServiceBoardSubtypeSvc : CWApiRestClientSvc
         $this.CWApiClient.RelativeBaseEndpointUri = "/service/boards";
     }
 
-    [psobject] ReadType([int] $boardId, $typeId)
+    [psobject] ReadSubType([int] $boardId, $typeId)
     {
         $relativePathUri = "/$boardId/subtypes/$typeId";
         return $this.ReadRequest($relativePathUri);
     }
 
-    [psobject[]] ReadTypes ([uint32] $boardId)
+    [psobject[]] ReadSubTypes ([uint32] $boardId)
     {
-        return $this.ReadTypes([uint32] $boardId, "*");
+        return $this.ReadSubTypes([uint32] $boardId, "*");
     }
 
-    [psobject[]] ReadTypes ([uint32] $boardId, [string] $fields)
+    [psobject[]] ReadSubTypes ([uint32] $boardId, [string] $fields)
     {
-        return $this.ReadTypes($boardId, $fields, 1);
+        return $this.ReadSubTypes($boardId, $fields, 1);
     }
 
-    [psobject[]] ReadTypes ([uint32] $boardId, [string] $fields, [uint32] $pageNum)
+    [psobject[]] ReadSubTypes ([uint32] $boardId, [string] $fields, [uint32] $pageNum)
     {
-        return $this.ReadTypes($boardId, $fields, $pageNum, 0);
+        return $this.ReadSubTypes($boardId, $fields, $pageNum, 0);
     }
 
-    [psobject[]] ReadTypes ([uint32] $boardId, [string] $fields, [uint32] $pageNum, [uint32] $pageSize)
+    [psobject[]] ReadSubTypes ([uint32] $boardId, [string] $fields, [uint32] $pageNum, [uint32] $pageSize)
     {
-        return $this.ReadTypes($boardId, $fields, $null, $pageNum, $pageSize);
+        return $this.ReadSubTypes($boardId, $fields, $null, $pageNum, $pageSize);
     }
 
-    [psobject[]] ReadTypes ([uint32] $boardId, [string] $fields, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
+    [psobject[]] ReadSubTypes ([uint32] $boardId, [string] $fields, [string] $orderBy, [uint32] $pageNum, [uint32] $pageSize)
     {
         [hashtable] $queryHashtable = @{
             fields     = $fields;
@@ -1012,12 +1071,12 @@ class CwApiServiceBoardSubtypeSvc : CWApiRestClientSvc
         return $this.ReadRequest($relativePathUri, $queryHashtable);
     }
 
-    [uint32] GetTypeCount ([uint32] $boardId)
+    [uint32] GetSubTypeCount ([uint32] $boardId)
     {
-        return $this.GetTypeCount($boardId, $null);
+        return $this.GetSubTypeCount($boardId, $null);
     }
 
-    [uint32] GetTypeCount ([uint32] $boardId, [string] $typeConditions)
+    [uint32] GetSubTypeCount ([uint32] $boardId, [string] $typeConditions)
     {
         $relativePathUri = "/$boardId/subtypes/count";
         return $this.GetCount($typeConditions, $relativePathUri);
