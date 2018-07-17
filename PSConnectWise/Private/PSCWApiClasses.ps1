@@ -1408,6 +1408,27 @@ class CwApiCompanyContactSvc : CWApiRestClientSvc
         return $this.GetCount($companyConditions);
     }
 
+    [pscustomobject] CreateContact ([string] $firstName, [string] $lastName, [uint32] $companyId, [uint32] $siteId, [bool] $inactiveFlag, [string] $title, [string] $emailAddress, [string] $phoneNumber)
+    {
+        $communicationItems = @()
+        $communicationItemEmail = New-Object psobject -Property @{ Type = [PSCustomObject] @{Id = [uint32]1}; Value = [string]$emailAddress; DefaultFlag = $true}
+        $communicationItems += $communicationItemEmail
+        $communicationItemPhone = New-Object psobject -Property @{ Type = [PSCustomObject] @{Id = [uint32]2}; Value = [string]$phoneNumber; DefaultFlag = $true}
+        $communicationItems += $communicationItemPhone
+
+        $newContactInfo = [PSCustomObject] @{
+                    FirstName               = [string]$firstName
+                    LastName                = [string]$lastName
+                    Company                 = [PSCustomObject] @{ Id = [uint32]$companyId;  }
+                    Site                    = [PSCustomObject] @{ Id = [uint32]$siteId;  }
+                    InactiveFlag            = [bool]$inactiveFlag
+                    Title                   = [string]$title
+                    CommunicationItems      = [array]$communicationItems
+                }
+
+        $newContact = $this.CreateRequest($newContactInfo);
+        return $newContact;
+    }
 }
 
 class CwApiTimeEntrySvc : CWApiRestClientSvc

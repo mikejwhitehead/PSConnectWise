@@ -170,4 +170,70 @@ function Get-CWCompanyContact
     }
 }
 
+function New-CWCompanyContact
+{
+    [CmdLetBinding()]
+    [OutputType("PSObject", ParameterSetName="Single")]
+    [CmdletBinding(DefaultParameterSetName="Single")]
+    param
+    (
+        [Parameter(ParameterSetName='Single', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$FirstName,
+        [Parameter(ParameterSetName='Single', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$LastName,
+        [Parameter(ParameterSetName='Single', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [bool]$InactiveFlag,
+        [Parameter(ParameterSetName='Single', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Title,
+        [Parameter(ParameterSetName='Single', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$EmailAddress,
+        [Parameter(ParameterSetName='Single', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$PhoneNumber,
+        [Parameter(ParameterSetName='Single', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$CompanyId,
+        [Parameter(ParameterSetName='Single', Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [uint32]$SiteId,
+        [Parameter(ParameterSetName='Single', Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [PSObject]$Session = $script:CWSession
+    )
+    
+    Begin
+    {
+
+        # get the service
+        $ContactSvc = $null;
+        if ($Session -ne $null)
+        {
+            $ContactSvc = [CwApiCompanyContactSvc]::new($Session);
+        } 
+        else 
+        {
+            Write-Error "No open ConnectWise session. See Set-CWSession for more information.";
+        }
+                
+        
+        
+    }
+    Process
+    {
+        $newContact = $ContactSvc.CreateContact($FirstName,$LastName,$CompanyId,$SiteId,$InactiveFlag,$Title,$EmailAddress,$PhoneNumber)
+        $newContact         
+    }
+    End
+    {
+        # do nothing here
+    }
+}
+
+
 Export-ModuleMember -Function 'Get-CWCompanyContact';
+Export-ModuleMember -Function 'New-CWCompanyContact';
