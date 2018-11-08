@@ -1413,8 +1413,11 @@ class CwApiCompanyContactSvc : CWApiRestClientSvc
         $communicationItems = @()
         $communicationItemEmail = New-Object psobject -Property @{ Type = [PSCustomObject] @{Id = [uint32]1}; Value = [string]$emailAddress; DefaultFlag = $true}
         $communicationItems += $communicationItemEmail
-        $communicationItemPhone = New-Object psobject -Property @{ Type = [PSCustomObject] @{Id = [uint32]2}; Value = [string]$phoneNumber; DefaultFlag = $true}
-        $communicationItems += $communicationItemPhone
+
+        if ($phoneNumber -ne "") {
+            $communicationItemPhone = New-Object psobject -Property @{ Type = [PSCustomObject] @{Id = [uint32]2}; Value = [string]$phoneNumber; DefaultFlag = $true}
+            $communicationItems += $communicationItemPhone
+        }
 
         $newContactInfo = [PSCustomObject] @{
                     FirstName               = [string]$firstName

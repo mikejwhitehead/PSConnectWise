@@ -49,7 +49,7 @@ function Get-CWCompanyContact
     
     Begin
     {
-        $MAX_ITEMS_PER_PAGE = 50;
+        $MAX_ITEMS_PER_PAGE = 1000;
         [string]$OrderBy = [String]::Empty;
 
         # get the service
@@ -192,7 +192,7 @@ function New-CWCompanyContact
         [Parameter(ParameterSetName='Single', Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$EmailAddress,
-        [Parameter(ParameterSetName='Single', Mandatory=$true)]
+        [Parameter(ParameterSetName='Single', Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string]$PhoneNumber,
         [Parameter(ParameterSetName='Single', Mandatory=$true)]
@@ -225,7 +225,12 @@ function New-CWCompanyContact
     }
     Process
     {
-        $newContact = $ContactSvc.CreateContact($FirstName,$LastName,$CompanyId,$SiteId,$InactiveFlag,$Title,$EmailAddress,$PhoneNumber)
+        if ($PhoneNumber){
+            $newContact = $ContactSvc.CreateContact($FirstName,$LastName,$CompanyId,$SiteId,$InactiveFlag,$Title,$EmailAddress,$PhoneNumber)
+        }
+        else{
+            $newContact = $ContactSvc.CreateContact($FirstName,$LastName,$CompanyId,$SiteId,$InactiveFlag,$Title,$EmailAddress,"")
+        }
         $newContact         
     }
     End
