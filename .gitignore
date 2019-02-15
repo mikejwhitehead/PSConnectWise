@@ -24,3 +24,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Additional Files
+new-contact.ps1
